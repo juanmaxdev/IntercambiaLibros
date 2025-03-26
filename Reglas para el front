@@ -1,37 +1,3 @@
-//Con Next hay que añadir:
+// Imagenes en Supabase
 
-
-
-//Esto para el GET
-import { supabase } from '@/lib/supabase';
-
-export async function getLibros() {
-  let { data, error } = await supabase.from('libros').select('*');
-  if (error) console.error(error);
-  return data;
-}
-
-
-//Para el Post
-export async function addLibro(libro) {
-    const { error } = await supabase.from('libros').insert([libro]);
-    if (error) console.error(error);
-  }
-
-  
-//Para el Put
-export async function updateLibro(isbn, nuevoEstado) {
-    const { error } = await supabase
-      .from('libros')
-      .update({ estado_libro: nuevoEstado })
-      .eq('isbn', isbn);
-    if (error) console.error(error);
-  }
-
-  
-//Para el Delete
-export async function deleteLibro(isbn) {
-    const { error } = await supabase.from('libros').delete().eq('isbn', isbn);
-    if (error) console.error(error);
-  }
-  
+//ID en libros y quitar ISBN
