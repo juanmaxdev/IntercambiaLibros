@@ -309,7 +309,7 @@ export default function CarouselSimple() {
           data-bs-slide="prev"
           style={{ top: '20%' }}
         >
-          <Image src="/assets/icons/Back.gif" alt="atras" width={65} height={65} />
+          <Image src="/assets/icons/Back.gif" alt="atras" width={65} height={65} unoptimized/>
 
           <span className="visually-hidden">Previous</span>
         </button>
@@ -320,7 +320,7 @@ export default function CarouselSimple() {
           data-bs-slide="next"
           style={{ top: '20%' }}
         >
-          <Image src="/assets/icons/Forward1.gif" alt="atras" width={50} height={50} />
+          <Image src="/assets/icons/Forward1.gif" alt="atras" width={50} height={50} unoptimized />
           <span className="visually-hidden">Next</span>
         </button>
       </div>
@@ -637,7 +637,7 @@ export function CarouselNuevosLibros() {
           data-bs-slide="prev"
           style={{ top: '20%' }}
         >
-          <Image src="/assets/icons/Back.gif" alt="atras" width={65} height={65}/>
+          <Image src="/assets/icons/Back.gif" alt="atras" width={65} height={65} unoptimized/>
 
           <span className="visually-hidden">Previous</span>
         </button>
@@ -648,7 +648,7 @@ export function CarouselNuevosLibros() {
           data-bs-slide="next"
           style={{ top: '20%' }}
         >
-          <Image src="/assets/icons/Forward1.gif" alt="atras" width={50} height={50} />
+          <Image src="/assets/icons/Forward1.gif" alt="atras" width={50} height={50} unoptimized/>
           <span className="visually-hidden">Next</span>
         </button>
       </div>

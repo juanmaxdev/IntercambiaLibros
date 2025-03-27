@@ -6,7 +6,7 @@ export default function Nav() {
   return (
     <>
       <header>
-        <nav className="navbar fixed-top pb-3 shadow-sm">
+        <nav className="navbar fixed-top pb-2 shadow-sm">
           <div className="container-fluid">
             <div className="d-flex w-100 justify-content-between align-items-center">
               {/* Menú izquierdo */}
@@ -37,8 +37,8 @@ export default function Nav() {
                   </ul>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link active" aria-current="page" href="/">
-                    IntercambiaLibros
+                  <Link className="nav-link active p-0 " aria-current="page" href="/">
+                    <Image src="/assets/img/logo2.png" alt="logo" width={150} height={28} />
                   </Link>
                 </li>
               </ul>
