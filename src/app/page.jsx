@@ -1,3 +1,5 @@
+'use client';
+
 import CarouselDoble from '../components/carousel/carouselDouble';
 import CarouselSimple, { CarouselNuevosLibros } from '../components/carousel/carouselSimple';
 import Opiniones from '../components/opiniones/opiniones';

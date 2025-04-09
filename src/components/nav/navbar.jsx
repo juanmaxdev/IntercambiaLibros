@@ -121,11 +121,12 @@ export function LoginModal() {
                           className="form-control"
                           id="floatingInput"
                           placeholder="name@example.com"
+                          required
                         />
                         <label htmlFor="floatingInput">Usuario</label>
                       </div>
                       <div className="form-floating mb-3">
-                        <input type="password" className="form-control" id="floatingPassword" placeholder="Password" />
+                        <input type="password" className="form-control" id="floatingPassword" placeholder="Password" required/>
                         <label htmlFor="floatingPassword">Contraseña</label>
                       </div>
                       <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-3">
@@ -183,15 +184,16 @@ export function RegistroModal() {
                           className="form-control"
                           id="usernameInput"
                           placeholder="Nombre de usuario"
+                          required
                         />
                         <label htmlFor="usernameInput">Nombre de usuario</label>
                       </div>
                       <div className="form-floating mb-3">
-                        <input type="email" className="form-control" id="emailInput" placeholder="Email" />
+                        <input type="email" className="form-control" id="emailInput" placeholder="Email" required />
                         <label htmlFor="emailInput">Email</label>
                       </div>
                       <div className="form-floating mb-3">
-                        <input type="password" className="form-control" id="passwordInput" placeholder="Contraseña" />
+                        <input type="password" className="form-control" id="passwordInput" placeholder="Contraseña" required/>
                         <label htmlFor="passwordInput">Contraseña</label>
                       </div>
                       <div className="form-floating mb-3">
@@ -200,6 +202,7 @@ export function RegistroModal() {
                           className="form-control"
                           id="repeatPasswordInput"
                           placeholder="Repetir Contraseña"
+                          required
                         />
                         <label htmlFor="repeatPasswordInput">Repetir Contraseña</label>
                       </div>

@@ -42,14 +42,14 @@ export default function Reportes() {
     }
 
     if (!formValues.email.trim()) {
-      newErrors.email = msg;
-    } else if (!/\S+@\S+\.\S+/.test(formValues.email)) {
-      newErrors.email = 'El email no es válido.';
+      newErrors.email = 'Este campo es obligatorio.';
+    } else if (!formValues.email.includes('@')) {
+      newErrors.email = 'El email debe contener @';
     }
 
-    if(!formValues.motivo.trim()){
+    if (!formValues.motivo.trim()) {
       newErrors.motivo = msg;
-    }else if(formValues.motivo.trim().length < 3){
+    } else if (formValues.motivo.trim().length < 3) {
       newErrors.motivo = 'El título debe contener al menos 3 caracteres.';
     }
 
@@ -59,8 +59,6 @@ export default function Reportes() {
       newErrors.mensaje =
         'El mensaje debe contener al menos 20 caracteres para explicar detalladamente el motivo. Por favor, proporciona una explicación completa.';
     }
-
-    if (!formValues.mensaje.trim()) newErrors.mensaje = msg;
 
     if (!formValues.acepto) {
       newErrors.acepto = 'Debes aceptar los términos y condiciones.';
@@ -152,7 +150,7 @@ export default function Reportes() {
 
               {/* Formulario */}
               <h4 className="mt-5">Contacto</h4>
-              <form className="row g-3 mb-5 mt-2" onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} noValidate className="row g-3 mb-5 mt-2" aria-label="Formulario de reportes">
                 <div className="form-floating col-md-6">
                   <input
                     type="text"
@@ -184,11 +182,14 @@ export default function Reportes() {
                     id="floatingEmail"
                     placeholder="Email"
                     name="email"
+                    value={formValues.email}
                     onChange={handleChange}
+                    data-testid="email-input"
                   />
                   <label htmlFor="floatingEmail">Email</label>
-                  {errors.email && <small className="text-danger">{errors.email}</small>}
+                  {errors.email && <small data-testid="email-error-message" className="text-danger">{errors.email}</small>}
                 </div>
+
                 <div className="form-floating col-12">
                   <input
                     type="text"
@@ -223,7 +224,8 @@ export default function Reportes() {
                       onChange={handleChange}
                     />
                     <label className="form-check-label" htmlFor="gridCheck">
-                      Acepto los términos y condiciones {/* PONER UN Link con el import hacia los terminos y condiciones cuando esten READY */}
+                      Acepto los términos y condiciones{' '}
+                      {/* PONER UN Link con el import hacia los terminos y condiciones cuando esten READY */}
                     </label>
                   </div>
                   {errors.acepto && <small className="text-danger">{errors.acepto}</small>}
