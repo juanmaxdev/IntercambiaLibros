@@ -1,8 +1,67 @@
 'use client';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function Nav() {
+  useEffect(() => {
+    // REGISTRO
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) {
+      registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const username = document.getElementById('usernameInput').value;
+        const email = document.getElementById('emailInput').value;
+        const password = document.getElementById('passwordInput').value;
+        const repeatPassword = document.getElementById('repeatPasswordInput').value;
+
+        if (password !== repeatPassword) {
+          alert('Las contraseñas no coinciden');
+          return;
+        }
+
+        const res = await fetch('/api/perfil/registro', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nombre_usuario: username,
+            correo_electronico: email,
+            contrasena: password,
+          }),
+        });
+
+        const result = await res.json();
+        alert(result.message);
+        if (res.ok) registerForm.reset();
+      });
+    }
+
+    // LOGIN
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('floatingInput').value;
+        const password = document.getElementById('floatingPassword').value;
+
+        const res = await fetch('/api/perfil/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            correo_electronico: email,
+            contrasena: password,
+          }),
+        });
+
+        const result = await res.json();
+        alert(result.message);
+        if (res.ok) loginForm.reset();
+      });
+    }
+  }, []);
+
   return (
     <>
       <header>
@@ -17,29 +76,19 @@ export default function Nav() {
                   </a>
                   <ul className="dropdown-menu" style={{ position: 'absolute' }}>
                     <li>
-                      <Link className="dropdown-item" href="/action">
-                        Generos
-                      </Link>
+                      <Link className="dropdown-item" href="/action">Géneros</Link>
                     </li>
                     <li>
-                      <Link className="dropdown-item" href="/views/footer/donaciones">
-                        Donaciones
-                      </Link>
+                      <Link className="dropdown-item" href="/views/footer/donaciones">Donaciones</Link>
                     </li>
+                    <li><hr className="dropdown-divider" /></li>
                     <li>
-                      <hr className="dropdown-divider" />
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" href="/something-else">
-                        Cerrar Sesión
-                      </Link>
+                      <Link className="dropdown-item" href="#">Cerrar Sesión</Link>
                     </li>
                   </ul>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link active" aria-current="page" href="/">
-                    IntercambiaLibros
-                  </Link>
+                  <Link className="nav-link active" href="/">IntercambiaLibros</Link>
                 </li>
               </ul>
 
@@ -47,7 +96,7 @@ export default function Nav() {
               <div className="d-flex justify-content-center w-100 mx-3">
                 <form className="d-flex" role="search" style={{ maxWidth: 600, width: '100%' }}>
                   <div className="input-group">
-                    <input type="search" className="form-control" placeholder="Buscar" aria-label="Buscar" />
+                    <input type="search" className="form-control" placeholder="Buscar" />
                     <button className="btn btn-outline-secondary" type="submit">
                       <Image src="/assets/icons/search.svg" alt="iconoBusqueda" width={20} height={20} />
                     </button>
@@ -58,24 +107,24 @@ export default function Nav() {
               {/* Menú derecho */}
               <ul className="navbar-nav d-flex flex-row align-items-center">
                 <li className="nav-item me-3">
-                  <Link className="nav-link d-flex align-items-center gap-2 text-nowrap" href="/views/subirLibro">
+                  <Link className="nav-link d-flex align-items-center gap-2" href="/views/subirLibro">
                     <Image src="/assets/icons/cloud-upload.svg" alt="iconoSubirLibro" width={18} height={18} />
                     <span className="d-none d-md-inline">Subir Libro</span>
                   </Link>
                 </li>
                 <li className="nav-item me-3">
-                  <Link
-                    className="nav-link d-flex align-items-center gap-2 text-nowrap"
+                  <a
+                    className="nav-link d-flex align-items-center gap-2"
                     data-bs-toggle="modal"
                     data-bs-target="#modalIniciarSesion"
                     href="#"
                   >
                     <Image src="/assets/icons/person-fill.svg" alt="iconoCuenta" width={18} height={18} />
                     <span className="d-none d-md-inline">Iniciar sesión</span>
-                  </Link>
+                  </a>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link d-flex align-items-center gap-2 text-nowrap" href="/views/perfil">
+                  <Link className="nav-link d-flex align-items-center gap-2" href="/views/perfil">
                     <Image src="/assets/icons/bell.svg" alt="iconoNotificacion" width={18} height={18} />
                     <span className="d-none d-md-inline">Notificación</span>
                   </Link>
@@ -84,72 +133,52 @@ export default function Nav() {
             </div>
           </div>
         </nav>
-        {/* Modales renderizados siempre */}
+
+        {/* Modales */}
         <LoginModal />
         <RegistroModal />
       </header>
     </>
   );
 }
-export function LoginModal() {
+
+function LoginModal() {
   return (
-    <div
-      className="modal fade"
-      id="modalIniciarSesion"
-      tabIndex={-1}
-      aria-labelledby="modalIniciarSesion"
-      aria-hidden="true"
-    >
+    <div className="modal fade" id="modalIniciarSesion" tabIndex={-1} aria-hidden="true">
       <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div className="modal-content">
           <div className="modal-header bg-light">
-            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+            <button type="button" className="btn-close" data-bs-dismiss="modal" />
           </div>
           <div className="modal-body p-0">
-            <section className="gradient-form rounded-bottom bg-light">
+            <section className="gradient-form bg-light rounded-bottom">
               <div className="container py-4">
-                <div className="row justify-content-center align-items-center">
-                  <div className="col-12">
-                    <div className="text-center mb-4">
-                      <Image src="/assets/img/lotus.png" width={185} height={185} alt="logo" />
-                      <h4 className="mt-3">IntercambiaLibros</h4>
-                    </div>
-                    <form>
-                      <div className="form-floating mb-3">
-                        <input
-                          type="email"
-                          className="form-control"
-                          id="floatingInput"
-                          placeholder="name@example.com"
-                        />
-                        <label htmlFor="floatingInput">Usuario</label>
-                      </div>
-                      <div className="form-floating mb-3">
-                        <input type="password" className="form-control" id="floatingPassword" placeholder="Password" />
-                        <label htmlFor="floatingPassword">Contraseña</label>
-                      </div>
-                      <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-3">
-                        <button className="btn btn-outline-primary w-100 w-sm-75 mb-2 mb-sm-0" type="submit">
-                          Iniciar Sesión
-                        </button>
-                        <a className="text-muted ms-sm-3" href="#!">
-                          ¿Olvidaste la contraseña?
-                        </a>
-                      </div>
-                      <div className="text-center">
-                        <p className="mb-2">¿No tienes una cuenta?</p>
-                        <button
-                          type="button"
-                          className="btn btn-outline-danger border-0"
-                          data-bs-target="#modalRegistro"
-                          data-bs-toggle="modal"
-                        >
-                          Regístrate
-                        </button>
-                      </div>
-                    </form>
-                  </div>
+                <div className="text-center mb-4">
+                  <Image src="/assets/img/lotus.png" width={185} height={185} alt="logo" />
+                  <h4 className="mt-3">IntercambiaLibros</h4>
                 </div>
+                <form id="login-form">
+                  <div className="form-floating mb-3">
+                    <input type="email" className="form-control" id="floatingInput" placeholder="Usuario" />
+                    <label htmlFor="floatingInput">Usuario</label>
+                  </div>
+                  <div className="form-floating mb-3">
+                    <input type="password" className="form-control" id="floatingPassword" placeholder="Contraseña" />
+                    <label htmlFor="floatingPassword">Contraseña</label>
+                  </div>
+                  <div className="text-center">
+                    <button className="btn btn-outline-primary w-100 mb-3" type="submit">Iniciar Sesión</button>
+                    <p className="mb-2">¿No tienes una cuenta?</p>
+                    <button
+                      type="button"
+                      className="btn btn-outline-danger"
+                      data-bs-target="#modalRegistro"
+                      data-bs-toggle="modal"
+                    >
+                      Regístrate
+                    </button>
+                  </div>
+                </form>
               </div>
             </section>
           </div>
@@ -159,79 +188,46 @@ export function LoginModal() {
   );
 }
 
-export function RegistroModal() {
+function RegistroModal() {
   return (
-    <div className="modal fade" id="modalRegistro" tabIndex={-1} aria-labelledby="modalRegistro" aria-hidden="true">
+    <div className="modal fade" id="modalRegistro" tabIndex={-1} aria-hidden="true">
       <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-        <div className="modal-content ">
+        <div className="modal-content">
           <div className="modal-header bg-light">
-            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+            <button type="button" className="btn-close" data-bs-dismiss="modal" />
           </div>
           <div className="modal-body p-0">
-            <section className="gradient-form rounded-bottom bg-light">
+            <section className="gradient-form bg-light rounded-bottom">
               <div className="container py-4">
-                <div className="row justify-content-center align-items-center">
-                  <div className="col-12">
-                    <div className="text-center mb-4">
-                      <h4 className="mb-2">Crear cuenta</h4>
-                      <Image src="/assets/img/lotus.png" width={120} height={120} alt="logo" />
-                    </div>
-                    <form>
-                      <div className="form-floating mb-3">
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="usernameInput"
-                          placeholder="Nombre de usuario"
-                        />
-                        <label htmlFor="usernameInput">Nombre de usuario</label>
-                      </div>
-                      <div className="form-floating mb-3">
-                        <input type="email" className="form-control" id="emailInput" placeholder="Email" />
-                        <label htmlFor="emailInput">Email</label>
-                      </div>
-                      <div className="form-floating mb-3">
-                        <input type="password" className="form-control" id="passwordInput" placeholder="Contraseña" />
-                        <label htmlFor="passwordInput">Contraseña</label>
-                      </div>
-                      <div className="form-floating mb-3">
-                        <input
-                          type="password"
-                          className="form-control"
-                          id="repeatPasswordInput"
-                          placeholder="Repetir Contraseña"
-                        />
-                        <label htmlFor="repeatPasswordInput">Repetir Contraseña</label>
-                      </div>
-                      <div className="form-check mb-3">
-                        <input className="form-check-input" type="checkbox" id="flexCheckTerminos" required />
-                        <label className="form-check-label" htmlFor="flexCheckTerminos">
-                          He leído y acepto la <a href="#">política de privacidad</a>
-                        </label>
-                      </div>
-                      <div className="mb-3">
-                        <button className="btn btn-outline-primary w-100" type="submit">
-                          Crear cuenta
-                        </button>
-                      </div>
-                      <div className="d-flex align-items-center justify-content-center mb-3">
-                        <div className="flex-grow-1 border-top"></div>
-                        <span className="px-3">Ya tengo una cuenta</span>
-                        <div className="flex-grow-1 border-top"></div>
-                      </div>
-                      <div className="text-center">
-                        <button
-                          type="button"
-                          className="btn btn-outline-danger w-100"
-                          data-bs-target="#modalIniciarSesion"
-                          data-bs-toggle="modal"
-                        >
-                          Iniciar sesión
-                        </button>
-                      </div>
-                    </form>
-                  </div>
+                <div className="text-center mb-4">
+                  <h4>Crear cuenta</h4>
+                  <Image src="/assets/img/lotus.png" width={120} height={120} alt="logo" />
                 </div>
+                <form id="register-form">
+                  <div className="form-floating mb-3">
+                    <input type="text" className="form-control" id="usernameInput" placeholder="Nombre de usuario" />
+                    <label htmlFor="usernameInput">Nombre de usuario</label>
+                  </div>
+                  <div className="form-floating mb-3">
+                    <input type="email" className="form-control" id="emailInput" placeholder="Email" />
+                    <label htmlFor="emailInput">Email</label>
+                  </div>
+                  <div className="form-floating mb-3">
+                    <input type="password" className="form-control" id="passwordInput" placeholder="Contraseña" />
+                    <label htmlFor="passwordInput">Contraseña</label>
+                  </div>
+                  <div className="form-floating mb-3">
+                    <input type="password" className="form-control" id="repeatPasswordInput" placeholder="Repetir Contraseña" />
+                    <label htmlFor="repeatPasswordInput">Repetir Contraseña</label>
+                  </div>
+                  <div className="form-check mb-3">
+                    <input className="form-check-input" type="checkbox" id="flexCheckTerminos" required />
+                    <label className="form-check-label" htmlFor="flexCheckTerminos">
+                      He leído y acepto la <a href="#">política de privacidad</a>
+                    </label>
+                  </div>
+                  <button className="btn btn-outline-primary w-100" type="submit">Crear cuenta</button>
+                </form>
               </div>
             </section>
           </div>
