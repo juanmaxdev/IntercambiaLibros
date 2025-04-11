@@ -1,66 +1,75 @@
 'use client';
-import { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function Nav() {
-  useEffect(() => {
-    // REGISTRO
-    const registerForm = document.getElementById('register-form');
-    if (registerForm) {
-      registerForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+  // Handler para el formulario de registro
+  const handleRegister = async (e) => {
+    e.preventDefault();
 
-        const username = document.getElementById('usernameInput').value;
-        const email = document.getElementById('emailInput').value;
-        const password = document.getElementById('passwordInput').value;
-        const repeatPassword = document.getElementById('repeatPasswordInput').value;
+    // Acceder a los valores de los inputs a través de e.target
+    const username = e.target.usernameInput.value;
+    const email = e.target.emailInput.value;
+    const password = e.target.passwordInput.value;
+    const repeatPassword = e.target.repeatPasswordInput.value;
 
-        if (password !== repeatPassword) {
-          alert('Las contraseñas no coinciden');
-          return;
-        }
-
-        const res = await fetch('/api/perfil/registro', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            nombre_usuario: username,
-            correo_electronico: email,
-            contrasena: password,
-          }),
-        });
-
-        const result = await res.json();
-        alert(result.message);
-        if (res.ok) registerForm.reset();
-      });
+    if (password !== repeatPassword) {
+      alert('Las contraseñas no coinciden');
+      return;
     }
 
-    // LOGIN
-    const loginForm = document.getElementById('login-form');
-    if (loginForm) {
-      loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const email = document.getElementById('floatingInput').value;
-        const password = document.getElementById('floatingPassword').value;
-
-        const res = await fetch('/api/perfil/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            correo_electronico: email,
-            contrasena: password,
-          }),
-        });
-
-        const result = await res.json();
-        alert(result.message);
-        if (res.ok) loginForm.reset();
+    try {
+      const res = await fetch('/api/perfil/registro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre_usuario: username,
+          correo_electronico: email,
+          contrasena: password,
+        }),
       });
+      
+      const result = await res.json();
+      alert(result.message);
+      
+      if (res.ok) {
+        // Reinicia el formulario si se creó correctamente
+        e.target.reset();
+      }
+    } catch (error) {
+      console.error('Error en el registro:', error);
+      alert('Ocurrió un error al registrar el usuario');
     }
-  }, []);
+  };
+
+  // Handler para el formulario de login
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    const email = e.target.floatingInput.value;
+    const password = e.target.floatingPassword.value;
+
+    try {
+      const res = await fetch('/api/perfil/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          correo_electronico: email,
+          contrasena: password,
+        }),
+      });
+      
+      const result = await res.json();
+      alert(result.message);
+      
+      if (res.ok) {
+        e.target.reset();
+      }
+    } catch (error) {
+      console.error('Error en el login:', error);
+      alert('Ocurrió un error al iniciar sesión');
+    }
+  };
 
   return (
     <>
@@ -71,7 +80,13 @@ export default function Nav() {
               {/* Menú izquierdo */}
               <ul className="navbar-nav d-flex flex-row align-items-center">
                 <li className="nav-item dropdown me-3 position-relative">
-                  <a className="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <a
+                    className="nav-link"
+                    href="#"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
                     <Image src="/assets/icons/list.svg" alt="iconoMenu" width={35} height={25} />
                   </a>
                   <ul className="dropdown-menu" style={{ position: 'absolute' }}>
@@ -81,7 +96,9 @@ export default function Nav() {
                     <li>
                       <Link className="dropdown-item" href="/views/footer/donaciones">Donaciones</Link>
                     </li>
-                    <li><hr className="dropdown-divider" /></li>
+                    <li>
+                      <hr className="dropdown-divider" />
+                    </li>
                     <li>
                       <Link className="dropdown-item" href="#">Cerrar Sesión</Link>
                     </li>
@@ -135,16 +152,16 @@ export default function Nav() {
         </nav>
 
         {/* Modales */}
-        <LoginModal />
-        <RegistroModal />
+        <LoginModal onLogin={handleLogin} />
+        <RegistroModal onRegister={handleRegister} />
       </header>
     </>
   );
 }
 
-function LoginModal() {
+function LoginModal({ onLogin }) {
   return (
-    <div className="modal fade" id="modalIniciarSesion" tabIndex={-1} aria-hidden="true">
+    <div className="modal fade" id="modalIniciarSesion" tabIndex="-1" aria-hidden="true">
       <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div className="modal-content">
           <div className="modal-header bg-light">
@@ -157,17 +174,33 @@ function LoginModal() {
                   <Image src="/assets/img/lotus.png" width={185} height={185} alt="logo" />
                   <h4 className="mt-3">IntercambiaLibros</h4>
                 </div>
-                <form id="login-form">
+                <form id="login-form" onSubmit={onLogin}>
                   <div className="form-floating mb-3">
-                    <input type="email" className="form-control" id="floatingInput" placeholder="Usuario" />
+                    <input
+                      type="email"
+                      className="form-control"
+                      id="floatingInput"
+                      name="floatingInput"
+                      placeholder="Usuario"
+                      required
+                    />
                     <label htmlFor="floatingInput">Usuario</label>
                   </div>
                   <div className="form-floating mb-3">
-                    <input type="password" className="form-control" id="floatingPassword" placeholder="Contraseña" />
+                    <input
+                      type="password"
+                      className="form-control"
+                      id="floatingPassword"
+                      name="floatingPassword"
+                      placeholder="Contraseña"
+                      required
+                    />
                     <label htmlFor="floatingPassword">Contraseña</label>
                   </div>
                   <div className="text-center">
-                    <button className="btn btn-outline-primary w-100 mb-3" type="submit">Iniciar Sesión</button>
+                    <button className="btn btn-outline-primary w-100 mb-3" type="submit">
+                      Iniciar Sesión
+                    </button>
                     <p className="mb-2">¿No tienes una cuenta?</p>
                     <button
                       type="button"
@@ -188,9 +221,9 @@ function LoginModal() {
   );
 }
 
-function RegistroModal() {
+function RegistroModal({ onRegister }) {
   return (
-    <div className="modal fade" id="modalRegistro" tabIndex={-1} aria-hidden="true">
+    <div className="modal fade" id="modalRegistro" tabIndex="-1" aria-hidden="true">
       <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div className="modal-content">
           <div className="modal-header bg-light">
@@ -203,30 +236,65 @@ function RegistroModal() {
                   <h4>Crear cuenta</h4>
                   <Image src="/assets/img/lotus.png" width={120} height={120} alt="logo" />
                 </div>
-                <form id="register-form">
+                <form id="register-form" onSubmit={onRegister}>
                   <div className="form-floating mb-3">
-                    <input type="text" className="form-control" id="usernameInput" placeholder="Nombre de usuario" />
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="usernameInput"
+                      name="usernameInput"
+                      placeholder="Nombre de usuario"
+                      required
+                    />
                     <label htmlFor="usernameInput">Nombre de usuario</label>
                   </div>
                   <div className="form-floating mb-3">
-                    <input type="email" className="form-control" id="emailInput" placeholder="Email" />
+                    <input
+                      type="email"
+                      className="form-control"
+                      id="emailInput"
+                      name="emailInput"
+                      placeholder="Email"
+                      required
+                    />
                     <label htmlFor="emailInput">Email</label>
                   </div>
                   <div className="form-floating mb-3">
-                    <input type="password" className="form-control" id="passwordInput" placeholder="Contraseña" />
+                    <input
+                      type="password"
+                      className="form-control"
+                      id="passwordInput"
+                      name="passwordInput"
+                      placeholder="Contraseña"
+                      required
+                    />
                     <label htmlFor="passwordInput">Contraseña</label>
                   </div>
                   <div className="form-floating mb-3">
-                    <input type="password" className="form-control" id="repeatPasswordInput" placeholder="Repetir Contraseña" />
+                    <input
+                      type="password"
+                      className="form-control"
+                      id="repeatPasswordInput"
+                      name="repeatPasswordInput"
+                      placeholder="Repetir Contraseña"
+                      required
+                    />
                     <label htmlFor="repeatPasswordInput">Repetir Contraseña</label>
                   </div>
                   <div className="form-check mb-3">
-                    <input className="form-check-input" type="checkbox" id="flexCheckTerminos" required />
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="flexCheckTerminos"
+                      required
+                    />
                     <label className="form-check-label" htmlFor="flexCheckTerminos">
                       He leído y acepto la <a href="#">política de privacidad</a>
                     </label>
                   </div>
-                  <button className="btn btn-outline-primary w-100" type="submit">Crear cuenta</button>
+                  <button className="btn btn-outline-primary w-100" type="submit">
+                    Crear cuenta
+                  </button>
                 </form>
               </div>
             </section>
