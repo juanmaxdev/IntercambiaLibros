@@ -4,6 +4,8 @@ import '/public/assets/bootstrap/css/bootstrap.min.css';
 import Nav from '@/components/nav/navbar';
 import Footer from '@/components/footer/footer';
 import './styles/globals.css';
+import { Providers } from '@/utils/providers';
+import "@/app/styles/dropdownNav.css"
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -102,9 +104,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <Providers>
         <Nav />
         <main>{children}</main>
         <Footer />
+        </Providers>
         <Script src="/assets/bootstrap/js/bootstrap.bundle.min.js" strategy="afterInteractive" />
       </body>
     </html>

@@ -24,7 +24,7 @@ export default function CarouselDoble() {
                     src="/assets/img/p1.jpg"
                     className="card-img-top"
                     alt="Imagen de Terror"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -42,7 +42,7 @@ export default function CarouselDoble() {
                     src="/assets/img/p2.jpg"
                     className="card-img-top"
                     alt="Imagen de ficción"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -60,7 +60,7 @@ export default function CarouselDoble() {
                     src="/assets/img/p3.jpg"
                     className="card-img-top"
                     alt="Imagen de Romance"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -78,7 +78,7 @@ export default function CarouselDoble() {
                     src="/assets/img/p4.jpg"
                     className="card-img-top"
                     alt="Imagen del Cosmos"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -96,7 +96,7 @@ export default function CarouselDoble() {
                     src="/assets/img/p5.jpg"
                     className="card-img-top"
                     alt="..."
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -116,7 +116,7 @@ export default function CarouselDoble() {
                     src="/assets/img/p1.jpg"
                     className="card-img-top"
                     alt="Imagen de Terror"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -134,7 +134,7 @@ export default function CarouselDoble() {
                     src="/assets/img/p2.jpg"
                     className="card-img-top"
                     alt="Imagen de ficción"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -152,7 +152,7 @@ export default function CarouselDoble() {
                     src="/assets/img/p3.jpg"
                     className="card-img-top"
                     alt="Imagen de Romance"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -170,7 +170,7 @@ export default function CarouselDoble() {
                     src="/assets/img/p4.jpg"
                     className="card-img-top"
                     alt="Imagen del Cosmos"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -188,7 +188,7 @@ export default function CarouselDoble() {
                     src="/assets/img/p5.jpg"
                     className="card-img-top"
                     alt="..."
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -212,7 +212,7 @@ export default function CarouselDoble() {
                     src="/assets/img/p1.jpg"
                     className="card-img-top"
                     alt="Imagen de Terror"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -230,7 +230,7 @@ export default function CarouselDoble() {
                     src="/assets/img/p2.jpg"
                     className="card-img-top"
                     alt="Imagen de ficción"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -248,7 +248,7 @@ export default function CarouselDoble() {
                     src="/assets/img/p3.jpg"
                     className="card-img-top"
                     alt="Imagen de Romance"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -266,7 +266,7 @@ export default function CarouselDoble() {
                     src="/assets/img/p4.jpg"
                     className="card-img-top"
                     alt="Imagen del Cosmos"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -284,7 +284,7 @@ export default function CarouselDoble() {
                     src="/assets/img/p5.jpg"
                     className="card-img-top"
                     alt="..."
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -304,7 +304,7 @@ export default function CarouselDoble() {
                     src="/assets/img/p1.jpg"
                     className="card-img-top"
                     alt="Imagen de Terror"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -322,7 +322,7 @@ export default function CarouselDoble() {
                     src="/assets/img/p2.jpg"
                     className="card-img-top"
                     alt="Imagen de ficción"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -340,7 +340,7 @@ export default function CarouselDoble() {
                     src="/assets/img/p3.jpg"
                     className="card-img-top"
                     alt="Imagen de Romance"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -358,7 +358,7 @@ export default function CarouselDoble() {
                     src="/assets/img/p4.jpg"
                     className="card-img-top"
                     alt="Imagen del Cosmos"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -376,7 +376,7 @@ export default function CarouselDoble() {
                     src="/assets/img/p5.jpg"
                     className="card-img-top"
                     alt="..."
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />

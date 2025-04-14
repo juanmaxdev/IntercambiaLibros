@@ -1,4 +1,4 @@
-import InfinityScrollBooks from '@components/carousel/infinityScrollPrueba';
+import InfinityScrollBooks from '@/components/infinityScroll/infinityScroll';
 
 export default function infinityScroll() {
     return(

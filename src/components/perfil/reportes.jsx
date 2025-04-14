@@ -150,7 +150,12 @@ export default function Reportes() {
 
               {/* Formulario */}
               <h4 className="mt-5">Contacto</h4>
-              <form onSubmit={handleSubmit} noValidate className="row g-3 mb-5 mt-2" aria-label="Formulario de reportes">
+              <form
+                onSubmit={handleSubmit}
+                noValidate
+                className="row g-3 mb-5 mt-2"
+                aria-label="Formulario de reportes"
+              >
                 <div className="form-floating col-md-6">
                   <input
                     type="text"
@@ -187,7 +192,11 @@ export default function Reportes() {
                     data-testid="email-input"
                   />
                   <label htmlFor="floatingEmail">Email</label>
-                  {errors.email && <small data-testid="email-error-message" className="text-danger">{errors.email}</small>}
+                  {errors.email && (
+                    <small data-testid="email-error-message" className="text-danger">
+                      {errors.email}
+                    </small>
+                  )}
                 </div>
 
                 <div className="form-floating col-12">

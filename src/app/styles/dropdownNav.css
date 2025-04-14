@@ -1,0 +1,28 @@
+/* Estilos para los menús desplegables */
+.dropdown-menu {
+    position: absolute !important;
+    z-index: 1030 !important;
+    transform: translate3d(0px, 38px, 0px) !important;
+    top: 0 !important;
+    left: auto !important;
+    right: 0 !important;
+    will-change: transform !important;
+  }
+  
+  .dropdown {
+    position: relative !important;
+  }
+  
+  /* Asegura que el dropdown no afecte el layout */
+  .dropdown-menu.show {
+    display: block;
+    margin-top: 0;
+  }
+  
+  /* Ajusta la posición para dispositivos móviles */
+  @media (max-width: 768px) {
+    .dropdown-menu {
+      transform: translate3d(-100px, 38px, 0px) !important;
+    }
+  }
+  

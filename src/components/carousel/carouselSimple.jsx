@@ -1,5 +1,6 @@
 'use client';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function CarouselSimple() {
   return (
@@ -8,7 +9,9 @@ export default function CarouselSimple() {
         {/* AÑADIR PARA QUE FUNCIONE EL CAROUSEL + PONER TIEMPO data-bs-ride="carousel"*/}
         <div className="border-bottom m-4 pb-2">
           <div className="d-flex justify-content-center justify-content-md-start ps-lg-5 ms-lg-5">
-            <h4 className="m-0 ps-1">GÉNEROS</h4>
+            <Link href="/views/books/bookList" className="text-decoration-none">
+              <h4 className="m-0 ps-1">GÉNEROS</h4>
+            </Link>
           </div>
         </div>
         {/* Mantiene el ancho completo */}
@@ -23,7 +26,7 @@ export default function CarouselSimple() {
                     src="/assets/img/terrifying-hand-silhouettes-studio.jpg"
                     className="card-img-top"
                     alt="Imagen de Terror"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -41,7 +44,7 @@ export default function CarouselSimple() {
                     src="/assets/img/science-fiction-7828391_1280.jpg"
                     className="card-img-top"
                     alt="Imagen de ficción"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -59,7 +62,7 @@ export default function CarouselSimple() {
                     src="/assets/img/vintage-4188771_1280.jpg"
                     className="card-img-top"
                     alt="Imagen de Romance"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -77,7 +80,7 @@ export default function CarouselSimple() {
                     src="/assets/img/cosmos.jpg"
                     className="card-img-top"
                     alt="Imagen del Cosmos"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -94,7 +97,7 @@ export default function CarouselSimple() {
                   <Image
                     src="/assets/img/kyoto-jishoji-temple-fckidpm20fotp9rp.jpg"
                     className="card-img-top"
-                    height={200}
+                    height={300}
                     width={100}
                     alt="..."
                     style={{ objectFit: 'cover' }}
@@ -118,7 +121,7 @@ export default function CarouselSimple() {
                   <Image
                     src="/assets/img/terror-1.png"
                     className="card-img-top"
-                    height={200}
+                    height={300}
                     width={100}
                     alt="Imagen de Terror"
                     style={{ objectFit: 'cover' }}
@@ -136,7 +139,7 @@ export default function CarouselSimple() {
                   <Image
                     src="/assets/img/terror-2.png"
                     className="card-img-top"
-                    height={200}
+                    height={300}
                     width={100}
                     alt="Imagen de ficción"
                     style={{ objectFit: 'cover' }}
@@ -155,7 +158,7 @@ export default function CarouselSimple() {
                     src="/assets/img/terror-3.png"
                     className="card-img-top"
                     alt="Imagen de Romance"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -173,7 +176,7 @@ export default function CarouselSimple() {
                     src="/assets/img/terror-4.png"
                     className="card-img-top"
                     alt="..."
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -191,7 +194,7 @@ export default function CarouselSimple() {
                     src="/assets/img/terror-5.png"
                     className="card-img-top"
                     alt="..."
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -215,7 +218,7 @@ export default function CarouselSimple() {
                     src="/assets/img/portada1.png"
                     className="card-img-top"
                     alt="Imagen de Terror"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -233,7 +236,7 @@ export default function CarouselSimple() {
                     src="/assets/img/portada2.png"
                     className="card-img-top"
                     alt="Imagen de ficción"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -251,7 +254,7 @@ export default function CarouselSimple() {
                     src="/assets/img/Portada3.png"
                     className="card-img-top"
                     alt="Imagen de Romance"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -269,7 +272,7 @@ export default function CarouselSimple() {
                     src="/assets/img/Portada4.png"
                     className="card-img-top"
                     alt="..."
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -287,7 +290,7 @@ export default function CarouselSimple() {
                     src="/assets/img/sereno-templo-zen-japones-tranquilo-fondo-pantalla-jardin-telefono_964851-8823.avif"
                     className="card-img-top"
                     alt="..."
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -309,7 +312,7 @@ export default function CarouselSimple() {
           data-bs-slide="prev"
           style={{ top: '20%' }}
         >
-          <Image src="/assets/icons/Back.gif" alt="atras" width={65} height={65} unoptimized/>
+          <Image src="/assets/icons/Back.gif" alt="atras" width={65} height={65} unoptimized />
 
           <span className="visually-hidden">Previous</span>
         </button>
@@ -351,7 +354,7 @@ export function CarouselNuevosLibros() {
                     src="/assets/img/terrifying-hand-silhouettes-studio.jpg"
                     className="card-img-top"
                     alt="Imagen de Terror"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -369,9 +372,9 @@ export function CarouselNuevosLibros() {
                     src="/assets/img/science-fiction-7828391_1280.jpg"
                     className="card-img-top"
                     alt="Imagen de ficción"
-                    height={200}
+                    height={300}
                     width={100}
-                    style={{objectFit: 'cover' }}
+                    style={{ objectFit: 'cover' }}
                   />
                   <div className="card-body d-flex flex-column justify-content-center p-0">
                     <a href="#" className="btn border-0 w-100 text-center text-nowrap">
@@ -387,7 +390,7 @@ export function CarouselNuevosLibros() {
                     src="/assets/img/vintage-4188771_1280.jpg"
                     className="card-img-top"
                     alt="Imagen de Romance"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -405,7 +408,7 @@ export function CarouselNuevosLibros() {
                     src="/assets/img/cosmos.jpg"
                     className="card-img-top"
                     alt="Imagen del Cosmos"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -423,7 +426,7 @@ export function CarouselNuevosLibros() {
                     src="/assets/img/kyoto-jishoji-temple-fckidpm20fotp9rp.jpg"
                     className="card-img-top"
                     alt="..."
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -447,7 +450,7 @@ export function CarouselNuevosLibros() {
                     src="/assets/img/terror-1.png"
                     className="card-img-top"
                     alt="Imagen de Terror"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -465,7 +468,7 @@ export function CarouselNuevosLibros() {
                     src="/assets/img/terror-2.png"
                     className="card-img-top"
                     alt="Imagen de ficción"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -483,7 +486,7 @@ export function CarouselNuevosLibros() {
                     src="/assets/img/terror-3.png"
                     className="card-img-top"
                     alt="Imagen de Romance"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -501,7 +504,7 @@ export function CarouselNuevosLibros() {
                     src="/assets/img/terror-4.png"
                     className="card-img-top"
                     alt="..."
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -519,7 +522,7 @@ export function CarouselNuevosLibros() {
                     src="/assets/img/terror-5.png"
                     className="card-img-top"
                     alt="..."
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -543,7 +546,7 @@ export function CarouselNuevosLibros() {
                     src="/assets/img/portada1.png"
                     className="card-img-top"
                     alt="Imagen de Terror"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -561,7 +564,7 @@ export function CarouselNuevosLibros() {
                     src="/assets/img/portada2.png"
                     className="card-img-top"
                     alt="Imagen de ficción"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -579,7 +582,7 @@ export function CarouselNuevosLibros() {
                     src="/assets/img/Portada3.png"
                     className="card-img-top"
                     alt="Imagen de Romance"
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -597,7 +600,7 @@ export function CarouselNuevosLibros() {
                     src="/assets/img/Portada4.png"
                     className="card-img-top"
                     alt="..."
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -615,7 +618,7 @@ export function CarouselNuevosLibros() {
                     src="/assets/img/sereno-templo-zen-japones-tranquilo-fondo-pantalla-jardin-telefono_964851-8823.avif"
                     className="card-img-top"
                     alt="..."
-                    height={200}
+                    height={300}
                     width={100}
                     style={{ objectFit: 'cover' }}
                   />
@@ -637,7 +640,7 @@ export function CarouselNuevosLibros() {
           data-bs-slide="prev"
           style={{ top: '20%' }}
         >
-          <Image src="/assets/icons/Back.gif" alt="atras" width={65} height={65} unoptimized/>
+          <Image src="/assets/icons/Back.gif" alt="atras" width={65} height={65} unoptimized />
 
           <span className="visually-hidden">Previous</span>
         </button>
@@ -648,7 +651,7 @@ export function CarouselNuevosLibros() {
           data-bs-slide="next"
           style={{ top: '20%' }}
         >
-          <Image src="/assets/icons/Forward1.gif" alt="atras" width={50} height={50} unoptimized/>
+          <Image src="/assets/icons/Forward1.gif" alt="atras" width={50} height={50} unoptimized />
           <span className="visually-hidden">Next</span>
         </button>
       </div>

@@ -4,6 +4,7 @@ import CarouselDoble from '../components/carousel/carouselDouble';
 import CarouselSimple, { CarouselNuevosLibros } from '../components/carousel/carouselSimple';
 import Opiniones from '../components/opiniones/opiniones';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Home() {
   return (
@@ -17,6 +18,7 @@ export default function Home() {
             <div className="col-1 d-none d-md-block"></div>
             <div className="col-12 col-md-5 col-lg-5 ps-md-4">
               <h3>Gracias por leer</h3>
+              
               <p className="text-start lh-1 pt-3 fw-bold fst-italic">Ventajas de leer</p>
               <ul>
                 <li>
