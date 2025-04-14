@@ -22,6 +22,7 @@ export default async function handler(req, res) {
       estado_intercambio = 'Disponible',
       valoracion_del_libro = 0,
       tipo_tapa = '',
+      editorial = ''
     } = req.body;
 
     // Generar fecha actual sin segundos
@@ -44,7 +45,8 @@ export default async function handler(req, res) {
         estado_intercambio,
         fecha_subida,
         valoracion_del_libro,
-        tipo_tapa
+        tipo_tapa,
+        editorial
       }])
       .select();
 
