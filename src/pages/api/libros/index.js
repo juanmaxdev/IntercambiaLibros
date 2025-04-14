@@ -19,10 +19,14 @@ export default async function handler(req, res) {
       ubicacion,
       imagenes,
       usuario_id,
-      estado_intercambio,
-      fecha_subida,
-      valoracion_del_libro
+      estado_intercambio = 'Disponible',
+      valoracion_del_libro = 0,
+      tipo_tapa = '',
     } = req.body;
+
+    // Generar fecha actual sin segundos
+    const fecha = new Date();
+    const fecha_subida = fecha.toISOString().slice(0, 16); // yyyy-mm-ddTHH:MM
 
     const { data, error } = await supabase
       .from('libros')
@@ -39,7 +43,8 @@ export default async function handler(req, res) {
         usuario_id,
         estado_intercambio,
         fecha_subida,
-        valoracion_del_libro
+        valoracion_del_libro,
+        tipo_tapa
       }])
       .select();
 
@@ -47,6 +52,5 @@ export default async function handler(req, res) {
     return res.status(201).json(data[0]);
   }
 
-  // Si no es GET ni POST
   return res.status(405).json({ message: 'Método no permitido' });
 }
