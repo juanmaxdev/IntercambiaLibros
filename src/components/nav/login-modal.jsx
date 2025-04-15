@@ -1,7 +1,8 @@
 "use client"
 import Image from "next/image"
-import { signIn } from "next-auth/react"
+import { signIn, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 export function LoginModal() {
   const router = useRouter()
@@ -9,6 +10,27 @@ export function LoginModal() {
   const handleGoogleSignIn = async () => {
     await signIn("google", { callbackUrl: "/" })
   }
+
+  useEffect(() => {
+    let timeout
+
+    const resetTimeout = () => {
+      clearTimeout(timeout)
+      timeout = setTimeout(() => {
+        signOut()
+      }, 30 * 60 * 1000) // 30 minutos en milisegundos
+    }
+
+    const events = ["mousemove", "keydown", "click"]
+    events.forEach((event) => window.addEventListener(event, resetTimeout))
+
+    resetTimeout()
+
+    return () => {
+      clearTimeout(timeout)
+      events.forEach((event) => window.removeEventListener(event, resetTimeout))
+    }
+  }, [])
 
   return (
     <div

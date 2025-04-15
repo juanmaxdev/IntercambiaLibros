@@ -64,15 +64,15 @@ export default function LibroSeleccionado({ book }) {
                 <p className="ps-3 fw-semibold pt-3">Vendedor</p>
               </div>
               <div className="col-6 col mt-2">
-                <p>{book.autor || '-'}</p>
-                <p>{book.editorial || '-'}</p>
-                <p>{book.categoria || '-'}</p>
-                <p>{book.tapa || '-'}</p>
-                <p>{book.isbn || '-'}</p>
-                <p>{book.donacion === false ? 'Presencial' : 'Donación'}</p>
-                <p>{book.estado_libro || '-'}</p>
-                <p>{book.ubicacion || '-'}</p>
-                <p className="pt-3">{book.usuario_id ? `Usuario #${book.usuario_id}` : '-'}</p>
+                <p className="fst-italic">{book.autor || '-'}</p>
+                <p className="fst-italic">{book.editorial || '-'}</p>
+                <p className="fst-italic">{book.categoria || '-'}</p>
+                <p className="fst-italic">{book.tipo_tapa || '-'}</p>
+                <p className="fst-italic">{book.isbn || '-'}</p>
+                <p className="fst-italic">{book.donacion === false ? 'Presencial' : 'Donación'}</p>
+                <p className="fst-italic">{book.estado_libro || '-'}</p>
+                <p className="fst-italic">{book.ubicacion || '-'}</p>
+                <p className="pt-3 fst-italic">{book.usuario_id ? `Usuario #${book.usuario_id}` : '-'}</p>
               </div>
             </div>
           </div>
@@ -80,9 +80,9 @@ export default function LibroSeleccionado({ book }) {
         <div className="col-5 col">
           <div className="container mt-5 pt-4">
             <h2 className="fw-semibold">{tituloCompleto}</h2>
-            <p className="fw-medium mt-5">Descripción del vendedor:</p>
-            <p className="fw-light mt-4">{book.descripcion || 'No hay descripción disponible para este libro.'}</p>
-            <p className="fw-semibold mt-5">
+            <p className="fw-medium mt-5 fs-5">Descripción del vendedor:</p>
+            <p className="fw-light mt-4 fs-5 fw-lighter">{book.descripcion || 'No hay descripción disponible para este libro.'}</p>
+            <p className="fw-semibold mt-5 fs-5">
               "¡Gracias por elegir el intercambio de libros! Al dar una nueva vida a este libro, estás ayudando a
               reducir el desperdicio y a cuidar el medio ambiente. Juntos fomentamos la reutilización, apoyamos la
               sostenibilidad y construimos una comunidad más consciente."
@@ -91,7 +91,7 @@ export default function LibroSeleccionado({ book }) {
           </div>
           <div className="container d-flex align-items-center justify-content-center gap-2 mt-5">
             <button type="button" className="btn btn-outline-danger rounded-circle border-0">
-              <Image src="/assets/icons/Cupid.gif" alt="Icono de corazón" width={50} height={50} />
+              <Image src="/assets/icons/Cupid.gif" alt="Icono de corazón" width={50} height={50} unoptimized />
             </button>
             <p className="fw-semibold pt-3">Agregar a lista de deseados</p>
           </div>

@@ -298,9 +298,9 @@ export default function FormSubirLibro() {
                 accept=".jpg,.jpeg,.png"
                 onChange={handleFileChange}
               />
-              <label htmlFor="archivoInput">Subir archivo</label>
+              <label htmlFor="archivoInput">Imagenes del libro</label>
               {errors.archivo && <div className="invalid-feedback">{errors.archivo}</div>}
-              <small className="form-text text-muted">Formatos permitidos: JPG, PNG. Tamaño máximo: 2MB</small>
+              <small className="form-text text-muted">Formatos permitidos: JPG, PNG. Tamaño máximo: 4MB</small>
             </div>
 
             <div className="form-floating my-3">

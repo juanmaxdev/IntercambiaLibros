@@ -12,9 +12,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: "/login",
     error: "/error",
   },
+  session: {
+    maxAge: 30 * 60, // 30 minutos en segundos
+  },
   callbacks: {
     async redirect({ url, baseUrl }) {
-      // Asegura que las redirecciones funcionen correctamente
       return url.startsWith(baseUrl) ? url : baseUrl
     },
   },
