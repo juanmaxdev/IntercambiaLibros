@@ -28,7 +28,6 @@ export default async function handler(req, res) {
         email,
         titulo,
         mensaje,
-        acepta_terminos,
         fecha_envio: new Date().toISOString().slice(0, 16), // opcional: añade fecha con precisión hasta minutos
       }]);
 
