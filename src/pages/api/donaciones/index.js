@@ -9,15 +9,10 @@ export default async function handler(req, res) {
     .from('donaciones_libros')
     .select(`
       *,
-      usuarios:usuario_id (
-        nombre_usuario
-      ),
-      libros:libro_id (
-        titulo,
-        autor,
-        imagenes
-      )
-    `);
+      usuarios (nombre_usuario),
+      libros (titulo, autor, imagenes)
+    `)
+    ;
 
   if (error) {
     return res.status(500).json({ message: 'Error al obtener donaciones', error: error.message });
