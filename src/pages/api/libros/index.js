@@ -15,6 +15,7 @@ export default async function handler(req, res) {
         donacion,
         ubicacion,
         imagenes,
+        usuario_id,
         estado_intercambio,
         fecha_subida,
         valoracion_del_libro,
@@ -27,10 +28,10 @@ export default async function handler(req, res) {
 
     if (error) return res.status(500).json({ error: error.message });
 
-    // Reemplazamos usuario_id por nombre_usuario
-    const formateado = data.map(({ usuarios, ...libro }) => ({
+    const formateado = data.map(({ usuarios, usuario_id, ...libro }) => ({
       ...libro,
-      nombre_usuario: usuarios?.nombre_usuario || 'Desconocido'
+      usuario_id, // aquí añadimos el usuario_id explícitamente
+      nombre_usuario: usuarios?.nombre_usuario || 'Desconocido',
     }));
 
     return res.status(200).json(formateado);
@@ -54,7 +55,6 @@ export default async function handler(req, res) {
       editorial = ''
     } = req.body;
 
-    // Le damos la fecha sin segundos (00) ni milisegundos.
     const fecha = new Date();
     const fecha_subida = fecha.toISOString().slice(0, 16); // yyyy-mm-ddTHH:MM
 
