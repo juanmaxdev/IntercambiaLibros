@@ -14,10 +14,11 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const { nombre, apellidos, email, titulo, mensaje, acepta_terminos } = req.body;
+    const { nombre, apellidos, email, titulo, mensaje } = req.body;
 
-    if (!nombre || !email || !titulo || !mensaje || acepta_terminos !== true) {
-      return res.status(400).json({ message: 'Faltan campos obligatorios o términos no aceptados' });
+    // Verificación de campos obligatorios (apellidos no es obligatorio aquí)
+    if (!nombre || !email || !titulo || !mensaje) {
+      return res.status(400).json({ message: 'Faltan campos obligatorios' });
     }
 
     const { data, error } = await supabase
@@ -28,8 +29,7 @@ export default async function handler(req, res) {
         email,
         titulo,
         mensaje,
-        acepta_terminos,
-        fecha_envio: new Date().toISOString().slice(0, 16), // opcional: añade fecha con precisión hasta minutos
+        fecha_envio: new Date().toISOString().slice(0, 16), // Fecha has los minutos
       }]);
 
     if (error) {
