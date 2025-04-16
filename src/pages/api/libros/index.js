@@ -24,7 +24,7 @@ export default async function handler(req, res) {
         usuarios:usuario_id (
           nombre_usuario
         ),
-        generos!libros_genero_id_fkey (
+        generos (
           nombre
         )
       `);
