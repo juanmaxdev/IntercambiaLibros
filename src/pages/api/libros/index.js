@@ -3,35 +3,37 @@ import { supabase } from '@/lib/supabase';
 export default async function handler(req, res) {
   if (req.method === 'GET') {
     const { data, error } = await supabase
-    .from('libros')
-    .select(`
-      id,
-      isbn,
-      titulo,
-      autor,
-      categoria,
-      estado_libro,
-      descripcion,
-      donacion,
-      ubicacion,
-      imagenes,
-      usuario_id,
-      estado_intercambio,
-      fecha_subida,
-      valoracion_del_libro,
-      tipo_tapa,
-      editorial,
-      usuarios:usuario_id (
-        nombre_usuario
-      )
-    `);
+      .from('libros')
+      .select(`
+        id,
+        isbn,
+        titulo,
+        autor,
+        estado_libro,
+        descripcion,
+        donacion,
+        ubicacion,
+        imagenes,
+        usuario_id,
+        estado_intercambio,
+        fecha_subida,
+        valoracion_del_libro,
+        tipo_tapa,
+        editorial,
+        usuarios:usuario_id (
+          nombre_usuario
+        ),
+        generos:genero_id (
+          nombre
+        )
+      `);
 
     if (error) return res.status(500).json({ error: error.message });
 
-    // Reemplazamos usuario_id por nombre_usuario
-    const formateado = data.map(({ usuarios, ...libro }) => ({
+    const formateado = data.map(({ usuarios, generos, ...libro }) => ({
       ...libro,
-      nombre_usuario: usuarios?.nombre_usuario || 'Desconocido'
+      nombre_usuario: usuarios?.nombre_usuario || 'Desconocido',
+      nombre_genero: generos?.nombre || 'Sin género'
     }));
 
     return res.status(200).json(formateado);
@@ -42,7 +44,7 @@ export default async function handler(req, res) {
       isbn,
       titulo,
       autor,
-      categoria,
+      genero_id,
       estado_libro,
       descripcion,
       donacion,
@@ -55,9 +57,8 @@ export default async function handler(req, res) {
       editorial = ''
     } = req.body;
 
-    // Le damos la fecha sin segundos (00) ni milisegundos.
     const fecha = new Date();
-    const fecha_subida = fecha.toISOString().slice(0, 16); // yyyy-mm-ddTHH:MM
+    const fecha_subida = fecha.toISOString().slice(0, 16);
 
     const { data, error } = await supabase
       .from('libros')
@@ -65,7 +66,7 @@ export default async function handler(req, res) {
         isbn,
         titulo,
         autor,
-        categoria,
+        genero_id,
         estado_libro,
         descripcion,
         donacion,
