@@ -16,7 +16,7 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     const { nombre, apellidos, email, titulo, mensaje, acepta_terminos } = req.body;
 
-    if (!nombre || apellidos || !email || !titulo || !mensaje !== true) {
+    if (!nombre || !apellidos || !email || !titulo || !mensaje !== true) {
       return res.status(400).json({ message: 'Faltan campos obligatorios o términos no aceptados' });
     }
 
