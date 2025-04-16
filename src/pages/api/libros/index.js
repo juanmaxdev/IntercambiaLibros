@@ -20,6 +20,7 @@ export default async function handler(req, res) {
         valoracion_del_libro,
         tipo_tapa,
         editorial,
+        metodo_intercambio,
         usuarios:usuario_id (
           nombre_usuario
         ),
@@ -54,7 +55,8 @@ export default async function handler(req, res) {
       estado_intercambio = 'Disponible',
       valoracion_del_libro = 0,
       tipo_tapa = '',
-      editorial = ''
+      editorial = '',
+      metodo_intercambio = 'Presencial' // valor por defecto
     } = req.body;
 
     const fecha = new Date();
@@ -77,7 +79,8 @@ export default async function handler(req, res) {
         fecha_subida,
         valoracion_del_libro,
         tipo_tapa,
-        editorial
+        editorial,
+        metodo_intercambio
       }])
       .select();
 
