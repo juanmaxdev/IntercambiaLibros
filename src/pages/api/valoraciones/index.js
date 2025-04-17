@@ -15,11 +15,15 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const { usuario_id, valoracion, comentario, fecha_valoracion, titulo } = req.body;
+    const { usuario_id, valoracion, comentario, titulo } = req.body;
 
     if (!usuario_id || !valoracion || !titulo) {
       return res.status(400).json({ message: 'Faltan campos obligatorios' });
     }
+
+    // Generar fecha con precisión hasta minutos (sin segundos ni milisegundos)
+    const fecha = new Date();
+    const fecha_valoracion = fecha.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
 
     const { data, error } = await supabase.from('valoraciones_libros').insert([
       {
