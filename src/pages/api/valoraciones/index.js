@@ -12,7 +12,6 @@ export default async function handler(req, res) {
         fecha_valoracion,
         titulo,
         usuarios:usuario_id (
-          nombre_usuario,
           correo_electronico
         )
       `);
