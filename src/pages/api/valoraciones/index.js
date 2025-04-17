@@ -68,7 +68,6 @@ export default async function handler(req, res) {
         comentario,
         fecha_valoracion,
         titulo,
-        imagen_usuario
       }])
       .select();
 
