@@ -35,10 +35,10 @@ export default async function handler(req, res) {
       usuario_id,         // Puede ser un número o un correo
       usuario_email,      // Alternativa si no llega usuario_id
       valoracion,
-      comentario,
+      comentario = '',
       titulo,
       fecha_valoracion,
-      imagen_usuario
+      imagen_usuario = ''
     } = req.body;
 
     // Validación mínima
