@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 
 export default async function handler(req, res) {
+  // GET: Obtener valoraciones
   if (req.method === 'GET') {
     const { data, error } = await supabase
       .from('valoraciones_libros')
@@ -28,21 +29,23 @@ export default async function handler(req, res) {
     return res.status(200).json(resultado);
   }
 
+  // POST: Insertar nueva valoración
   if (req.method === 'POST') {
     let {
-      usuario_id, // Puede ser un ID numérico o un correo electrónico
+      usuario_id, // Puede ser un número o correo
       valoracion,
       comentario,
       titulo,
-      imagen_usuario = '',
       fecha_valoracion = new Date().toISOString().slice(0, 16)
     } = req.body;
+
+    const imagen_usuario = req.body.imagen_usuario || '';
 
     if (!usuario_id || !valoracion || !titulo) {
       return res.status(400).json({ message: 'Faltan campos obligatorios' });
     }
 
-    // Si usuario_id es un string, lo tratamos como correo electrónico
+    // Si se envía correo en vez de ID, obtener el ID desde la tabla usuarios
     if (typeof usuario_id === 'string' && isNaN(Number(usuario_id))) {
       const { data: userData, error: userError } = await supabase
         .from('usuarios')
@@ -53,21 +56,20 @@ export default async function handler(req, res) {
       if (userError || !userData) {
         return res.status(404).json({ message: 'Correo no encontrado en la base de datos' });
       }
+
       usuario_id = userData.id;
     }
 
     const { data, error } = await supabase
       .from('valoraciones_libros')
-      .insert([
-        {
-          usuario_id,
-          valoracion,
-          comentario,
-          fecha_valoracion,
-          titulo,
-          imagen_usuario
-        }
-      ])
+      .insert([{
+        usuario_id,
+        valoracion,
+        comentario,
+        fecha_valoracion,
+        titulo,
+        imagen_usuario
+      }])
       .select();
 
     if (error) return res.status(500).json({ error: error.message });
