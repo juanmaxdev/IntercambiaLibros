@@ -11,7 +11,6 @@ export default async function handler(req, res) {
         comentario,
         fecha_valoracion,
         titulo,
-        imagen_usuario,
         usuarios:usuario_id (
           nombre_usuario,
           correo_electronico
