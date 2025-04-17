@@ -45,18 +45,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'Faltan campos obligatorios (usuario_id, valoracion, titulo)' });
     }
 
-    // Comprobar si el correo ya existe
-    const { data: existingUser } = await supabase
-    .from('usuarios')
-    .select('id')
-    .eq('correo_electronico', usuario_id)
-    .single();
-
-    if (existingUser) {
-    return res.status(409).json({ message: 'El correo ya está registrado' });
-    }
-
-
     // Si no se recibe fecha, la generamos desde backend
     if (!fecha_valoracion) {
       const fecha = new Date();
@@ -72,6 +60,7 @@ export default async function handler(req, res) {
         .single();
 
       if (userData) {
+        // Si ya existe, usamos su ID
         usuario_id = userData.id;
       } else {
         // Insertamos usuario si no existe (login Google)
@@ -99,7 +88,7 @@ export default async function handler(req, res) {
         valoracion,
         comentario,
         fecha_valoracion,
-        titulo,
+        titulo
       }])
       .select();
 
