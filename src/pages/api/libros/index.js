@@ -24,7 +24,7 @@ export default async function handler(req, res) {
         usuarios:usuario_id (
           nombre_usuario
         ),
-        genero:genero_id (
+        generos:genero_id (
           nombre
         )
       `);
