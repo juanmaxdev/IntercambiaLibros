@@ -30,7 +30,6 @@ export default async function handler(req, res) {
         usuario_id,
         valoracion,
         comentario,
-        fecha_valoracion,
         titulo
       }
     ]).select();
