@@ -1,7 +1,6 @@
 import { supabase } from '@/lib/supabase';
 
 export default async function handler(req, res) {
-  // GET: Obtener valoraciones
   if (req.method === 'GET') {
     const { data, error } = await supabase
       .from('valoraciones_libros')
@@ -12,6 +11,7 @@ export default async function handler(req, res) {
         comentario,
         fecha_valoracion,
         titulo,
+        imagen_usuario,
         usuarios:usuario_id (
           nombre_usuario,
           correo_electronico
@@ -29,23 +29,21 @@ export default async function handler(req, res) {
     return res.status(200).json(resultado);
   }
 
-  // POST: Insertar nueva valoración
   if (req.method === 'POST') {
     let {
-      usuario_id, // Puede ser un número o correo
+      usuario_id,           // puede ser un número o un correo
       valoracion,
-      comentario,
+      comentario = '',
       titulo,
-      fecha_valoracion = new Date().toISOString().slice(0, 16)
+      imagen_usuario = '',
+      fecha_valoracion      // enviado por el frontend
     } = req.body;
 
-    const imagen_usuario = req.body.imagen_usuario || '';
-
-    if (!usuario_id || !valoracion || !titulo) {
-      return res.status(400).json({ message: 'Faltan campos obligatorios' });
+    if (!usuario_id || !valoracion || !titulo || !fecha_valoracion) {
+      return res.status(400).json({ message: 'Faltan campos obligatorios (usuario_id, valoracion, titulo, fecha_valoracion)' });
     }
 
-    // Si se envía correo en vez de ID, obtener el ID desde la tabla usuarios
+    // Si usuario_id es un correo electrónico
     if (typeof usuario_id === 'string' && isNaN(Number(usuario_id))) {
       const { data: userData, error: userError } = await supabase
         .from('usuarios')
@@ -68,6 +66,7 @@ export default async function handler(req, res) {
         comentario,
         fecha_valoracion,
         titulo,
+        imagen_usuario
       }])
       .select();
 
