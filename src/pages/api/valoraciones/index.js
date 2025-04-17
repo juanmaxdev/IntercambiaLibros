@@ -80,7 +80,6 @@ export default async function handler(req, res) {
           .insert([{
             correo_electronico: usuario_id,
             nombre_usuario: nombre_usuario || 'Usuario',
-            imagen: imagen_usuario || null
           }])
           .select()
           .single();
