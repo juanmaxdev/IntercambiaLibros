@@ -31,19 +31,20 @@ export default async function handler(req, res) {
 
   if (req.method === 'POST') {
     let {
-      usuario_id, // puede ser ID o correo
+      usuario_id, // Puede ser número o correo
       valoracion,
       comentario,
       titulo,
       imagen_usuario = '',
       fecha_valoracion = new Date().toISOString().slice(0, 16),
+      nombre_usuario = '' // opcional desde el frontend
     } = req.body;
 
     if (!usuario_id || !valoracion || !titulo) {
       return res.status(400).json({ message: 'Faltan campos obligatorios' });
     }
 
-    // Si usuario_id es un string (correo), buscar el ID real
+    // Si usuario_id es un correo, buscar su ID
     if (isNaN(usuario_id)) {
       const { data: userData, error: userError } = await supabase
         .from('usuarios')
@@ -54,6 +55,7 @@ export default async function handler(req, res) {
       if (userError || !userData) {
         return res.status(404).json({ message: 'Correo no encontrado en la base de datos' });
       }
+
       usuario_id = userData.id;
     }
 
@@ -67,13 +69,17 @@ export default async function handler(req, res) {
           fecha_valoracion,
           titulo,
           imagen_usuario,
-        },
+          nombre_usuario
+        }
       ])
       .select();
 
     if (error) return res.status(500).json({ error: error.message });
 
-    return res.status(201).json({ message: 'Valoración registrada', valoracion: data[0] });
+    return res.status(201).json({
+      message: 'Valoración registrada',
+      valoracion: data[0]
+    });
   }
 
   return res.status(405).json({ message: 'Método no permitido' });
