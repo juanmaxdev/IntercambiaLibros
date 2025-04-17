@@ -1,7 +1,6 @@
 import { supabase } from '@/lib/supabase';
 
 export default async function handler(req, res) {
-  // GET: obtener valoraciones
   if (req.method === 'GET') {
     const { data, error } = await supabase
       .from('valoraciones_libros')
@@ -29,45 +28,57 @@ export default async function handler(req, res) {
     return res.status(200).json(resultado);
   }
 
-  // POST: insertar valoración
   if (req.method === 'POST') {
     let {
-      usuario_id,
-      usuario_email, // si viene como correo
+      usuario_id,            // Puede ser un número o un correo
+      usuario_email,         // Alternativa si no llega usuario_id
       valoracion,
-      comentario = '',
+      comentario = '',       // Por defecto vacío
       titulo,
       fecha_valoracion,
-      ...otrosCampos // aquí capturamos imagen_usuario y lo ignoramos
+      imagen_usuario = null, // Campo opcional (del front)
+      nombre_usuario = null  // Campo opcional (del front)
     } = req.body;
 
     // Validación mínima
-    if (!usuario_id && !usuario_email) {
-      return res.status(400).json({ message: 'Falta el identificador del usuario' });
-    }
-    if (!valoracion || !titulo) {
-      return res.status(400).json({ message: 'Faltan campos obligatorios (valoracion, titulo)' });
+    if (!usuario_id || !valoracion || !titulo) {
+      return res.status(400).json({ message: 'Faltan campos obligatorios (usuario_id, valoracion, titulo)' });
     }
 
-    // Fecha si no se proporciona
+    // Si no se recibe fecha, la generamos desde backend
     if (!fecha_valoracion) {
       const fecha = new Date();
-      fecha_valoracion = fecha.toISOString().slice(0, 16);
+      fecha_valoracion = fecha.toISOString().slice(0, 16); // yyyy-mm-ddTHH:MM
     }
 
-    // Buscar usuario por correo si no es numérico
+    // Si usuario_id es un correo electrónico
     if (typeof usuario_id === 'string' && isNaN(Number(usuario_id))) {
-      const { data: userData, error: userError } = await supabase
+      const { data: userData } = await supabase
         .from('usuarios')
         .select('id')
         .eq('correo_electronico', usuario_id)
         .single();
 
-      if (userError || !userData) {
-        return res.status(404).json({ message: 'Correo no encontrado en la base de datos' });
-      }
+      if (userData) {
+        usuario_id = userData.id;
+      } else {
+        // Insertamos usuario si no existe (login Google)
+        const { data: newUser, error: insertError } = await supabase
+          .from('usuarios')
+          .insert([{
+            correo_electronico: usuario_id,
+            nombre_usuario: nombre_usuario || 'Usuario',
+            imagen: imagen_usuario || null
+          }])
+          .select()
+          .single();
 
-      usuario_id = userData.id;
+        if (insertError) {
+          return res.status(500).json({ message: 'No se pudo crear el usuario' });
+        }
+
+        usuario_id = newUser.id;
+      }
     }
 
     const { data, error } = await supabase
@@ -77,8 +88,9 @@ export default async function handler(req, res) {
         valoracion,
         comentario,
         fecha_valoracion,
-        titulo
-        // no insertamos imagen_usuario ni otros campos no válidos
+        titulo,
+        imagen_usuario,
+        nombre_usuario
       }])
       .select();
 
