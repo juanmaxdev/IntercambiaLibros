@@ -21,15 +21,22 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'Faltan campos obligatorios' });
     }
 
-    const { data, error } = await supabase.from('valoraciones_libros').insert([
-      {
-        usuario_id,
-        valoracion,
-        comentario,
-        titulo
-        // No se incluye fecha_valoracion, ya que se usa CURRENT_TIMESTAMP en Supabase
-      }
-    ]).select();
+    // Crear fecha hasta minutos
+    const fecha = new Date();
+    const fecha_valoracion = fecha.toISOString().slice(0, 16);
+
+    const { data, error } = await supabase
+      .from('valoraciones_libros')
+      .insert([
+        {
+          usuario_id,
+          valoracion,
+          comentario,
+          titulo,
+          fecha_valoracion
+        }
+      ])
+      .select();
 
     if (error) return res.status(500).json({ error: error.message });
     return res.status(201).json({ message: 'Valoración registrada', valoracion: data[0] });
