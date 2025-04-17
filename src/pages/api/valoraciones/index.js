@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase';
 
 export default async function handler(req, res) {
-  // GET: Obtener valoraciones
+  // GET: obtener valoraciones
   if (req.method === 'GET') {
     const { data, error } = await supabase
       .from('valoraciones_libros')
@@ -29,30 +29,33 @@ export default async function handler(req, res) {
     return res.status(200).json(resultado);
   }
 
-  // POST: Insertar nueva valoración
+  // POST: insertar valoración
   if (req.method === 'POST') {
     let {
-      usuario_id,         // Puede ser un número o un correo
-      usuario_email,      // Alternativa si no llega usuario_id
+      usuario_id,
+      usuario_email, // si viene como correo
       valoracion,
       comentario = '',
       titulo,
       fecha_valoracion,
-      imagen_usuario = ''
+      ...otrosCampos // aquí capturamos imagen_usuario y lo ignoramos
     } = req.body;
 
     // Validación mínima
-    if (!valoracion || !comentario || !titulo) {
-      return res.status(400).json({ message: 'Faltan campos obligatorios' });
+    if (!usuario_id && !usuario_email) {
+      return res.status(400).json({ message: 'Falta el identificador del usuario' });
+    }
+    if (!valoracion || !titulo) {
+      return res.status(400).json({ message: 'Faltan campos obligatorios (valoracion, titulo)' });
     }
 
-    // Si no se recibe fecha, la ponemos desde backend
+    // Fecha si no se proporciona
     if (!fecha_valoracion) {
       const fecha = new Date();
-      fecha_valoracion = fecha.toISOString().slice(0, 16); // yyyy-mm-ddTH:MM
+      fecha_valoracion = fecha.toISOString().slice(0, 16);
     }
 
-    // Si usuario_id es un string (correo), buscar el ID real
+    // Buscar usuario por correo si no es numérico
     if (typeof usuario_id === 'string' && isNaN(Number(usuario_id))) {
       const { data: userData, error: userError } = await supabase
         .from('usuarios')
@@ -70,12 +73,12 @@ export default async function handler(req, res) {
     const { data, error } = await supabase
       .from('valoraciones_libros')
       .insert([{
-        usuario_id: usuario_id || null,
+        usuario_id,
         valoracion,
         comentario,
         fecha_valoracion,
-        titulo,
-        imagen_usuario: imagen_usuario || null
+        titulo
+        // no insertamos imagen_usuario ni otros campos no válidos
       }])
       .select();
 
