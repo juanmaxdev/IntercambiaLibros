@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     let {
       usuario_id,
       usuario_email,
-      nombre_usuario,
+      nombre_usuario, // <-- viene del front, pero no se guarda
       imagen_usuario = null,
       valoracion,
       comentario,
@@ -13,12 +13,12 @@ export default async function handler(req, res) {
       fecha_valoracion = new Date().toISOString().slice(0, 16)
     } = req.body;
 
-    // Validar campos obligatorios
+    // Validaciones mínimas
     if (!valoracion || !comentario || !titulo) {
       return res.status(400).json({ message: 'Faltan campos obligatorios' });
     }
 
-    // Si no se proporciona usuario_id pero sí email
+    // Buscar ID si solo se envió el correo
     if (!usuario_id && usuario_email) {
       const { data: userData, error: userError } = await supabase
         .from('usuarios')
@@ -27,28 +27,26 @@ export default async function handler(req, res) {
         .single();
 
       if (userError || !userData) {
-        return res.status(404).json({ message: 'Correo no encontrado en la base de datos' });
+        return res.status(404).json({ message: 'Correo no encontrado' });
       }
 
       usuario_id = userData.id;
     }
 
-    // Si aún no hay usuario_id, lo dejamos como null (por si viene de OAuth sin estar en tu tabla)
     const { data, error } = await supabase
       .from('valoraciones_libros')
-      .insert([
-        {
-          usuario_id: usuario_id || null,
-          valoracion,
-          comentario,
-          titulo,
-          fecha_valoracion,
-          imagen_usuario: imagen_usuario || null,
-        },
-      ])
+      .insert([{
+        usuario_id: usuario_id || null,
+        valoracion,
+        comentario,
+        titulo,
+        fecha_valoracion,
+        imagen_usuario
+      }])
       .select();
 
     if (error) return res.status(500).json({ error: error.message });
+
     return res.status(201).json({ message: 'Valoración registrada', valoracion: data[0] });
   }
 
@@ -73,7 +71,7 @@ export default async function handler(req, res) {
 
     const resultado = data.map(({ usuarios, ...rest }) => ({
       ...rest,
-      nombre_usuario: usuarios?.nombre_usuario || 'Usuario',
+      nombre_usuario: usuarios?.nombre_usuario || '',
       correo_electronico: usuarios?.correo_electronico || ''
     }));
 
