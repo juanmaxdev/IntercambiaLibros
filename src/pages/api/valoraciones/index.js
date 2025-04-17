@@ -49,7 +49,7 @@ export default async function handler(req, res) {
     const { data: existingUser } = await supabase
     .from('usuarios')
     .select('id')
-    .eq('correo_electronico', correo_electronico)
+    .eq('correo_electronico', usuario_id)
     .single();
 
     if (existingUser) {
@@ -86,7 +86,7 @@ export default async function handler(req, res) {
           .single();
 
         if (insertError) {
-          return res.status(500).json({ error: error.message });
+          return res.status(500).json({ error: insertError.message });
         }
 
         usuario_id = newUser.id;
