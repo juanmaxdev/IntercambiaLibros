@@ -2,61 +2,77 @@ import { supabase } from '@/lib/supabase';
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {
-    let { usuario_id, titulo } = req.query;
+    const { data, error } = await supabase
+      .from('valoraciones_libros')
+      .select(`
+        id,
+        usuario_id,
+        valoracion,
+        comentario,
+        fecha_valoracion,
+        titulo,
+        imagen_usuario,
+        usuarios:usuario_id (
+          nombre_usuario,
+          correo_electronico
+        )
+      `);
 
-    const query = supabase.from('valoraciones_libros').select('*');
+    if (error) return res.status(500).json({ error: error.message });
 
-    // Si se envía un correo como usuario_id, buscamos el ID real
-    if (usuario_id && usuario_id.includes('@')) {
-      const { data: user, error } = await supabase
+    const resultado = data.map(({ usuarios, ...rest }) => ({
+      ...rest,
+      nombre_usuario: usuarios?.nombre_usuario || '',
+      correo_electronico: usuarios?.correo_electronico || ''
+    }));
+
+    return res.status(200).json(resultado);
+  }
+
+  if (req.method === 'POST') {
+    let {
+      usuario_id, // puede ser ID o correo
+      valoracion,
+      comentario,
+      titulo,
+      imagen_usuario = '',
+      fecha_valoracion = new Date().toISOString().slice(0, 16),
+    } = req.body;
+
+    if (!usuario_id || !valoracion || !titulo) {
+      return res.status(400).json({ message: 'Faltan campos obligatorios' });
+    }
+
+    // Si usuario_id es un string (correo), buscar el ID real
+    if (isNaN(usuario_id)) {
+      const { data: userData, error: userError } = await supabase
         .from('usuarios')
         .select('id')
         .eq('correo_electronico', usuario_id)
         .single();
 
-      if (error || !user) {
-        return res.status(404).json({ message: 'Correo no encontrado en usuarios' });
+      if (userError || !userData) {
+        return res.status(404).json({ message: 'Correo no encontrado en la base de datos' });
       }
-
-      usuario_id = user.id;
+      usuario_id = userData.id;
     }
 
-    // Aplicar filtros
-    if (usuario_id) query.eq('usuario_id', usuario_id);
-    if (titulo) query.eq('titulo', titulo);
-
-    const { data, error } = await query;
-
-    if (error) return res.status(500).json({ error: error.message });
-    return res.status(200).json(data);
-  }
-
-  if (req.method === 'POST') {
-    const {
-      usuario_id,
-      valoracion,
-      comentario,
-      titulo,
-      fecha_valoracion,
-      nombre_usuario,
-      imagen_usuario,
-    } = req.body;
-
-    if (!usuario_id || !valoracion || !titulo || !fecha_valoracion) {
-      return res.status(400).json({ message: 'Faltan campos obligatorios' });
-    }
-
-    const { data, error } = await supabase.from('valoraciones_libros').insert([{
-      usuario_id,
-      valoracion,
-      comentario,
-      titulo,
-      fecha_valoracion,
-      nombre_usuario,
-      imagen_usuario,
-    }]).select();
+    const { data, error } = await supabase
+      .from('valoraciones_libros')
+      .insert([
+        {
+          usuario_id,
+          valoracion,
+          comentario,
+          fecha_valoracion,
+          titulo,
+          imagen_usuario,
+        },
+      ])
+      .select();
 
     if (error) return res.status(500).json({ error: error.message });
+
     return res.status(201).json({ message: 'Valoración registrada', valoracion: data[0] });
   }
 
