@@ -21,16 +21,13 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'Faltan campos obligatorios' });
     }
 
-    // Generar fecha con precisión hasta minutos (sin segundos ni milisegundos)
-    const fecha = new Date();
-    const fecha_valoracion = fecha.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
-
     const { data, error } = await supabase.from('valoraciones_libros').insert([
       {
         usuario_id,
         valoracion,
         comentario,
         titulo
+        // No se incluye fecha_valoracion, ya que se usa CURRENT_TIMESTAMP en Supabase
       }
     ]).select();
 
