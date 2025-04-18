@@ -1,3 +1,4 @@
+// pages/api/libros/index.js
 import { supabase } from '@/lib/supabase';
 
 export default async function handler(req, res) {
@@ -6,6 +7,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: `Método ${req.method} no permitido` });
   }
 
+  // Traemos todos los campos de libros + usuario y género relacionados
   const { data, error } = await supabase
     .from('libros')
     .select(`
@@ -34,6 +36,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ message: 'Error al obtener libros', error: error.message });
   }
 
+  // Aplanar usuarios y géneros para dejar todo en el mismo objeto
   const libros = data.map(({ usuarios, generos, ...rest }) => ({
     ...rest,
     nombre_usuario: usuarios?.nombre_usuario ?? 'Desconocido',
