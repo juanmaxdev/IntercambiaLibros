@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../../public/assets/bootstrap/css/bootstrap.min.css" />
+    <title>Document</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      footer {
+        margin-top: auto;
+      }
+
+      main {
+        flex: 1;
+      }
+      .custom-rectangle {
+        width: 25rem;
+        height: 55rem;
+        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 87%, 0% 100%);
+      }
+      .custom-container-comment {
+        width: 90rem;
+        height: 19rem;
+        clip-path: polygon(27% 0, 27% 22%, 100% 22%, 100% 100%, 0 100%, 0 0);
+      }
+    </style>
+    
+
+    <script>
+      const form = document.getElementById('register-form');
+      const message = document.getElementById('message');
+  
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+  
+        const formData = new FormData(form);
+        const data = {
+          nombre_usuario: formData.get('nombre_usuario'),
+          correo_electronico: formData.get('correo_electronico'),
+          contrasena: formData.get('contrasena'),
+        };
+  
+        const res = await fetch('/api/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data),
+        });
+  
+        const result = await res.json();
+        message.textContent = result.message;
+  
+        if (res.ok) {
+          form.reset();
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <!-- NAV BAR -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
+      <div class="container-fluid">
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item dropdown">
+              <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="../../public/assets/icons/list.svg" alt="iconoMenu" width="35" height="25" />
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Action</a></li>
+                <li><a class="dropdown-item" href="#">Another action</a></li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" href="#">Something else here</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#">IntercambiaLibros</a>
+            </li>
+          </ul>
+          <!-- Barra de busqueda -->
+          <div class="d-flex justify-content-center w-100">
+            <form class="d-flex" role="search" style="max-width: 500px; width: 100%">
+              <div class="input-group">
+                <input type="search" class="form-control" placeholder="Buscar" aria-label="Buscar" />
+                <button class="btn btn-outline-secondary" type="submit">
+                  <img src="../../public/assets/icons/search.svg" alt="iconoBusqueda" width="20" height="20" />
+                </button>
+              </div>
+            </form>
+          </div>
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center gap-2 text-nowrap px-2" href="#">
+                <img src="../../public/assets/icons/cloud-upload.svg" alt="iconoSubirLibro" with="18" height="18" />
+                Subir Libro
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link d-flex align-items-center gap-2 text-nowrap px-2"
+                data-bs-toggle="modal"
+                data-bs-target="#modalIniciarSesion"
+                href="#"
+              >
+                <img src="../../public/assets/icons/person-fill.svg" alt="iconoCuenta" with="18" height="18" />
+                Iniciar sesión
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link d-flex align-items-center gap-2 text-nowrap ps-2" href="#">
+                <img src="../../public/assets/icons/bell.svg" alt="iconoNotificacion" with="18" height="18" />
+                Notificacion
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- MODAL REGISTRO -->
+    <div
+      class="modal fade"
+      id="modalIniciarSesion"
+      tabindex="-1"
+      aria-labelledby="modalIniciarSesion"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-0">
+            <section class="h-100 gradient-form" style="background-color: #eee">
+              <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="card-body px-md-5 pb-md-5 pt-md-3 mx-md-4">
+                  <div class="text-center">
+                    <img
+                      src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/lotus.webp"
+                      style="width: 185px"
+                      alt="logo"
+                    />
+                    <h4 class="mt-1 mb-5 pb-1">IntercambiaLibros</h4>
+                  </div>
+
+                  <form>
+                    <div class="form-floating mb-3">
+                      <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" />
+                      <label for="floatingInput">Usuario</label>
+                    </div>
+                    <div class="form-floating">
+                      <input type="password" class="form-control" id="floatingPassword" placeholder="Password" />
+                      <label for="floatingPassword">Contraseña</label>
+                    </div>
+
+                    <div class="text-center mt-4 pb-2 d-flex justify-content-between">
+                      <button class="btn btn-outline-primary" style="width: 80%" type="submit">Iniciar Sesión</button>
+                      <a class="text-muted" href="#!">¿Olvidaste la contraseña?</a>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-center m-3 gap-3">
+                      <p class="mb-0 me-2">¿No tienes una cuenta?</p>
+                      <button
+                        type="button"
+                        style="width: 40%"
+                        class="btn btn-outline-danger border-0 py-0"
+                        data-bs-target="#modalRegistro"
+                        data-bs-toggle="modal"
+                      >
+                        Registrate
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL DE REGISTRO-->
+    <div class="modal fade" id="modalRegistro" tabindex="-1" aria-labelledby="modalRegistro" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-0">
+            <section class="h-100 gradient-form" style="background-color: #eee">
+              <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="card-body px-md-5 pb-md-5 pt-md-3 mx-md-4">
+                  <div class="d-flex flex-column justify-content-center align-items-center text-center my-2 pb-4 ">
+                    <h4 class="mb-0">Crear cuenta</h4>
+                    <img
+                      src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/lotus.webp"
+                      style="width: 120px"
+                      alt="logo"
+                    />
+                  </div>
+
+                 <form id="register-form">
+                    <div class="form-floating mb-3">
+                      <input type="nombre_usuario" class="form-control" id="floatingInput" placeholder="name@example.com" name="username" />
+                      <label for="floatingInput">Nombre de usuario</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                      <input type="correo_electronico" class="form-control" id="floatingPassword" placeholder="Email" name="email" />
+                      <label for="floatingPassword">Email</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                      <input type="contrasena" class="form-control" id="floatingPassword" placeholder="Password" name="password"/>
+                      <label for="floatingPassword">Contraseña</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                      <input type="password" class="form-control" id="floatingPassword" placeholder="Password" />
+                      <label for="floatingPasswordRepeat">Repetir Contraseña</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="flexCheckTerminos" required />
+                      <label class="form-check-label" for="flexCheckTerminos">
+                        <span>
+                          He leído y acepto la
+                          <a href="#">política de privacidad</a>
+                        </span>
+                      </label>
+                    </div>
+
+                    <div class="text-center mt-4 pb-2 d-flex justify-content-between">
+                      <button class="btn btn-outline-primary w-100" type="submit">Crear cuenta</button>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-center m-3 gap-3">
+                      <div class="d-flex align-items-center w-100">
+                        <div class="flex-grow-1 border-top"></div>
+                        <span class="px-3 mb-0">Ya tengo una cuenta</span>
+                        <div class="flex-grow-1 border-top"></div>
+                      </div>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                      <button
+                        type="button"
+                        class="btn btn-outline-danger w-100"
+                        data-bs-target="#modalIniciarSesion"
+                        data-bs-toggle="modal"
+                      >
+                        Iniciar sesión
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main class="pt-5 mt-3">
+      <div class="container"></div>
+    </main>
+
+    <!-- FOOTER -->
+
+    <div class="container-fluid mx-0 p-0 border-top" style="--bs-border-opacity: 0.5">
+      <footer class="py-5 bottom-0 w-100 pb-0 pt-3">
+        <div class="row align-items-center m-0">
+          <!-- Sección Izquierda -->
+          <div class="col-12 col-md-4 d-flex flex-column align-items-center">
+            <p class="mb-0 me-0 text-center">¿Necesitas ayuda?</p>
+            <button
+              type="button"
+              class="btn btn-outline-info mt-4 px-3 py-1 d-flex align-items-center justify-content-center rounded-pill"
+              style="width: 120px"
+            >
+              Contáctanos
+            </button>
+          </div>
+
+          <!-- Sección Derecha -->
+          <div class="col-12 col-md-8 d-flex justify-content-end gap-5 p-0">
+            <div class="col-auto">
+              <ul class="nav flex-column">
+                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Sobre Nosotros</a></li>
+                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Quienes somos</a></li>
+                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Donaciones</a></li>
+                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Afiliados</a></li>
+              </ul>
+            </div>
+
+            <div class="col-auto">
+              <ul class="nav flex-column">
+                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Ayuda</a></li>
+                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Cookies</a></li>
+                <li class="nav-item mb-2">
+                  <a href="#" class="nav-link p-0 text-body-secondary">Política de privacidad</a>
+                </li>
+                <li class="nav-item mb-2">
+                  <a href="#" class="nav-link p-0 text-body-secondary text-nowrap">Términos y condiciones</a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="col-auto">
+              <ul class="nav flex-column me-4">
+                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Localidad</a></li>
+                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">España</a></li>
+                <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">FAQs</a></li>
+                <li class="nav-item mb-2 d-flex gap-3">
+                  <a href="#" class="nav-link p-0 text-body-secondary">
+                    <img src="../../public/assets/icons/instagram.svg" width="18" height="18" />
+                  </a>
+                  <a href="#" class="nav-link p-0 text-body-secondary">
+                    <img src="../../public/assets/icons/facebook.svg" width="18" height="18" />
+                  </a>
+                  <a href="#" class="nav-link p-0 text-body-secondary">
+                    <img src="../../public/assets/icons/youtube.svg" width="18" height="18" />
+                  </a>
+                  <a href="#" class="nav-link p-0 text-body-secondary">
+                    <img src="../../public/assets/icons/twitter-x.svg" width="18" height="18" />
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+    <script src="../../public/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

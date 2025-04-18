@@ -1,0 +1,55 @@
+:root {
+  --text: rgb(11, 11, 22);
+  --background: rgb(247, 247, 251);
+  --primary: rgb(85, 83, 172);
+  --secondary: rgb(212, 167, 177 ,0.15);
+  --accent: rgba(192, 150, 125, 0.45);
+}
+
+.bg-text{
+  color: var(--text);
+}
+
+.bg-background{
+  background-color: var(--background);
+}
+
+.bg-primario{
+  background-color: var(--primary);
+}
+
+.bg-secondario{
+  background-color: var(--secondary);
+}
+
+.bg-ascent{
+  background-color: var(--accent);
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+footer {
+  margin-top: auto;
+}
+
+main {
+  flex: 1;
+}
+.custom-rectangle {
+  width: 25rem;
+  height: 55rem;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 87%, 0% 100%);
+}
+.custom-container-comment {
+  width: 90rem;
+  height: 19rem;
+  clip-path: polygon(27% 0, 27% 22%, 100% 22%, 100% 100%, 0 100%, 0 0);
+}
+
