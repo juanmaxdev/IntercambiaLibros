@@ -50,5 +50,15 @@ main {
 .custom-container-comment {
   width: 90rem;
   height: 19rem;
-  clip-path: polygon(27% 0, 27% 22%, 100% 22%, 100% 100%, 0 100%, 0 0);
+}
+
+.formulario-comentario {
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.formulario-comentario textarea {
+  resize: vertical;
+  min-height: 100px;
 }

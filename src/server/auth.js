@@ -17,7 +17,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   callbacks: {
     async redirect({ url, baseUrl }) {
-      return url.startsWith(baseUrl) ? url : baseUrl
+      // Siempre devolver la URL original para mantener al usuario en la misma página
+      return url
     },
+    // Otros callbacks...
   },
+  // Otras opciones...
 })

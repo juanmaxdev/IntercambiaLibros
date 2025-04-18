@@ -68,7 +68,7 @@ export default function Reportes() {
   };
 
   // Manejar el envío del formulario
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
@@ -78,7 +78,38 @@ export default function Reportes() {
     // Si no hay errores, puedes proceder a enviar los datos al servidor
     setErrors({});
     console.log('Formulario válido:', formValues);
-    // Aqui hacemos el call a la api cuando este lista
+    
+    const dataForm = {
+      nombre: formValues.nombre,
+      apellidos: formValues.apellidos,
+      email: formValues.email,
+      titulo: formValues.motivo,
+      mensaje: formValues.mensaje,
+      fecha_envio: new Date().toISOString(),
+    }
+
+    const response = await fetch("/api/reportes", {
+      method: "POST",
+      headers : {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(dataForm),
+    })
+
+    if(!response.ok){
+      throw new Error("Error al enviar el formulario")
+    }else{
+      alert("Formulario enviado correctamente")
+      setFormValues({
+        nombre: '',
+        apellidos: '',
+        email: '',
+        motivo: '',
+        mensaje: '',
+        acepto: false,
+      });
+    }
+
   };
 
   return (
@@ -163,6 +194,7 @@ export default function Reportes() {
                     id="floatingInputNombre"
                     placeholder="Nombre"
                     name="nombre"
+                    value={formValues.nombre}
                     onChange={handleChange}
                   />
                   <label htmlFor="floatingInputNombre">Nombre</label>
@@ -175,6 +207,7 @@ export default function Reportes() {
                     id="floatingApellidos"
                     placeholder="Apellidos"
                     name="apellidos"
+                    value={formValues.apellidos}
                     onChange={handleChange}
                   />
                   <label htmlFor="floatingApellidos">Apellidos</label>
@@ -206,6 +239,7 @@ export default function Reportes() {
                     id="floatingReason"
                     placeholder="Motivo"
                     name="motivo"
+                    value={formValues.motivo}
                     onChange={handleChange}
                   />
                   <label htmlFor="floatingReason">Título del mensaje</label>
@@ -218,6 +252,7 @@ export default function Reportes() {
                     placeholder="Mensaje"
                     name="mensaje"
                     style={{ height: '100px' }}
+                    value={formValues.mensaje}
                     onChange={handleChange}
                   />
                   <label htmlFor="floatingInputDescripcion">Mensaje</label>
@@ -230,6 +265,7 @@ export default function Reportes() {
                       type="checkbox"
                       id="gridCheck"
                       name="acepto"
+                      checked={formValues.acepto}
                       onChange={handleChange}
                     />
                     <label className="form-check-label" htmlFor="gridCheck">

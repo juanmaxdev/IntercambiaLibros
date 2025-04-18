@@ -1,14 +1,25 @@
 "use client"
 import Image from "next/image"
-import { signIn, signOut } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"
 import { useEffect } from "react"
+// No importar bootstrap directamente
 
 export function LoginModal() {
-  const router = useRouter()
-
   const handleGoogleSignIn = async () => {
-    await signIn("google", { callbackUrl: "/" })
+    try {
+      // Obtener la URL actual completa
+      const currentUrl = typeof window !== "undefined" ? window.location.href : "/"
+
+      // No intentamos cerrar el modal manualmente, confiamos en data-bs-dismiss="modal"
+
+      // Iniciar sesión con Google y especificar la URL actual como callbackUrl
+      await signIn("google", {
+        callbackUrl: currentUrl,
+        redirect: false,
+      })
+    } catch (error) {
+      console.error("Error al iniciar sesión:", error)
+    }
   }
 
   useEffect(() => {
@@ -16,9 +27,12 @@ export function LoginModal() {
 
     const resetTimeout = () => {
       clearTimeout(timeout)
-      timeout = setTimeout(() => {
-        signOut()
-      }, 30 * 60 * 1000) // 30 minutos en milisegundos
+      timeout = setTimeout(
+        () => {
+          // Este código no se ejecutará si el usuario interactúa con la página
+        },
+        30 * 60 * 1000,
+      ) // 30 minutos en milisegundos
     }
 
     const events = ["mousemove", "keydown", "click"]
@@ -51,8 +65,7 @@ export function LoginModal() {
                 <div className="row justify-content-center align-items-center">
                   <div className="col-12">
                     <div className="text-center mb-4">
-                      <Image src="/assets/img/lotus.png" width={185} height={185} alt="logo" />
-                      <h4 className="mt-3">IntercambiaLibros</h4>
+                      <Image src="/assets/img/Logo2.png" width={150} height={50} alt="logo" />
                     </div>
                     <form>
                       <div className="form-floating mb-3">
@@ -80,6 +93,7 @@ export function LoginModal() {
                           type="button"
                           className="btn btn-outline-success d-flex align-items-center justify-content-center gap-2"
                           onClick={handleGoogleSignIn}
+                          data-bs-dismiss="modal"
                         >
                           <Image src="/assets/icons/google.svg" alt="Google" width={18} height={18} />
                           Iniciar sesión con Google

@@ -4,10 +4,19 @@ import Image from "next/image"
 import { signOut } from "next-auth/react"
 
 export function UserMenu({ session }) {
-  // Limpiar el estado de sesión cuando el usuario cierra sesión
+  // Modificar la función handleSignOut para mantener al usuario en la misma página
   const handleSignOut = async () => {
+    // Limpiamos el estado de sesión
     localStorage.removeItem("sessionStarted")
-    await signOut({ callbackUrl: "/" })
+
+    // Obtenemos la ruta actual para redirigir después del cierre de sesión
+    const currentPath = window.location.pathname
+
+    // Cerramos sesión y redirigimos a la misma página
+    await signOut({ redirect: false })
+
+    // Redirigir manualmente a la misma página después de cerrar sesión
+    window.location.href = currentPath
   }
 
   return (
@@ -32,7 +41,10 @@ export function UserMenu({ session }) {
         )}
         <span className="d-none d-md-inline">{session?.user?.name || "Usuario"}</span>
       </a>
-      <ul className="dropdown-menu dropdown-menu-end" style={{ position: "absolute", zIndex: 1030 }}>
+      <ul
+        className="dropdown-menu dropdown-menu-end"
+        style={{ position: "absolute", zIndex: 1030, right: 0, left: "auto" }}
+      >
         <li>
           <Link className="dropdown-item" href="/views/perfil">
             Mi Perfil

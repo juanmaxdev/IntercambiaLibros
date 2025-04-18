@@ -1,7 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { ToastNotification } from "./notification"
@@ -17,7 +16,6 @@ export default function Nav() {
   const isAuthenticated = status === "authenticated"
   const [showToast, setShowToast] = useState(false)
   const [toastMessage, setToastMessage] = useState("")
-  const router = useRouter()
 
   // Verificar si el usuario acaba de iniciar sesión (usando localStorage)
   useEffect(() => {
@@ -26,12 +24,10 @@ export default function Nav() {
       setShowToast(true)
       localStorage.setItem("sessionStarted", "true")
 
-      // Redirigir al index después de 2 segundos
-      setTimeout(() => {
-        router.push("/")
-      }, 2000)
+      // Eliminar la redirección al index
+      // No redirigimos al usuario, se queda en la misma página
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated])
 
   return (
     <>
@@ -44,7 +40,22 @@ export default function Nav() {
                 <NavLinks isAuthenticated={isAuthenticated} />
                 <li className="nav-item">
                   <Link className="nav-link active p-0" aria-current="page" href="/">
-                    <Image src="/assets/img/logo2.png" alt="logo" width={150} height={28} priority />
+                    <Image
+                      src="/assets/img/logo2.png"
+                      alt="logo"
+                      className="d-none d-md-inline"
+                      width={150}
+                      height={28}
+                      priority
+                    />
+                    <Image
+                      src="/assets/img/logo/Logo_small_true.jpg"
+                      alt="logo"
+                      className="d-inline d-md-none"
+                      width={28}
+                      height={28}
+                      priority
+                    />
                   </Link>
                 </li>
               </ul>

@@ -14,30 +14,54 @@ export default function BookCard({ book }) {
   }
 
   const handleMoreInfo = () => {
-    if (book && book.id) {
-      router.push(`/views/books/bookId/${book.id}`)
+    // Usar libro_id si está disponible, de lo contrario usar id
+    const bookId = book.libro_id || book.id
+
+    if (bookId) {
+      router.push(`/views/books/bookId/${bookId}`)
     } else {
       alert("No se puede mostrar la información del libro porque no tiene un ID válido.")
     }
   }
 
+  // Verificar si el libro es una donación
+  const isDonation = book.donacion === true || book.tipoIntercambio === "2"
+
   return (
     <div
-      className="card h-100 shadow-sm"
+      className="card h-100 shadow-sm position-relative"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{ borderRadius: "8px", overflow: "hidden" }}
     >
+      {/* Etiqueta de donación */}
+      {isDonation && (
+        <div
+          className="position-absolute badge bg-success"
+          style={{
+            top: "10px",
+            right: "10px",
+            zIndex: 10,
+            padding: "5px 10px",
+            fontSize: "0.8rem",
+            fontWeight: "bold",
+            borderRadius: "4px",
+          }}
+        >
+          Donación
+        </div>
+      )}
+
       <div
         className="position-relative overflow-hidden d-flex justify-content-center align-items-center"
         style={{
-          height: "300px",
+          height: "350px",
           transition: "all 0.3s ease",
         }}
       >
         {imageError || !book.imagenes ? (
           <div className="text-center p-3">
-            <div className="mb-2" style={{ fontSize: "3rem" }}>
+            <div className="mb-2" style={{ fontSize: "4rem" }}>
               📚
             </div>
             <span className="text-muted">Imagen no disponible</span>
@@ -50,8 +74,9 @@ export default function BookCard({ book }) {
             onError={handleImageError}
             fill
             sizes="(min-width: 768px) 20vw, 50vw"
+            priority={true}
             style={{
-              objectFit: "contain",
+              objectFit: "fill",
               transition: "transform 0.3s ease",
               transform: isHovered ? "scale(1.05)" : "scale(1)",
             }}

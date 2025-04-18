@@ -1,16 +1,59 @@
 "use client"
+import { useEffect, useState, useRef } from "react"
+import BookCard from "@/components/books/book-card"
+import GenreSelector from "@/components/books/genre-selector"
 
-import { useState, useEffect, useRef } from "react"
-import BookCard from "./book-card"
-import GenreSelector from "./genre-selector"
-
-export default function BookList({ books = [], isLoading }) {
+export default function DonationsPage() {
+  const [books, setBooks] = useState([])
   const [visibleBooks, setVisibleBooks] = useState([])
   const [page, setPage] = useState(1)
   const [selectedGenre, setSelectedGenre] = useState("All")
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
   const loaderRef = useRef(null)
   const booksPerPage = 10
   const filteredBooksRef = useRef([])
+
+  // Cargar donaciones desde la API
+  useEffect(() => {
+    async function fetchDonations() {
+      try {
+        setIsLoading(true)
+        const response = await fetch("/api/proxy-books/donaciones")
+
+        if (!response.ok) {
+          throw new Error(`Error al obtener las donaciones: ${response.status}`)
+        }
+
+        const data = await response.json()
+
+        // Filtrar donaciones duplicadas basadas en libro_id
+        const uniqueDonations = []
+        const seenIds = new Set()
+
+        data.forEach((donation) => {
+          const idToCheck = donation.libro_id || donation.id
+          if (idToCheck && !seenIds.has(idToCheck)) {
+            seenIds.add(idToCheck)
+            uniqueDonations.push({
+              ...donation,
+              id: idToCheck, // Asegurar que el campo 'id' exista y sea igual a 'libro_id' o 'id'
+              donacion: true, // Marcar explícitamente como donación
+            })
+          }
+        })
+
+        setBooks(uniqueDonations)
+      } catch (err) {
+        console.error("Error al cargar las donaciones:", err)
+        setError(err.message)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchDonations()
+  }, [])
 
   // Filtrar libros por género - Modificar para usar categoría o nombre_genero
   const filteredBooks =
@@ -30,7 +73,7 @@ export default function BookList({ books = [], isLoading }) {
     // Resetear cuando cambia el filtro de género o los libros
     setPage(1)
     setVisibleBooks(filteredBooksRef.current.slice(0, booksPerPage))
-  }, [selectedGenre, books, booksPerPage]) // No incluir filteredBooks aquí
+  }, [selectedGenre, books, booksPerPage])
 
   // Este useEffect maneja la carga infinita
   useEffect(() => {
@@ -73,24 +116,31 @@ export default function BookList({ books = [], isLoading }) {
         observer.unobserve(loaderRef.current)
       }
     }
-  }, [page, visibleBooks.length, booksPerPage]) // Eliminamos filteredBooks de las dependencias
+  }, [page, visibleBooks.length, booksPerPage])
 
   // Extraer géneros únicos de los libros - Modificar para usar categoría o nombre_genero
   const genres = ["All", ...new Set(books.map((book) => book.categoria || book.nombre_genero).filter(Boolean))]
 
   return (
-    <div className="book-list">
+    <div className="container py-4">
+      <h2 className="mb-4 text-center">Donaciones</h2>
+      <p className="text-center mb-4">Libros disponibles para donación - ¡Llévate uno gratis!</p>
+
       <GenreSelector genres={genres} selectedGenre={selectedGenre} onSelectGenre={setSelectedGenre} />
 
-      {isLoading ? (
+      {isLoading && visibleBooks.length === 0 ? (
         <div className="text-center my-4">
           <div className="spinner-border" role="status">
-            <span className="visually-hidden">Cargando libros...</span>
+            <span className="visually-hidden">Cargando donaciones...</span>
           </div>
+        </div>
+      ) : error ? (
+        <div className="alert alert-danger text-center" role="alert">
+          {error}
         </div>
       ) : filteredBooks.length === 0 ? (
         <div className="alert alert-info text-center" role="alert">
-          Libros de este género no encontrados.
+          No se encontraron donaciones en esta categoría.
         </div>
       ) : (
         <>
@@ -105,7 +155,7 @@ export default function BookList({ books = [], isLoading }) {
           {visibleBooks.length < filteredBooks.length && (
             <div ref={loaderRef} className="text-center my-4 py-3">
               <div className="spinner-border" role="status">
-                <span className="visually-hidden">Cargando más libros...</span>
+                <span className="visually-hidden">Cargando más donaciones...</span>
               </div>
             </div>
           )}
