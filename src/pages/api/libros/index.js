@@ -27,44 +27,7 @@ apiRoute.use((req, res, next) => {
   next();
 });
 
-// GET /api/libros
-apiRoute.get(async (req, res) => {
-  const { data, error } = await supabase
-    .from('libros')
-    .select(`
-      id,
-      isbn,
-      titulo,
-      autor,
-      estado_libro,
-      descripcion,
-      donacion,
-      ubicacion,
-      imagenes,
-      usuario_id,
-      estado_intercambio,
-      fecha_subida,
-      valoracion_del_libro,
-      tipo_tapa,
-      editorial,
-      metodo_intercambio,
-      usuarios:usuario_id ( nombre_usuario ),
-      generos:genero_id ( nombre )
-    `);
 
-  if (error) {
-    console.error('Error al consultar libros:', error);
-    return res.status(500).json({ error: error.message });
-  }
-
-  const formateado = data.map(({ usuarios, generos, ...libro }) => ({
-    ...libro,
-    nombre_usuario: usuarios?.nombre_usuario || 'Desconocido',
-    nombre_genero: generos?.nombre || 'Sin género'
-  }));
-
-  return res.status(200).json(formateado);
-});
 
 // POST /api/libros
 apiRoute.post(async (req, res) => {
@@ -136,3 +99,42 @@ apiRoute.post(async (req, res) => {
 });
 
 export default apiRoute;
+
+// GET /api/libros
+apiRoute.get(async (req, res) => {
+  const { data, error } = await supabase
+    .from('libros')
+    .select(`
+      id,
+      isbn,
+      titulo,
+      autor,
+      estado_libro,
+      descripcion,
+      donacion,
+      ubicacion,
+      imagenes,
+      usuario_id,
+      estado_intercambio,
+      fecha_subida,
+      valoracion_del_libro,
+      tipo_tapa,
+      editorial,
+      metodo_intercambio,
+      usuarios:usuario_id ( nombre_usuario ),
+      generos:genero_id ( nombre )
+    `);
+
+  if (error) {
+    console.error('Error al consultar libros:', error);
+    return res.status(500).json({ error: error.message });
+  }
+
+  const formateado = data.map(({ usuarios, generos, ...libro }) => ({
+    ...libro,
+    nombre_usuario: usuarios?.nombre_usuario || 'Desconocido',
+    nombre_genero: generos?.nombre || 'Sin género'
+  }));
+
+  return res.status(200).json(formateado);
+});
