@@ -6,17 +6,15 @@ import { supabase } from '@/lib/supabase';
 const upload = multer({ storage: multer.memoryStorage() });
 
 const apiRoute = nextConnect({
-  onError(error, req, res) {
+  onError(error, req, res) => {
     res.status(501).json({ error: `Error en la API: ${error.message}` });
   },
-  onNoMatch(req, res) {
+  onNoMatch(req, res) => {
     res.status(405).json({ error: `Método ${req.method} no permitido` });
   },
 });
 
-apiRoute.use(upload.single('archivo'));
-
-// GET - Obtener libros
+// ✅ GET - Obtener libros
 apiRoute.get(async (req, res) => {
   const { data, error } = await supabase
     .from('libros')
@@ -56,8 +54,8 @@ apiRoute.get(async (req, res) => {
   return res.status(200).json(formateado);
 });
 
-// POST - Subir nuevo libro con posible imagen
-apiRoute.post(async (req, res) => {
+// ✅ POST - Subir nuevo libro con posible imagen
+apiRoute.post(upload.single('archivo'), async (req, res) => {
   const {
     isbn,
     titulo,
@@ -129,7 +127,6 @@ export default apiRoute;
 
 export const config = {
   api: {
-    bodyParser: false, // requerido para usar multer
+    bodyParser: false, // necesario para usar multer
   },
 };
-
