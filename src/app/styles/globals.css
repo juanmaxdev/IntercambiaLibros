@@ -1,0 +1,47 @@
+:root {
+  --text: rgb(11, 11, 22);
+  --background: rgb(247, 247, 251);
+  --primary: rgb(85, 83, 172);
+  --secondary: rgb(212, 167, 177);
+  --accent: rgb(192, 150, 125);
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+nav{
+  background-color: var(--background);
+  border-bottom: rgba(11, 11, 22, 0.1) 1px solid;
+}
+
+footer{
+  background-color: var(--background);
+}
+
+html,
+body {
+  background-color: var(--background);
+  max-width: 100vw;
+  overflow-x: hidden;
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main{
+  flex: 1;
+  margin-top: 30px;
+}
+
+h1,h2,h3,h4,h5,h6 {
+  color: var(--text);
+}
+
+span, p {
+  color: var(--text);
+}
+
