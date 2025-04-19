@@ -1,4 +1,3 @@
-// pages/api/libros/create.js
 import nextConnect from 'next-connect';
 import multer from 'multer';
 import { supabase } from '@/lib/supabase';
