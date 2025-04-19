@@ -42,14 +42,14 @@ export default function Reportes() {
     }
 
     if (!formValues.email.trim()) {
-      newErrors.email = msg;
-    } else if (!/\S+@\S+\.\S+/.test(formValues.email)) {
-      newErrors.email = 'El email no es válido.';
+      newErrors.email = 'Este campo es obligatorio.';
+    } else if (!formValues.email.includes('@')) {
+      newErrors.email = 'El email debe contener @';
     }
 
-    if(!formValues.motivo.trim()){
+    if (!formValues.motivo.trim()) {
       newErrors.motivo = msg;
-    }else if(formValues.motivo.trim().length < 3){
+    } else if (formValues.motivo.trim().length < 3) {
       newErrors.motivo = 'El título debe contener al menos 3 caracteres.';
     }
 
@@ -60,8 +60,6 @@ export default function Reportes() {
         'El mensaje debe contener al menos 20 caracteres para explicar detalladamente el motivo. Por favor, proporciona una explicación completa.';
     }
 
-    if (!formValues.mensaje.trim()) newErrors.mensaje = msg;
-
     if (!formValues.acepto) {
       newErrors.acepto = 'Debes aceptar los términos y condiciones.';
     }
@@ -70,7 +68,7 @@ export default function Reportes() {
   };
 
   // Manejar el envío del formulario
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
@@ -80,7 +78,38 @@ export default function Reportes() {
     // Si no hay errores, puedes proceder a enviar los datos al servidor
     setErrors({});
     console.log('Formulario válido:', formValues);
-    // Aqui hacemos el call a la api cuando este lista
+    
+    const dataForm = {
+      nombre: formValues.nombre,
+      apellidos: formValues.apellidos,
+      email: formValues.email,
+      titulo: formValues.motivo,
+      mensaje: formValues.mensaje,
+      fecha_envio: new Date().toISOString(),
+    }
+
+    const response = await fetch("/api/reportes", {
+      method: "POST",
+      headers : {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(dataForm),
+    })
+
+    if(!response.ok){
+      throw new Error("Error al enviar el formulario")
+    }else{
+      alert("Formulario enviado correctamente")
+      setFormValues({
+        nombre: '',
+        apellidos: '',
+        email: '',
+        motivo: '',
+        mensaje: '',
+        acepto: false,
+      });
+    }
+
   };
 
   return (
@@ -152,7 +181,12 @@ export default function Reportes() {
 
               {/* Formulario */}
               <h4 className="mt-5">Contacto</h4>
-              <form className="row g-3 mb-5 mt-2" onSubmit={handleSubmit}>
+              <form
+                onSubmit={handleSubmit}
+                noValidate
+                className="row g-3 mb-5 mt-2"
+                aria-label="Formulario de reportes"
+              >
                 <div className="form-floating col-md-6">
                   <input
                     type="text"
@@ -160,6 +194,7 @@ export default function Reportes() {
                     id="floatingInputNombre"
                     placeholder="Nombre"
                     name="nombre"
+                    value={formValues.nombre}
                     onChange={handleChange}
                   />
                   <label htmlFor="floatingInputNombre">Nombre</label>
@@ -172,6 +207,7 @@ export default function Reportes() {
                     id="floatingApellidos"
                     placeholder="Apellidos"
                     name="apellidos"
+                    value={formValues.apellidos}
                     onChange={handleChange}
                   />
                   <label htmlFor="floatingApellidos">Apellidos</label>
@@ -184,11 +220,18 @@ export default function Reportes() {
                     id="floatingEmail"
                     placeholder="Email"
                     name="email"
+                    value={formValues.email}
                     onChange={handleChange}
+                    data-testid="email-input"
                   />
                   <label htmlFor="floatingEmail">Email</label>
-                  {errors.email && <small className="text-danger">{errors.email}</small>}
+                  {errors.email && (
+                    <small data-testid="email-error-message" className="text-danger">
+                      {errors.email}
+                    </small>
+                  )}
                 </div>
+
                 <div className="form-floating col-12">
                   <input
                     type="text"
@@ -196,6 +239,7 @@ export default function Reportes() {
                     id="floatingReason"
                     placeholder="Motivo"
                     name="motivo"
+                    value={formValues.motivo}
                     onChange={handleChange}
                   />
                   <label htmlFor="floatingReason">Título del mensaje</label>
@@ -208,6 +252,7 @@ export default function Reportes() {
                     placeholder="Mensaje"
                     name="mensaje"
                     style={{ height: '100px' }}
+                    value={formValues.mensaje}
                     onChange={handleChange}
                   />
                   <label htmlFor="floatingInputDescripcion">Mensaje</label>
@@ -220,10 +265,12 @@ export default function Reportes() {
                       type="checkbox"
                       id="gridCheck"
                       name="acepto"
+                      checked={formValues.acepto}
                       onChange={handleChange}
                     />
                     <label className="form-check-label" htmlFor="gridCheck">
-                      Acepto los términos y condiciones {/* PONER UN Link con el import hacia los terminos y condiciones cuando esten READY */}
+                      Acepto los términos y condiciones{' '}
+                      {/* PONER UN Link con el import hacia los terminos y condiciones cuando esten READY */}
                     </label>
                   </div>
                   {errors.acepto && <small className="text-danger">{errors.acepto}</small>}
