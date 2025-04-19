@@ -26,10 +26,19 @@ apiRoute.use(upload.single('archivo'));
 
 apiRoute.post(async (req, res) => {
   const {
-    isbn, titulo, autor, genero_id, estado_libro,
-    descripcion, donacion, ubicacion, usuario_id,
-    valoracion_del_libro = 0, tipo_tapa = '',
-    editorial = '', metodo_intercambio = 'Presencial'
+    isbn, 
+    titulo, 
+    autor, 
+    genero_id, 
+    estado_libro,
+    descripcion, 
+    donacion, 
+    ubicacion, 
+    usuario_id,
+    valoracion_del_libro = 0, 
+    tipo_tapa = '',
+    editorial = '', 
+    metodo_intercambio = 'Presencial'
   } = req.body;
 
   let urlImagen = req.body.imagenes || '';
@@ -58,10 +67,21 @@ apiRoute.post(async (req, res) => {
   const { data, error } = await supabase
     .from('libros')
     .insert([{
-      isbn, titulo, autor, genero_id, estado_libro,
-      descripcion, donacion, ubicacion, imagenes: urlImagen,
-      usuario_id, fecha_subida, valoracion_del_libro,
-      tipo_tapa, editorial, metodo_intercambio
+      isbn, 
+      titulo,
+      autor,
+      genero_id,
+      estado_libro,
+      descripcion,
+      donacion,
+      ubicacion,
+      imagenes,
+      usuario_id,
+      fecha_subida,
+      valoracion_del_libro,
+      tipo_tapa, 
+      editorial, 
+      metodo_intercambio
     }])
     .select();
 
