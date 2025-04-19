@@ -1,0 +1,65 @@
+<!-- Probando subida de libros -->
+ 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Subir Libro</title>
+</head>
+<body>
+  <h2>Registrar Libro para Intercambio</h2>
+  <form id="libro-form" enctype="multipart/form-data">
+    <label>ISBN: <input type="text" name="isbn" required></label><br>
+    <label>Título: <input type="text" name="titulo" required></label><br>
+    <label>Autor: <input type="text" name="autor" required></label><br>
+    <label>Categoría: <input type="text" name="categoria" required></label><br>
+    <label>Descripción: <textarea name="descripcion" required></textarea></label><br>
+    <label>Estado del libro: 
+      <select name="estado_libro">
+        <option value="Nuevo">Nuevo</option>
+        <option value="Seminuevo">Seminuevo</option>
+        <option value="Usado">Usado</option>
+      </select>
+    </label><br>
+    <label>Donación: 
+      <select name="donacion">
+        <option value="false">No</option>
+        <option value="true">Sí</option>
+      </select>
+    </label><br>
+    <label>Ubicación: <input type="text" name="ubicacion" required></label><br>
+    <label>ID Usuario: <input type="number" name="usuario_id" required></label><br>
+    <label>Imagen: <input type="file" name="imagen" accept="image/*" required></label><br><br>
+    
+    <button type="submit">Subir Libro</button>
+  </form>
+
+  <p id="message"></p>
+
+  <script>
+    const form = document.getElementById('libro-form');
+    const message = document.getElementById('message');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+
+      try {
+        const res = await fetch('/api/libros/subir', {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await res.json();
+        message.textContent = result.message;
+        message.style.color = res.ok ? 'green' : 'red';
+        if (res.ok) form.reset();
+      } catch (err) {
+        message.textContent = 'Error al conectar con el servidor.';
+        message.style.color = 'red';
+      }
+    });
+  </script>
+</body>
+</html>
