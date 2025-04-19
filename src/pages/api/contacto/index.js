@@ -12,7 +12,6 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     const { nombre, apellidos, email, titulo, mensaje } = req.body;
 
-    // ✅ Verifica solo los campos obligatorios
     if (!nombre || !email || !titulo || !mensaje) {
       return res.status(400).json({ message: 'Faltan campos obligatorios' });
     }
