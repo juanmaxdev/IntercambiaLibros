@@ -1,163 +1,217 @@
-"use client";
-import { useEffect } from "react";
+'use client';
+import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Nav() {
+  // Handler para el formulario de registro
+  const handleRegister = async (e) => {
+    e.preventDefault();
+
+    // Acceder a los valores de los inputs a través de e.target
+    const username = e.target.usernameInput.value;
+    const email = e.target.emailInput.value;
+    const password = e.target.passwordInput.value;
+    const repeatPassword = e.target.repeatPasswordInput.value;
+
+    if (password !== repeatPassword) {
+      alert('Las contraseñas no coinciden');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/perfil/registro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre_usuario: username,
+          correo_electronico: email,
+          contrasena: password,
+        }),
+      });
+      
+      const result = await res.json();
+      alert(result.message);
+      
+      if (res.ok) {
+        // Reinicia el formulario si se creó correctamente
+        e.target.reset();
+      }
+    } catch (error) {
+      console.error('Error en el registro:', error);
+      alert('Ocurrió un error al registrar el usuario');
+    }
+  };
+
+  // Handler para el formulario de login
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    const email = e.target.floatingInput.value;
+    const password = e.target.floatingPassword.value;
+
+    try {
+      const res = await fetch('/api/perfil/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          correo_electronico: email,
+          contrasena: password,
+        }),
+      });
+      
+      const result = await res.json();
+      alert(result.message);
+      
+      if (res.ok) {
+        e.target.reset();
+      }
+    } catch (error) {
+      console.error('Error en el login:', error);
+      alert('Ocurrió un error al iniciar sesión');
+    }
+  };
+
   return (
     <>
-    <nav className="navbar navbar-expand-lg fixed-top pb-3">
-      <div className="container-fluid">
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon" />
-        </button>
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-            <li className="nav-item dropdown">
-              <a
-                className="nav-link"
-                href="javascript:void(0)"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <img src="/assets/icons/list.svg" alt="iconoMenu" width={35} height={25} />
-              </a>
-              <ul className="dropdown-menu">
-                <li>
-                  <a className="dropdown-item" href="javascript:void(0)">
-                    Action
+      <header>
+        <nav className="navbar fixed-top pb-3 shadow-sm">
+          <div className="container-fluid">
+            <div className="d-flex w-100 justify-content-between align-items-center">
+              {/* Menú izquierdo */}
+              <ul className="navbar-nav d-flex flex-row align-items-center">
+                <li className="nav-item dropdown me-3 position-relative">
+                  <a
+                    className="nav-link"
+                    href="#"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    <Image src="/assets/icons/list.svg" alt="iconoMenu" width={35} height={25} />
                   </a>
+                  <ul className="dropdown-menu" style={{ position: 'absolute' }}>
+                    <li>
+                      <Link className="dropdown-item" href="/action">Géneros</Link>
+                    </li>
+                    <li>
+                      <Link className="dropdown-item" href="/views/footer/donaciones">Donaciones</Link>
+                    </li>
+                    <li>
+                      <hr className="dropdown-divider" />
+                    </li>
+                    <li>
+                      <Link className="dropdown-item" href="#">Cerrar Sesión</Link>
+                    </li>
+                  </ul>
                 </li>
-                <li>
-                  <a className="dropdown-item" href="javascript:void(0)">
-                    Another action
-                  </a>
-                </li>
-                <li>
-                  <hr className="dropdown-divider" />
-                </li>
-                <li>
-                  <a className="dropdown-item" href="javascript:void(0)">
-                    Something else here
-                  </a>
+                <li className="nav-item">
+                  <Link className="nav-link active" href="/">IntercambiaLibros</Link>
                 </li>
               </ul>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href="javascript:void(0)">
-                IntercambiaLibros
-              </a>
-            </li>
-          </ul>
-          {/* Barra de busqueda */}
-          <div className="d-flex justify-content-center w-100">
-            <form className="d-flex" role="search" style={{ maxWidth: 500, width: '100%' }}>
-              <div className="input-group">
-                <input type="search" className="form-control" placeholder="Buscar" aria-label="Buscar" />
-                <button className="btn btn-outline-secondary" type="submit">
-                  <img src="/assets/icons/search.svg" alt="iconoBusqueda" width={20} height={20} />
-                </button>
+
+              {/* Barra de búsqueda */}
+              <div className="d-flex justify-content-center w-100 mx-3">
+                <form className="d-flex" role="search" style={{ maxWidth: 600, width: '100%' }}>
+                  <div className="input-group">
+                    <input type="search" className="form-control" placeholder="Buscar" />
+                    <button className="btn btn-outline-secondary" type="submit">
+                      <Image src="/assets/icons/search.svg" alt="iconoBusqueda" width={20} height={20} />
+                    </button>
+                  </div>
+                </form>
               </div>
-            </form>
+
+              {/* Menú derecho */}
+              <ul className="navbar-nav d-flex flex-row align-items-center">
+                <li className="nav-item me-3">
+                  <Link className="nav-link d-flex align-items-center gap-2" href="/views/subirLibro">
+                    <Image src="/assets/icons/cloud-upload.svg" alt="iconoSubirLibro" width={18} height={18} />
+                    <span className="d-none d-md-inline">Subir Libro</span>
+                  </Link>
+                </li>
+                <li className="nav-item me-3">
+                  <a
+                    className="nav-link d-flex align-items-center gap-2"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalIniciarSesion"
+                    href="#"
+                  >
+                    <Image src="/assets/icons/person-fill.svg" alt="iconoCuenta" width={18} height={18} />
+                    <span className="d-none d-md-inline">Iniciar sesión</span>
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link d-flex align-items-center gap-2" href="/views/perfil">
+                    <Image src="/assets/icons/bell.svg" alt="iconoNotificacion" width={18} height={18} />
+                    <span className="d-none d-md-inline">Notificación</span>
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </div>
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-            <li className="nav-item">
-              <a className="nav-link d-flex align-items-center gap-2 text-nowrap px-2" href="javascript:void(0)">
-                <img src="/assets/icons/cloud-upload.svg" alt="iconoSubirLibro" width={18} height={18} />
-                Subir Libro
-              </a>
-            </li>
-            <li className="nav-item">
-              <a
-                className="nav-link d-flex align-items-center gap-2 text-nowrap px-2"
-                data-bs-toggle="modal"
-                data-bs-target="#modalIniciarSesion"
-                href="javascript:void(0)"
-              >
-                <img src="/assets/icons/person-fill.svg" alt="iconoCuenta" width={18} height={18} />
-                Iniciar sesión
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link d-flex align-items-center gap-2 text-nowrap ps-2" href="javascript:void(0)">
-                <img src="/assets/icons/bell.svg" alt="iconoNotificacion" width={18} height={18} />
-                Notificacion
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-    {/* Modales renderizados siempre */}
-    <LoginModal />
-    <RegistroModal />
+        </nav>
+
+        {/* Modales */}
+        <LoginModal onLogin={handleLogin} />
+        <RegistroModal onRegister={handleRegister} />
+      </header>
     </>
   );
 }
-export function LoginModal() {
+
+function LoginModal({ onLogin }) {
   return (
-    <div
-      className="modal fade"
-      id="modalIniciarSesion"
-      tabIndex={-1}
-      aria-labelledby="modalIniciarSesion"
-      aria-hidden="true"
-    >
-      <div className="modal-dialog">
+    <div className="modal fade" id="modalIniciarSesion" tabIndex="-1" aria-hidden="true">
+      <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div className="modal-content">
-          <div className="modal-header">
-            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+          <div className="modal-header bg-light">
+            <button type="button" className="btn-close" data-bs-dismiss="modal" />
           </div>
           <div className="modal-body p-0">
-            <section className="h-100 gradient-form rounded-bottom" style={{ backgroundColor: '#eee' }}>
-              <div className="row d-flex justify-content-center align-items-center h-100 ">
-                <div className="card-body px-md-5 pb-md-5 pt-md-3 mx-md-4 rounded">
-                  <div className="text-center">
-                    <img
-                      src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/lotus.webp"
-                      style={{ width: 185 }}
-                      alt="logo"
-                    />
-                    <h4 className="mt-1 mb-5 pb-1">IntercambiaLibros</h4>
-                  </div>
-                  <form>
-                    <div className="form-floating mb-3">
-                      <input type="email" className="form-control" id="floatingInput" placeholder="name@example.com" />
-                      <label htmlFor="floatingInput">Usuario</label>
-                    </div>
-                    <div className="form-floating">
-                      <input type="password" className="form-control" id="floatingPassword" placeholder="Password" />
-                      <label htmlFor="floatingPassword">Contraseña</label>
-                    </div>
-                    <div className="text-center mt-4 pb-2 d-flex justify-content-between">
-                      <button className="btn btn-outline-primary" style={{ width: '80%' }} type="submit">
-                        Iniciar Sesión
-                      </button>
-                      <a className="text-muted" href="#!">
-                        ¿Olvidaste la contraseña?
-                      </a>
-                    </div>
-                    <div className="d-flex align-items-center justify-content-center m-3 gap-3">
-                      <p className="mb-0 me-2">¿No tienes una cuenta?</p>
-                      <button
-                        type="button"
-                        style={{ width: '40%' }}
-                        className="btn btn-outline-danger border-0 py-0"
-                        data-bs-target="#modalRegistro"
-                        data-bs-toggle="modal"
-                      >
-                        Registrate
-                      </button>
-                    </div>
-                  </form>
+            <section className="gradient-form bg-light rounded-bottom">
+              <div className="container py-4">
+                <div className="text-center mb-4">
+                  <Image src="/assets/img/lotus.png" width={185} height={185} alt="logo" />
+                  <h4 className="mt-3">IntercambiaLibros</h4>
                 </div>
+                <form id="login-form" onSubmit={onLogin}>
+                  <div className="form-floating mb-3">
+                    <input
+                      type="email"
+                      className="form-control"
+                      id="floatingInput"
+                      name="floatingInput"
+                      placeholder="Usuario"
+                      required
+                    />
+                    <label htmlFor="floatingInput">Usuario</label>
+                  </div>
+                  <div className="form-floating mb-3">
+                    <input
+                      type="password"
+                      className="form-control"
+                      id="floatingPassword"
+                      name="floatingPassword"
+                      placeholder="Contraseña"
+                      required
+                    />
+                    <label htmlFor="floatingPassword">Contraseña</label>
+                  </div>
+                  <div className="text-center">
+                    <button className="btn btn-outline-primary w-100 mb-3" type="submit">
+                      Iniciar Sesión
+                    </button>
+                    <p className="mb-2">¿No tienes una cuenta?</p>
+                    <button
+                      type="button"
+                      className="btn btn-outline-danger"
+                      data-bs-target="#modalRegistro"
+                      data-bs-toggle="modal"
+                    >
+                      Regístrate
+                    </button>
+                  </div>
+                </form>
               </div>
             </section>
           </div>
@@ -167,76 +221,81 @@ export function LoginModal() {
   );
 }
 
-export function RegistroModal() {
+function RegistroModal({ onRegister }) {
   return (
-    <div className="modal fade" id="modalRegistro" tabIndex={-1} aria-labelledby="modalRegistro" aria-hidden="true">
-      <div className="modal-dialog">
+    <div className="modal fade" id="modalRegistro" tabIndex="-1" aria-hidden="true">
+      <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div className="modal-content">
-          <div className="modal-header">
-            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+          <div className="modal-header bg-light">
+            <button type="button" className="btn-close" data-bs-dismiss="modal" />
           </div>
           <div className="modal-body p-0">
-            <section className="h-100 gradient-form rounded-bottom" style={{ backgroundColor: '#eee' }}>
-              <div className="row d-flex justify-content-center align-items-center h-100">
-                <div className="card-body px-md-5 pb-md-5 pt-md-3 mx-md-4">
-                  <div className="d-flex flex-column justify-content-center align-items-center text-center my-2 pb-4 ">
-                    <h4 className="mb-0">Crear cuenta</h4>
-                    <img
-                      src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/lotus.webp"
-                      style={{ width: 120 }}
-                      alt="logo"
-                    />
-                  </div>
-                  <form>
-                    <div className="form-floating mb-3">
-                      <input type="email" className="form-control" id="floatingInput" placeholder="name@example.com" />
-                      <label htmlFor="floatingInput">Nombre de usuario</label>
-                    </div>
-                    <div className="form-floating mb-3">
-                      <input type="email" className="form-control" id="floatingPassword" placeholder="Email" />
-                      <label htmlFor="floatingPassword">Email</label>
-                    </div>
-                    <div className="form-floating mb-3">
-                      <input type="password" className="form-control" id="floatingPassword" placeholder="Password" />
-                      <label htmlFor="floatingPassword">Contraseña</label>
-                    </div>
-                    <div className="form-floating mb-3">
-                      <input type="password" className="form-control" id="floatingPassword" placeholder="Password" />
-                      <label htmlFor="floatingPassword">Repetir Contraseña</label>
-                    </div>
-                    <div className="form-check">
-                      <input className="form-check-input" type="checkbox" value="" id="flexCheckTerminos" required />
-                      <label className="form-check-label" htmlFor="flexCheckTerminos">
-                        <span>
-                          He leído y acepto la &nbsp;
-                          <a href="#">política de privacidad</a>
-                        </span>
-                      </label>
-                    </div>
-                    <div className="text-center mt-4 pb-2 d-flex justify-content-between">
-                      <button className="btn btn-outline-primary w-100" type="submit">
-                        Crear cuenta
-                      </button>
-                    </div>
-                    <div className="d-flex align-items-center justify-content-center m-3 gap-3">
-                      <div className="d-flex align-items-center w-100">
-                        <div className="flex-grow-1 border-top" />
-                        <span className="px-3 mb-0">Ya tengo una cuenta</span>
-                        <div className="flex-grow-1 border-top" />
-                      </div>
-                    </div>
-                    <div className="d-flex justify-content-center">
-                      <button
-                        type="button"
-                        className="btn btn-outline-danger w-100"
-                        data-bs-target="#modalIniciarSesion"
-                        data-bs-toggle="modal"
-                      >
-                        Iniciar sesión
-                      </button>
-                    </div>
-                  </form>
+            <section className="gradient-form bg-light rounded-bottom">
+              <div className="container py-4">
+                <div className="text-center mb-4">
+                  <h4>Crear cuenta</h4>
+                  <Image src="/assets/img/lotus.png" width={120} height={120} alt="logo" />
                 </div>
+                <form id="register-form" onSubmit={onRegister}>
+                  <div className="form-floating mb-3">
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="usernameInput"
+                      name="usernameInput"
+                      placeholder="Nombre de usuario"
+                      required
+                    />
+                    <label htmlFor="usernameInput">Nombre de usuario</label>
+                  </div>
+                  <div className="form-floating mb-3">
+                    <input
+                      type="email"
+                      className="form-control"
+                      id="emailInput"
+                      name="emailInput"
+                      placeholder="Email"
+                      required
+                    />
+                    <label htmlFor="emailInput">Email</label>
+                  </div>
+                  <div className="form-floating mb-3">
+                    <input
+                      type="password"
+                      className="form-control"
+                      id="passwordInput"
+                      name="passwordInput"
+                      placeholder="Contraseña"
+                      required
+                    />
+                    <label htmlFor="passwordInput">Contraseña</label>
+                  </div>
+                  <div className="form-floating mb-3">
+                    <input
+                      type="password"
+                      className="form-control"
+                      id="repeatPasswordInput"
+                      name="repeatPasswordInput"
+                      placeholder="Repetir Contraseña"
+                      required
+                    />
+                    <label htmlFor="repeatPasswordInput">Repetir Contraseña</label>
+                  </div>
+                  <div className="form-check mb-3">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="flexCheckTerminos"
+                      required
+                    />
+                    <label className="form-check-label" htmlFor="flexCheckTerminos">
+                      He leído y acepto la <a href="#">política de privacidad</a>
+                    </label>
+                  </div>
+                  <button className="btn btn-outline-primary w-100" type="submit">
+                    Crear cuenta
+                  </button>
+                </form>
               </div>
             </section>
           </div>

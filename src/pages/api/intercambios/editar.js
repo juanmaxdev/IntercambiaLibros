@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ message: 'Falta el ID del intercambio' });
   }
 
-  // 🔒 Validación obligatoria si se marca como intercambiado
+  // Validación obligatoria si se marca como intercambiado
   if (estado === 'intercambiado' && (valoracion_intercambio === undefined || valoracion_intercambio === null)) {
     return res.status(400).json({ message: 'Debes valorar el intercambio para marcarlo como intercambiado' });
   }

@@ -1,19 +1,20 @@
-// src/api/libros/index.js
+// pages/api/libros/index.js
 import { supabase } from '@/lib/supabase';
 
 export default async function handler(req, res) {
-  if (req.method === 'GET') {
-    const { data, error } = await supabase.from('libros').select('*');
-    if (error) return res.status(500).json({ error: error.message });
-    return res.status(200).json(data);
+  if (req.method !== 'GET') {
+    res.setHeader('Allow', ['GET']);
+    return res.status(405).json({ message: `Método ${req.method} no permitido` });
   }
 
-  if (req.method === 'POST') {
-    const {
+  // Traemos todos los campos de libros + usuario y género relacionados
+  const { data, error } = await supabase
+    .from('libros')
+    .select(`
+      id,
       isbn,
       titulo,
       autor,
-      categoria,
       estado_libro,
       descripcion,
       donacion,
@@ -22,31 +23,25 @@ export default async function handler(req, res) {
       usuario_id,
       estado_intercambio,
       fecha_subida,
-      valoracion_del_libro
-    } = req.body;
+      valoracion_del_libro,
+      tipo_tapa,
+      editorial,
+      metodo_intercambio,
+      usuarios:usuario_id ( nombre_usuario ),
+      generos:genero_id ( nombre )
+    `);
 
-    const { data, error } = await supabase
-      .from('libros')
-      .insert([{
-        isbn,
-        titulo,
-        autor,
-        categoria,
-        estado_libro,
-        descripcion,
-        donacion,
-        ubicacion,
-        imagenes,
-        usuario_id,
-        estado_intercambio,
-        fecha_subida,
-        valoracion_del_libro
-      }])
-      .select();
-
-    if (error) return res.status(500).json({ error: error.message });
-    return res.status(201).json(data[0]);
+  if (error) {
+    console.error('Error al obtener libros:', error);
+    return res.status(500).json({ message: 'Error al obtener libros', error: error.message });
   }
 
-  return res.status(405).json({ message: 'Método no permitido' });
+  // Aplanar usuarios y géneros para dejar todo en el mismo objeto
+  const libros = data.map(({ usuarios, generos, ...rest }) => ({
+    ...rest,
+    nombre_usuario: usuarios?.nombre_usuario ?? 'Desconocido',
+    nombre_genero: generos?.nombre ?? 'Sin género',
+  }));
+
+  return res.status(200).json(libros);
 }
