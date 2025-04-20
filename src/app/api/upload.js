@@ -42,3 +42,4 @@ export const config = {
     bodyParser: false, // ¡Importante para multer!
   },
 };
+
