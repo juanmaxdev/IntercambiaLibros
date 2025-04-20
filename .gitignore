@@ -27,13 +27,8 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-<<<<<<< HEAD
 # local env files
 .env*.local
-=======
-# env files (can opt-in for committing if needed)
-.env*
->>>>>>> parent of b099d4a (Actualizo gitinore para que suba los archivos .env)
 
 # vercel
 .vercel
