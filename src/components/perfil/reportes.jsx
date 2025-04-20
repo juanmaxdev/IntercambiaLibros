@@ -88,7 +88,7 @@ export default function Reportes() {
       fecha_envio: new Date().toISOString(),
     }
 
-    const response = await fetch("/api/reportes", {
+    const response = await fetch("/api/contacto", {
       method: "POST",
       headers : {
         "Content-Type": "application/json",
