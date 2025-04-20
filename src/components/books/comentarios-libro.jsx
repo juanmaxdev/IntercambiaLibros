@@ -47,9 +47,14 @@ export default function ComentariosLibro({ titulo, session }) {
 
         // Usar el proxy configurado en next.config.mjs en lugar de llamar directamente a la API externa
         // Esto evita problemas de CORS
-        const response = await fetch(`/api/proxy-books/comentarios?titulo=${encodeURIComponent(titulo)}`)
+        const response = await fetch(`/api/libros/comentarios?titulo=${encodeURIComponent(titulo)}`)
 
         if (!response.ok) {
+          // Intentar obtener más detalles del error si fuera el caso
+          const errorText = await response.text()
+          console.error("Respuesta de error:", errorText)
+          console.error("Status code:", response.status)
+          console.error("Status text:", response.statusText)
           throw new Error(`Error al cargar los comentarios: ${response.status}`)
         }
 
@@ -179,7 +184,9 @@ export default function ComentariosLibro({ titulo, session }) {
         fecha_valoracion: new Date().toISOString(),
       }
 
-      const response = await fetch("/api/proxy-books/comentarios", {
+      console.log("Datos del comentario a enviar:", comentarioData)
+
+      const response = await fetch("/api/libros/comentarios", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

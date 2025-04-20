@@ -15,7 +15,7 @@ export default function CarouselDoble() {
       try {
         setLoading(true)
         // Usar el endpoint de proxy para donaciones
-        const response = await fetch("/api/proxy-books/donaciones", {
+        const response = await fetch("/api/libros/donaciones", {
           cache: "no-store",
           headers: {
             "Content-Type": "application/json",

@@ -1,59 +1,39 @@
-import { NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabase';
 
-export async function POST(request) {
-  try {
-    const data = await request.json();
+export default async function handler(req, res) {
+  if (req.method === 'POST') {
+    const { id_usuario_reportante, id_usuario_reportado, isbn, motivo, estado } = req.body;
 
-    // Validación de campos requeridos
-    const requiredFields = ['nombre', 'apellidos', 'email', 'titulo', 'mensaje', 'fecha_envio'];
-    const missingFields = requiredFields.filter((field) => !data[field]);
-
-    if (missingFields.length > 0) {
-      return NextResponse.json(
-        {
-          error: 'Faltan campos requeridos',
-          missingFields,
-        },
-        { status: 400 }
-      );
+    if (!id_usuario_reportante || !id_usuario_reportado || !isbn || !motivo) {
+      return res.status(400).json({ message: 'Faltan campos obligatorios' });
     }
 
-    // Enviar los datos a la API remota
-    const response = await fetch("https://intercambialibros-omega.vercel.app/api/contacto", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      return NextResponse.json(
+    const { data, error } = await supabase
+      .from('reportes')
+      .insert([
         {
-          error: 'Error al enviar los datos a la API remota',
-          details: errorData,
+          id_usuario_reportante,
+          id_usuario_reportado,
+          isbn,
+          motivo,
+          fecha_reporte: new Date().toISOString(),
+          estado: estado || 'pendiente',
         },
-        { status: response.status }
-      );
+      ])
+      .select();
+
+    if (error) {
+      return res.status(500).json({ error: error.message });
     }
 
-    const responseData = await response.json();
-
-    return NextResponse.json(
-      {
-        message: 'Reporte enviado correctamente a la API remota',
-        data: responseData,
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    return NextResponse.json(
-      {
-        error: 'Error procesando el reporte',
-        details: error.message,
-      },
-      { status: 500 }
-    );
+    return res.status(201).json({ message: 'Reporte enviado con éxito', reporte: data[0] });
   }
+
+  if (req.method === 'GET') {
+    const { data, error } = await supabase.from('reportes').select('*');
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json(data);
+  }
+
+  return res.status(405).json({ message: 'Método no permitido' });
 }

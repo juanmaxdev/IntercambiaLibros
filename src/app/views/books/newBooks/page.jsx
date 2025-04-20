@@ -19,7 +19,7 @@ export default function NewBooksPage() {
     async function fetchBooks() {
       try {
         setIsLoading(true)
-        const response = await fetch("/api/proxy-books")
+        const response = await fetch("/api/libros")
 
         if (!response.ok) {
           throw new Error(`Error al obtener los libros: ${response.status}`)
