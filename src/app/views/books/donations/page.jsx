@@ -19,7 +19,7 @@ export default function DonationsPage() {
     async function fetchDonations() {
       try {
         setIsLoading(true)
-        const response = await fetch("/api/proxy-books/donaciones")
+        const response = await fetch("/api/libros/donaciones")
 
         if (!response.ok) {
           throw new Error(`Error al obtener las donaciones: ${response.status}`)

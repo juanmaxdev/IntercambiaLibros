@@ -1,11 +1,9 @@
 // pages/api/libros/index.js
 import { supabase } from '@/lib/supabase';
+import { NextResponse } from 'next/server';
 
-export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    res.setHeader('Allow', ['GET']);
-    return res.status(405).json({ message: `Método ${req.method} no permitido` });
-  }
+export async function GET() {
+  // Verificamos si el usuario está autenticado
 
   // Traemos todos los campos de libros + usuario y género relacionados
   const { data, error } = await supabase
@@ -32,8 +30,7 @@ export default async function handler(req, res) {
     `);
 
   if (error) {
-    console.error('Error al obtener libros:', error);
-    return res.status(500).json({ message: 'Error al obtener libros', error: error.message });
+    return NextResponse.json({ message: 'Error al obtener libros', error: error.message }, { status: 500 });
   }
 
   // Aplanar usuarios y géneros para dejar todo en el mismo objeto
@@ -43,5 +40,5 @@ export default async function handler(req, res) {
     nombre_genero: generos?.nombre ?? 'Sin género',
   }));
 
-  return res.status(200).json(libros);
+  return NextResponse.json(libros);
 }

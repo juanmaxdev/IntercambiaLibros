@@ -9,7 +9,7 @@ export default function BookListPage() {
   useEffect(() => {
     async function fetchBooks() {
       try {
-        const response = await fetch('/api/proxy-books');
+        const response = await fetch('/api/libros');
         const data = await response.json();
         setBooks(data);
       } catch (error) {

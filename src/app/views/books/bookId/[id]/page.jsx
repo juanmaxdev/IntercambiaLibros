@@ -5,7 +5,7 @@ import Link from "next/link";
 async function getBookData(id) {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"; // Usar una URL base, cambiar cuando se haga el despliegue
-    const response = await fetch(`${baseUrl}/api/proxy-books`, {
+    const response = await fetch(`${baseUrl}/api/libros`, {
       cache: "no-store",
     });
 

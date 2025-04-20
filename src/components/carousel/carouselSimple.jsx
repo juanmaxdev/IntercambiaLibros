@@ -15,7 +15,7 @@ export default function CarouselSimple() {
       try {
         setLoading(true)
         // Consumir la API de géneros
-        const response = await fetch("/api/proxy-books/generos", {
+        const response = await fetch("/api/generos", {
           cache: "no-store",
           headers: {
             "Content-Type": "application/json",
@@ -179,7 +179,7 @@ export function CarouselNuevosLibros() {
     const fetchBooks = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/proxy-books', {
+        const response = await fetch('/api/libros', {
           cache: 'no-store',
           headers: {
             'Content-Type': 'application/json',
