@@ -21,12 +21,19 @@ export async function iniciarSesion({ correo_electronico, contrasena }) {
       throw new Error('Correo o contraseña incorrectos');
     }
 
-    // Generar un token JWT
-    const token = jwt.sign(
-      { id: usuario.id, correo_electronico: usuario.correo_electronico },
-      process.env.AUTH_SECRET,
-      { expiresIn: '7d' }
-    );
+    // Generar un token JWT (El token actúa como una prueba de que el usuario ha iniciado sesión correctamente)
+    let token;
+    try {
+      token = jwt.sign(
+        { id: usuario.id, correo_electronico: usuario.correo_electronico },
+        process.env.AUTH_SECRET,
+        { expiresIn: '7d' }
+      );
+      console.log('✅ Token generado:', token);
+    } catch (error) {
+      console.error('❌ Error al generar el token JWT:', error);
+      throw new Error('Error al generar el token de autenticación');
+    }
 
     return {
       message: 'Inicio de sesión exitoso',

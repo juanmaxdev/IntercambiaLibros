@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import bcrypt from 'bcrypt';
 
-export async function registrarUsuario({ nombre_usuario, correo_electronico, contrasena, ubicacion = '', biografia = '' }) {
+export async function registrarUsuario({ nombre_usuario, correo_electronico, contrasena, ubicacion = null, biografia = null }) {
   try {
     // Encriptar la contraseña
     const hashedPassword = await bcrypt.hash(contrasena, 10);
@@ -13,19 +13,11 @@ export async function registrarUsuario({ nombre_usuario, correo_electronico, con
         nombre_usuario,
         correo_electronico,
         contrasena: hashedPassword,
-        ubicacion: ubicacion || null,
-        biografia: biografia || null,
-        reputacion: 0,
-      }]);
-
-    console.log('📩 Datos enviados a Supabase:', {
-      nombre_usuario,
-      correo_electronico,
-      contrasena: hashedPassword,
-      ubicacion,
-      biografia,
-      reputacion: 0,
-    });
+        ubicacion,
+        biografia,
+        reputacion: 0, // Valor inicial para reputación
+      }])
+      .select(); // Asegurarse de que Supabase devuelva los datos insertados
 
     if (error) {
       console.error('❌ Error al insertar usuario en la base de datos:', error);
@@ -33,8 +25,10 @@ export async function registrarUsuario({ nombre_usuario, correo_electronico, con
     }
 
     if (!data || data.length === 0) {
-      console.error('❌ No se devolvieron datos después de la inserción.');
-      throw new Error('No se devolvieron datos después de la inserción.');
+      console.warn('⚠️ No se devolvieron datos después de la inserción. Verifica la configuración de la tabla.');
+      return {
+        message: 'Usuario creado, pero no se devolvieron datos.',
+      };
     }
 
     return {

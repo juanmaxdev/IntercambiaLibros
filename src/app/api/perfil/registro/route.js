@@ -3,7 +3,12 @@ import { registrarUsuario } from '@/services/registroService';
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { nombre_usuario, correo_electronico, contrasena, ubicacion, biografia } = body;
+    const { nombre_usuario, 
+      correo_electronico, 
+      contrasena, 
+      ubicacion = null, 
+      biografia = null 
+    } = body;
 
     // Validar campos obligatorios
     if (!nombre_usuario || !correo_electronico || !contrasena) {
