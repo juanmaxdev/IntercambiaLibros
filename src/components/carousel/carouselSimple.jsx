@@ -52,7 +52,7 @@ export default function CarouselSimple() {
       <div className="container-fluid">
         <div className="border-bottom m-4 pb-2">
           <div className="d-flex justify-content-center justify-content-md-start ps-lg-5 ms-lg-5">
-            <Link href="/views/books/bookList" className="text-decoration-none">
+            <Link href="/libros/generos" className="text-decoration-none">
               <h4 className="m-0 ps-1">GÉNEROS</h4>
             </Link>
           </div>
@@ -71,7 +71,7 @@ export default function CarouselSimple() {
       <div className="container-fluid">
         <div className="border-bottom m-4 pb-2">
           <div className="d-flex justify-content-center justify-content-md-start ps-lg-5 ms-lg-5">
-            <Link href="/views/books/bookList" className="text-decoration-none">
+            <Link href="/libros/generos" className="text-decoration-none">
               <h4 className="m-0 ps-1">GÉNEROS</h4>
             </Link>
           </div>
@@ -88,7 +88,7 @@ export default function CarouselSimple() {
       <div id="carouselSimpleGenero" className="carousel slide" data-bs-ride="carousel" data-bs-interval="7000">
         <div className="border-bottom m-4 pb-2">
           <div className="d-flex justify-content-center justify-content-md-start ps-lg-5 ms-lg-5">
-            <Link href="/views/books/bookList" className="text-decoration-none">
+            <Link href="/libros/generos" className="text-decoration-none">
               <h4 className="m-0 ps-1">GÉNEROS</h4>
             </Link>
           </div>
@@ -223,7 +223,7 @@ export function CarouselNuevosLibros() {
       <div className="container-fluid">
         <div className="border-bottom m-4 pt-3 pb-2">
           <div className="d-flex justify-content-center justify-content-md-start ps-lg-5 ms-lg-5">
-            <Link href="/views/books/newBooks" className="text-decoration-none">
+            <Link href="/libros/novedades" className="text-decoration-none">
               <h4 className="m-0 ps-1">NUEVOS LIBROS</h4>
             </Link>
           </div>
@@ -242,7 +242,7 @@ export function CarouselNuevosLibros() {
       <div className="container-fluid">
         <div className="border-bottom m-4 pt-3 pb-2">
           <div className="d-flex justify-content-center justify-content-md-start ps-lg-5 ms-lg-5">
-            <Link href="/views/books/newBooks" className="text-decoration-none">
+            <Link href="/libros/novedades" className="text-decoration-none">
               <h4 className="m-0 ps-1">NUEVOS LIBROS</h4>
             </Link>
           </div>
@@ -259,7 +259,7 @@ export function CarouselNuevosLibros() {
       <div id="carouselNuevosLibros" className="carousel slide" data-bs-ride="carousel" data-bs-interval="7000">
         <div className="border-bottom m-4 pt-3 pb-2">
           <div className="d-flex justify-content-center justify-content-md-start ps-lg-5 ms-lg-5">
-            <Link href="/views/books/newBooks" className="text-decoration-none">
+            <Link href="/libros/novedades" className="text-decoration-none">
               <h4 className="m-0 ps-1">NUEVOS LIBROS</h4>
             </Link>
           </div>

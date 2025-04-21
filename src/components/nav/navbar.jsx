@@ -68,7 +68,7 @@ export default function Nav() {
                 {/* Mostrar "Subir Libro" solo si el usuario está autenticado */}
                 {isAuthenticated && (
                   <li className="nav-item me-3">
-                    <Link className="nav-link d-flex align-items-center gap-2 text-nowrap" href="/views/subirLibro">
+                    <Link className="nav-link d-flex align-items-center gap-2 text-nowrap" href="/subirLibro">
                       <Image src="/assets/icons/cloud-upload.svg" alt="iconoSubirLibro" width={18} height={18} />
                       <span className="d-none d-md-inline">Subir Libro</span>
                     </Link>
@@ -80,7 +80,7 @@ export default function Nav() {
                   {isAuthenticated ? <UserMenu session={session} /> : <LoginButton />}
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link d-flex align-items-center gap-2 text-nowrap" href="/views/perfil">
+                  <Link className="nav-link d-flex align-items-center gap-2 text-nowrap" href="/">
                     <Image src="/assets/icons/bell.svg" alt="iconoNotificacion" width={18} height={18} />
                     <span className="d-none d-md-inline">Notificación</span>
                   </Link>

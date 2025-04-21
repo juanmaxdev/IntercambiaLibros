@@ -18,7 +18,7 @@ export default function BookCard({ book }) {
     const bookId = book.libro_id || book.id
 
     if (bookId) {
-      router.push(`/views/books/bookId/${bookId}`)
+      router.push(`/libros/${bookId}`)
     } else {
       alert("No se puede mostrar la información del libro porque no tiene un ID válido.")
     }

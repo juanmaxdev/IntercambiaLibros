@@ -8,12 +8,12 @@ export default function SideBar() {
           {/* SIDE NAV */} ,
           <ul className="nav flex-column mb-5">
             <li className="nav-item">
-              <Link className="nav-link active text-body-secondary py-1" aria-current="page" href="/views/perfil/misDatos">
+              <Link className="nav-link active text-body-secondary py-1" aria-current="page" href="/perfil/misDatos">
                 Mis datos
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link text-body-secondary py-1" href="/views/perfil/mensajes">
+              <Link className="nav-link text-body-secondary py-1" href="/perfil/mensajes">
                 Mensajes
               </Link>
             </li>
@@ -23,7 +23,7 @@ export default function SideBar() {
               </a>
             </li>
             <li className="nav-item">
-              <Link className="nav-link text-body-secondary py-1" href="/views/perfil/transacciones">
+              <Link className="nav-link text-body-secondary py-1" href="/perfil/transacciones">
                 Transacciones
               </Link>
             </li>
@@ -33,7 +33,7 @@ export default function SideBar() {
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link text-body-secondary py-1" href="/views/perfil/reportes">
+              <a className="nav-link text-body-secondary py-1" href="/perfil/reportes">
                 Sistema de reporte
               </a>
             </li>
