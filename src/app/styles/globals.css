@@ -4,6 +4,11 @@
   --primary: rgb(85, 83, 172);
   --secondary: rgb(212, 167, 177);
   --accent: rgb(192, 150, 125);
+
+  --primary-light: rgba(85, 83, 172, 0.1);
+  --primary-dark: rgb(65, 63, 152);
+  --text-light: rgba(11, 11, 22, 0.7);
+  --background-alt: rgb(240, 240, 245);
 }
 
 * {

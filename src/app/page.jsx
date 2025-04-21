@@ -1,88 +1,116 @@
-'use client';
+"use client"
 
-import CarouselDoble from '../components/carousel/carouselDouble';
-import CarouselSimple, { CarouselNuevosLibros } from '../components/carousel/carouselSimple';
-import Opiniones from '../components/opiniones/opiniones';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useEffect } from 'react';
+import { useState, useEffect } from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { useSession } from "next-auth/react"
+import CarouselDoble from "@/components/carousel/carouselDouble"
+import CarouselSimple, { CarouselNuevosLibros } from "@/components/carousel/carouselSimple"
+import Opiniones from "@/components/opiniones/opiniones"
+import QuoteCarousel from "@/components/home/quote-carousel"
+import FeaturedCategories from "@/components/home/featured-categories"
+import WhyChooseUs from "@/components/home/why-choose-us"
+import "@/app/styles/home.css"
 
 export default function Home() {
+  const [isLoaded, setIsLoaded] = useState(false)
+  const { data: session } = useSession()
+  const isAuthenticated = !!session
+
+  useEffect(() => {
+    // Añadir clase home-page al body solo en esta página
+    document.body.classList.add("home-page")
+    setIsLoaded(true)
+
+    // Limpiar al desmontar
+    return () => {
+      document.body.classList.remove("home-page")
+    }
+  }, [])
 
   return (
     <>
-      <main className="container-fluid">
+      <main className="container-fluid p-0">
+        {/* Hero Section con efecto de degradado */}
+        <section className="hero-section position-relative overflow-hidden">
+          <div className="parallax-bg"></div>
+          <div className="hero-content container position-relative z-1 py-5">
+            <div className="row align-items-center min-vh-75">
+              <div className="col-lg-6 text-center text-lg-start mb-5 mb-lg-0">
+                <h1 className={`display-4 fw-bold mb-4 text-white hero-title ${isLoaded ? "animate-in" : ""}`}>
+                  Descubre historias, comparte experiencias
+                </h1>
+                <p className={`lead text-white-75 mb-4 hero-subtitle ${isLoaded ? "animate-in" : ""}`}>
+                  Intercambia libros con personas que comparten tu pasión por la lectura. Una comunidad donde cada libro
+                  encuentra un nuevo hogar.
+                </p>
+                <div
+                  className={`d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start hero-buttons ${isLoaded ? "animate-in" : ""}`}
+                >
+                  <Link href="/libros/generos" className="btn btn-primary px-4 py-2 rounded-pill">
+                    Explorar libros
+                  </Link>
+                  <Link href="/libros/donaciones" className="btn btn-outline-light px-4 py-2 rounded-pill">
+                    Donaciones
+                  </Link>
+                </div>
+              </div>
+              <div className="col-lg-6 position-relative book-stack-container">
+                <div className={`book-stack ${isLoaded ? "animate-in" : ""}`}>
+                  <Image
+                    src="/assets/favicon/apple-touch-icon.png"
+                    alt="Pila de libros"
+                    width={400}
+                    height={400}
+                    className="img-fluid floating"
+                    priority
+                  />
+                  <div className="book-quote">
+                    <QuoteCarousel />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* Reemplazo del divisor de onda con un degradado suave */}
+          <div className="gradient-divider"></div>
+        </section>
+
+        {/* Sección de categorías destacadas */}
+        <FeaturedCategories />
+
+        {/* Carruseles existentes */}
         <CarouselSimple />
         <CarouselNuevosLibros />
         <CarouselDoble />
-        <div className="container-fluid  my-5 rounded">
-          <div className="row my-4 mb-1">
-            <div className="col-1 d-none d-md-block"></div>
-            <div className="col-12 col-md-5 col-lg-5 ps-md-4">
-              <h3>Gracias por leer</h3>
-              
-              <p className="text-start lh-1 pt-3 fw-bold fst-italic">Ventajas de leer</p>
-              <ul>
-                <li>
-                  <p className="text-start fw-light lh-1">
-                    <span className="fw-medium">Desarrollo personal:&nbsp;&nbsp;</span>
-                    fomenta la imaginación, la creatividad y el pensamiento crítico.
-                  </p>
-                </li>
-                <li>
-                  <p className="text-start fw-light lh-1">
-                    <span className="fw-medium">Conocimiento:&nbsp;</span>
-                    amplía la perspectiva y enriquece el vocabulario.
-                  </p>
-                </li>
-                <li>
-                  <p className="text-start fw-light lh-1">
-                    <span className="fw-medium">Reducción del estrés:&nbsp;</span>
-                    leer ayuda a desconectar y relajarse.
-                  </p>
-                </li>
-              </ul>
 
-              <p className="text-start lh-1 pt-3 fw-bold fst-italic">Ventajas de utilizar IntercambiaLibros</p>
-              <ul>
-                <li>
-                  <p className="text-start fw-light lh-1">
-                    <span className="fw-medium">Sostenibilidad:&nbsp;</span>
-                    fomenta la reutilización, reduciendo el desperdicio
-                  </p>
-                </li>
-                <li>
-                  <p className="text-start fw-light lh-1">
-                    <span className="fw-medium">Comunidad:&nbsp;</span>
-                    conecta a amantes de los libros para compartir recomendaciones y experiencias.
-                  </p>
-                </li>
-              </ul>
+        {/* Sección "Por qué elegirnos" */}
+        <WhyChooseUs />
 
-              <p className="text-start lh-1 fw-bold fst-italic">Quienes somos</p>
-              <p className="text-start fw-light lh-1">
-                Somos una plataforma creada por y para los amantes de los libros. Creemos en la magia de compartir
-                historias y en el impacto positivo de reutilizar libros.
-                <br />
-                Nuestro objetivo es ofrecer un espacio donde las personas puedan intercambiar libros fácilmente,
-                promoviendo la sostenibilidad y el acceso al conocimiento. Buscamos construir una comunidad unida por el
-                amor a la lectura y el deseo de marcar la diferencia.
-              </p>
-            </div>
+        {/* Sección de testimonios */}
+        <Opiniones />
 
-            <div className="col-12 col-md-5 col-lg-5 pe-0 mt-4 mt-md-0">
-              <Image
-                src="/assets/img/cerebro_lectura_fm_mundo.jpg"
-                className="rounded img-fluid"
-                alt="imagen de un libro y un cerebro"
-                width={580}
-                height={500}
-              />
+        {/* Call to Action con efecto mejorado */}
+        <section className="cta-section text-center py-5">
+          <div className="container">
+            <div className="cta-content p-5 rounded-4">
+              <h2 className="mb-3">¿Listo para compartir tus libros?</h2>
+              <p className="lead mb-4">Únete a nuestra comunidad y comienza a intercambiar historias hoy mismo.</p>
+              <div className="d-flex justify-content-center gap-3">
+                {isAuthenticated ? (
+                  <Link href="/views/subirLibro" className="btn btn-light px-4 py-2">
+                    Subir un libro
+                  </Link>
+                ) : (
+                  <button className="btn btn-light px-4 py-2" data-bs-toggle="modal" data-bs-target="#modalRegistro">
+                    Crear cuenta
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-        <Opiniones />
+        </section>
       </main>
     </>
-  );
+  )
 }

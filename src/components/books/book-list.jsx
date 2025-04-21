@@ -11,6 +11,26 @@ export default function BookList({ books = [], isLoading }) {
   const loaderRef = useRef(null)
   const booksPerPage = 10
   const filteredBooksRef = useRef([])
+  const [genres, setGenres] = useState(["All"])
+
+  // Extraer géneros únicos de los libros - Modificar para usar categoría o nombre_genero
+  useEffect(() => {
+    const uniqueGenres = ["All", ...new Set(books.map((book) => book.categoria || book.nombre_genero).filter(Boolean))]
+    setGenres(uniqueGenres)
+  }, [books])
+
+  // Añadir useEffect para manejar el parámetro de género en la URL
+  useEffect(() => {
+    // Verificar si hay un parámetro de género en la URL
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search)
+      const genreParam = params.get("genre")
+
+      if (genreParam && genres.includes(genreParam)) {
+        setSelectedGenre(genreParam)
+      }
+    }
+  }, [genres]) // Dependencia de genres para asegurar que se ejecute después de cargar los géneros
 
   // Filtrar libros por género - Modificar para usar categoría o nombre_genero
   const filteredBooks =
@@ -76,7 +96,6 @@ export default function BookList({ books = [], isLoading }) {
   }, [page, visibleBooks.length, booksPerPage]) // Eliminamos filteredBooks de las dependencias
 
   // Extraer géneros únicos de los libros - Modificar para usar categoría o nombre_genero
-  const genres = ["All", ...new Set(books.map((book) => book.categoria || book.nombre_genero).filter(Boolean))]
 
   return (
     <div className="book-list">
