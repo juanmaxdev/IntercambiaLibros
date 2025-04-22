@@ -39,3 +39,74 @@ export async function obtenerLibros() {
 
   return libros;
 }
+
+export async function subidaLibros(req) {
+  const {
+    isbn,
+    titulo,
+    autor,
+    genero_id,
+    estado_libro,
+    descripcion,
+    donacion,
+    ubicacion,
+    usuario_id,
+    valoracion_del_libro = 0,
+    tipo_tapa = '',
+    editorial = '',
+    metodo_intercambio = 'Presencial',
+  } = req.body;
+
+  let urlImagen = req.body.imagenes || '';
+
+  if (req.file) {
+    const { buffer, originalname, mimetype } = req.file;
+    const ext = originalname.split('.').pop();
+    const fileName = `${Date.now()}.${ext}`;
+    const filePath = `subidas/${fileName}`;
+
+    const { error: uploadError } = await supabase
+      .storage
+      .from('portada-libros')
+      .upload(filePath, buffer, { contentType: mimetype });
+
+    if (uploadError) {
+      console.error('Error al subir imagen:', uploadError);
+      throw new Error('Error al subir la imagen');
+    }
+
+    urlImagen = `https://heythjlroyqoqhqbmtlc.supabase.co/storage/v1/object/public/portada-libros/${filePath}`;
+  }
+
+  const fecha_subida = new Date().toISOString().slice(0, 16);
+
+  const { data, error } = await supabase
+    .from('libros')
+    .insert([
+      {
+        isbn,
+        titulo,
+        autor,
+        genero_id,
+        estado_libro,
+        descripcion,
+        donacion,
+        ubicacion,
+        imagenes: urlImagen,
+        usuario_id,
+        fecha_subida,
+        valoracion_del_libro,
+        tipo_tapa,
+        editorial,
+        metodo_intercambio,
+      },
+    ])
+    .select();
+
+  if (error) {
+    console.error('Error al insertar libro:', error);
+    throw new Error(error.message);
+  }
+
+  return data[0];
+}
