@@ -1,11 +1,24 @@
 "use client"
 import { useState, useEffect } from "react"
-import SideBar from "@/components/perfil/sideBar"
+import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 import Link from "next/link"
 import Image from "next/image"
-import "./stylesFormSubirLibro.css"
+import "@/app/styles/stylesFormSubirLibro.css"
 
 export default function FormSubirLibro() {
+  const router = useRouter()
+  const { data: session, status } = useSession()
+  const isAuthenticated = status === "authenticated"
+
+  // Redirigir si no está autenticado
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      // Redirigir a la página principal con un parámetro para mostrar el modal de login
+      router.push("/?login=true")
+    }
+  }, [status, router])
+
   // Estado para almacenar los datos del formulario
   const [formData, setFormData] = useState({
     isbn: "",
@@ -19,6 +32,7 @@ export default function FormSubirLibro() {
     archivo: null,
     tipo_tapa: "",
     editorial: "",
+    metodo_intercambio: "",
   })
 
   // Estado para los errores de validación
@@ -34,7 +48,6 @@ export default function FormSubirLibro() {
   const [isLoading, setIsLoading] = useState(false)
 
   // Lista de géneros con sus IDs
-
   const generos = [
     { id: 1, nombre: "Novela" },
     { id: 2, nombre: "Misterio" },
@@ -245,7 +258,7 @@ export default function FormSubirLibro() {
         }
 
         // Enviar los datos al servidor
-        const response = await fetch("/api/proxy-books/formBooks", {
+        const response = await fetch("/api/libros", {
           method: "POST",
           body: formDataToSend,
           // No establecer Content-Type, el navegador lo hará automáticamente con el boundary correcto
@@ -273,6 +286,7 @@ export default function FormSubirLibro() {
           archivo: null,
           tipo_tapa: "",
           editorial: "",
+          metodo_intercambio: "",
         })
         setImagePreview(null)
         setIsSubmitted(false)
@@ -298,12 +312,25 @@ export default function FormSubirLibro() {
     }
   }, [formData, isSubmitted])
 
+  // Si no está autenticado, mostrar mensaje de carga mientras se redirige
+  if (status === "loading" || status === "unauthenticated") {
+    return (
+      <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
+        <div className="text-center">
+          <div className="spinner-border text-primary mb-3" role="status">
+            <span className="visually-hidden">Cargando...</span>
+          </div>
+          <h4>Verificando sesión...</h4>
+          <p>Debes iniciar sesión para subir un libro.</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="container-fluid">
       <div className="row">
         <div className="col-2 ps-0">
-          {/* SIDE NAV */}
-          <SideBar />
         </div>
         <div className="col-10 mb-5">
           {/* FORMULARIO */}

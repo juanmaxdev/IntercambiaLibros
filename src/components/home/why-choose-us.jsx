@@ -53,7 +53,7 @@ export default function WhyChooseUs() {
           <div className="col-lg-6">
             <div className="position-relative">
               <Image
-                src="/assets/img/cerebro_lectura_fm_mundo.jpg"
+                src="/assets/img/index/rincon_naturaleza.jpg"
                 alt="Rincón de lectura en la naturaleza"
                 width={600}
                 height={400}

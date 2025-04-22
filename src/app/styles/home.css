@@ -12,19 +12,6 @@ body.home-page main {
   background: linear-gradient(135deg, #7da87d 0%, #5a8c5a 50%, #3a6d7c 100%);
 }
 
-.parallax-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: url("/assets/img/nature-library-bg.jpg");
-  background-size: cover;
-  background-position: center;
-  opacity: 0.3;
-  z-index: 0;
-}
-
 .hero-title,
 .hero-subtitle,
 .hero-buttons {
@@ -123,21 +110,24 @@ body.home-page main {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 100px;
+  height: 150px; /* Aumentamos la altura para una transición más suave */
   background: linear-gradient(
     to bottom,
-    transparent,
-    rgba(255, 255, 255, 0.3) 30%,
-    rgba(255, 255, 255, 0.8) 70%,
-    #ffffff 100%
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 20%,
+    rgba(255, 255, 255, 0.6) 60%,
+    #f9f9f7 100%
   );
   z-index: 1;
 }
 
 /* Featured Categories */
 .featured-categories {
+  position: relative;
+  z-index: 2;
   padding: 3rem 0;
   background-color: #f9f9f7;
+  margin-top: -2px; /* Pequeño ajuste para eliminar cualquier línea */
 }
 
 .section-title {

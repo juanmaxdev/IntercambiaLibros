@@ -69,7 +69,7 @@ export function SearchBar() {
     }
   }
 
-  // Manejar el envío del formulario
+  // Modificar la función handleSubmit para asegurar que la redirección sea correcta
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -99,22 +99,12 @@ export function SearchBar() {
           )
         })
 
-        if (filteredBooks.length > 0) {
-          // Si hay resultados, redirigir a la página de resultados
-          router.push(`/libros/generos/search?term=${encodeURIComponent(searchTerm)}`)
-        } else {
-          // Si no hay resultados, mostrar notificación
-          setShowNotification(true)
-          setTimeout(() => {
-            setShowNotification(false)
-          }, 3000)
-        }
+        // Siempre redirigir a la página de resultados, incluso si no hay coincidencias
+        router.push(`libros/search?term=${encodeURIComponent(searchTerm)}`)
       } catch (error) {
         console.error("Error al buscar:", error)
-        setShowNotification(true)
-        setTimeout(() => {
-          setShowNotification(false)
-        }, 3000)
+        // Aún así, redirigir a la página de resultados
+        router.push(`libros/search?term=${encodeURIComponent(searchTerm)}`)
       } finally {
         setIsSearching(false)
         setShowResults(false)
@@ -190,12 +180,13 @@ export function SearchBar() {
                 </div>
               </Link>
             ))}
+            {/* También modificar el botón "Ver todos los resultados" */}
             <div className="search-view-all">
               <button
                 className="btn btn-link w-100"
                 onClick={(e) => {
                   e.preventDefault()
-                  router.push(`/libros/generos/search?term=${encodeURIComponent(searchTerm)}`)
+                  router.push(`libros/search?term=${encodeURIComponent(searchTerm)}`)
                   setShowResults(false)
                 }}
               >

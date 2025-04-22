@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
+import { useSearchParams } from "next/navigation"
 import CarouselDoble from "@/components/carousel/carouselDouble"
 import CarouselSimple, { CarouselNuevosLibros } from "@/components/carousel/carouselSimple"
 import Opiniones from "@/components/opiniones/opiniones"
@@ -16,17 +17,31 @@ export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false)
   const { data: session } = useSession()
   const isAuthenticated = !!session
+  const searchParams = useSearchParams()
+  const showLogin = searchParams.get("login") === "true"
 
   useEffect(() => {
     // Añadir clase home-page al body solo en esta página
     document.body.classList.add("home-page")
     setIsLoaded(true)
 
+    // Mostrar modal de login solo si se solicita Y el usuario NO está autenticado
+    if (showLogin && !isAuthenticated && typeof window !== "undefined") {
+      // Pequeño retraso para asegurar que el DOM está listo
+      setTimeout(() => {
+        const modalElement = document.getElementById("modalIniciarSesion")
+        if (modalElement && window.bootstrap) {
+          const bsModal = new window.bootstrap.Modal(modalElement)
+          bsModal.show()
+        }
+      }, 300)
+    }
+
     // Limpiar al desmontar
     return () => {
       document.body.classList.remove("home-page")
     }
-  }, [])
+  }, [showLogin, isAuthenticated])
 
   return (
     <>
@@ -58,7 +73,7 @@ export default function Home() {
               <div className="col-lg-6 position-relative book-stack-container">
                 <div className={`book-stack ${isLoaded ? "animate-in" : ""}`}>
                   <Image
-                    src="/assets/favicon/apple-touch-icon.png"
+                    src="/assets/img/index/pila_de_libros.png"
                     alt="Pila de libros"
                     width={400}
                     height={400}
@@ -98,7 +113,7 @@ export default function Home() {
               <p className="lead mb-4">Únete a nuestra comunidad y comienza a intercambiar historias hoy mismo.</p>
               <div className="d-flex justify-content-center gap-3">
                 {isAuthenticated ? (
-                  <Link href="/views/subirLibro" className="btn btn-light px-4 py-2">
+                  <Link href="/subirLibro" className="btn btn-light px-4 py-2">
                     Subir un libro
                   </Link>
                 ) : (

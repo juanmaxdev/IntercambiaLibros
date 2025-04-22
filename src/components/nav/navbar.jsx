@@ -23,9 +23,6 @@ export default function Nav() {
       setToastMessage("Sesión iniciada correctamente")
       setShowToast(true)
       localStorage.setItem("sessionStarted", "true")
-
-      // Eliminar la redirección al index
-      // No redirigimos al usuario, se queda en la misma página
     }
   }, [isAuthenticated])
 
@@ -89,7 +86,7 @@ export default function Nav() {
             </div>
           </div>
         </nav>
-        {/* Modales renderizados siempre */}
+        {/* Modales renderizados solo cuando el usuario no está autenticado */}
         {!isAuthenticated && (
           <>
             <LoginModal />

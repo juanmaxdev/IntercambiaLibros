@@ -197,3 +197,18 @@
     width: 90%;
   }
 }
+
+/* Añadir estilos para mantener consistencia en la barra de búsqueda */
+.search-container-nav {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .search-container-nav {
+    max-width: 100%;
+    margin: 0 10px;
+  }
+}
