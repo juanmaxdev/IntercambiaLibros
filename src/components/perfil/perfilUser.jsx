@@ -1,249 +1,391 @@
-'use client';
-
-import SideBar from '@components/perfil/sideBar';
-import Image from 'next/image';
+"use client"
+import { useState, useEffect } from "react"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import Image from "next/image"
+import ModernSidebar from "./sideBar"
+import "@/app/styles/perfil/perfil-styles.css"
 
 export default function PerfilUser() {
-  return (
-    <>
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-2 ps-0">
-            {/* SIDE NAV */}
-            <SideBar />
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  const [isEditing, setIsEditing] = useState(false)
+  const [userData, setUserData] = useState({
+    nombre: "Antonio",
+    apellidos: "Pérez García",
+    edad: "32",
+    ubicacion: "Sevilla",
+    telefono: "612345678",
+    generos_preferidos: "Terror, Ciencia Ficción",
+    biografia:
+      "Apasionado de la lectura desde joven. Me encanta descubrir nuevos autores y compartir mis libros favoritos con otros lectores.",
+  })
+  const [editData, setEditData] = useState({ ...userData })
+
+  // Redirigir si no está autenticado
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/?login=true")
+    }
+  }, [status, router])
+
+  const handleEditToggle = () => {
+    if (isEditing) {
+      // Guardar cambios
+      setUserData({ ...editData })
+    }
+    setIsEditing(!isEditing)
+  }
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setEditData({
+      ...editData,
+      [name]: value,
+    })
+  }
+
+  // Si no está autenticado, mostrar mensaje de carga mientras se redirige
+  if (status === "loading" || status === "unauthenticated") {
+    return (
+      <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
+        <div className="text-center">
+          <div className="spinner-border text-primary mb-3" role="status">
+            <span className="visually-hidden">Cargando...</span>
           </div>
-          <div className="col-1" />
-          <div className="col-2">
-            <h2 className="mb-4 ps-5">Perfil</h2>
-            <Image
-              src="/assets/img/icono_masculino_perfil.png"
-              alt="Imaagen del usuario de perfil"
-              style={{ width: '12rem' }}
-              width={150}
-              height={180}
-            />
-          </div>
-          <div className="col-2 mt-5 ps-5">
-            <p>
-              <strong>Nombre</strong>
-            </p>
-            <p>
-              <strong>Apellidos</strong>
-            </p>
-            <p>
-              <strong>Edad</strong>
-            </p>
-            <p>
-              <strong>Localizacion</strong>
-            </p>
-            <p>
-              <strong>Generos Preferidos</strong>
-            </p>
-          </div>
-          <div className="col-2 mt-5">
-            <p className="text-secondary">Antonio</p>
-            <p className="text-secondary">Perez García</p>
-            <p className="text-secondary">32</p>
-            <p className="text-secondary">Sevilla</p>
-            <p className="text-secondary">Terror, Ciencia</p>
-          </div>
+          <h4>Verificando sesión...</h4>
+          <p>Debes iniciar sesión para ver tu perfil.</p>
         </div>
       </div>
-      <OpinionesPerfil />
-    </>
-  );
-}
+    )
+  }
 
-{
-  /* Comentarios */
-}
-
-export function OpinionesPerfil() {
   return (
-    <div className="container-fluid position-relative">
-      <h4 className="border-bottom m-4 px-5 pb-2">OPINIONES</h4>
-      <div className="carousel-inner position-relative mb-4">
-        {/* Primera diapositiva con tarjetas */}
-        <div className="carousel-item active mb-4">
-          <div className="row justify-content-center">
-            <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 m-0">
-              {/* Tarjeta 1 */}
-              <div className="col">
-                <div className="card h-100">
-                  <div className="card-body">
-                    <h6 className="card-title fw-bold mb-3">"Excelente Iniciativa"</h6>
-                    <div className="d-flex align-items-center">
-                      <Image
-                        src="/assets/img/icono_masculino2.png"
-                        className="rounded-circle me-3"
-                        alt="Imagen de usuario"
-                        width={50}
-                        height={50}
-                        style={{ objectFit: 'cover' }}
-                      />
-                      <div>
-                        <p className="mb-0 fw-medium">Saul</p>
-                        <p className="mb-0 text-muted small">Happy</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* Tarjeta 2 */}
-              <div className="col">
-                <div className="card h-100">
-                  <div className="card-body">
-                    <h6 className="card-title fw-bold mb-3">"Muy Buen Servicio"</h6>
-                    <div className="d-flex align-items-center">
-                      <Image
-                        src="/assets/img/imagen_femenino2.avif"
-                        className="rounded-circle me-3"
-                        alt="Imagen de usuario"
-                        width={50}
-                        height={50}
-                        style={{ objectFit: 'cover' }}
-                      />
-                      <div>
-                        <p className="mb-0 fw-medium">Ana</p>
-                        <p className="mb-0 text-muted small">Satisfied</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* Tarjeta 3 */}
-              <div className="col">
-                <div className="card h-100">
-                  <div className="card-body">
-                    <h6 className="card-title fw-bold mb-3">"Increíble Experiencia"</h6>
-                    <div className="d-flex align-items-center">
-                      <Image
-                        src="/assets/img/icono_masculino.png"
-                        className="rounded-circle me-3"
-                        alt="Imagen de usuario"
-                        width={50}
-                        height={50}
-                        style={{ objectFit: 'cover' }}
-                      />
-                      <div>
-                        <p className="mb-0 fw-medium">Carlos</p>
-                        <p className="mb-0 text-muted small">Excited</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* Tarjeta 4 */}
-              <div className="col">
-                <div className="card h-100">
-                  <div className="card-body">
-                    <h6 className="card-title fw-bold mb-3">"Recomendado 100%"</h6>
-                    <div className="d-flex align-items-center">
-                      <Image
-                        src="/assets/img/imagen_femenino.jpg"
-                        className="rounded-circle me-3"
-                        alt="Imagen de usuario"
-                        width={50}
-                        height={50}
-                        style={{ objectFit: 'cover' }}
-                      />
-                      <div>
-                        <p className="mb-0 fw-medium">Laura</p>
-                        <p className="mb-0 text-muted small">Impressed</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+    <div className="profile-page">
+      <div className="container-fluid">
+        <div className="row">
+          {/* Sidebar moderna */}
+          <div className="col-lg-3 col-xl-2 px-0">
+            <ModernSidebar activeItem="perfil" />
           </div>
-        </div>
-        {/* Segunda diapositiva */}
-        <div className="row justify-content-center">
-          <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 m-0">
-            {/* Tarjeta 1 */}
-            <div className="col">
-              <div className="card h-100">
-                <div className="card-body">
-                  <h6 className="card-title fw-bold mb-3">"Excelente Iniciativa"</h6>
-                  <div className="d-flex align-items-center">
+
+          {/* Contenido principal */}
+          <div className="col-lg-9 col-xl-10 p-0">
+            <div className="profile-content">
+              <div className="profile-header">
+                <div className="profile-cover">
+                  <div className="cover-overlay"></div>
+                </div>
+                <div className="profile-avatar">
+                  {session?.user?.image ? (
                     <Image
-                      src="/assets/img/icono_masculino.png"
-                      className="rounded-circle me-3"
-                      alt="Imagen de usuario"
-                      width={50}
-                      height={50}
-                      style={{ objectFit: 'cover' }}
+                      src={session.user.image || "/placeholder.svg"}
+                      alt="Foto de perfil"
+                      width={120}
+                      height={120}
+                      className="avatar-img"
                     />
-                    <div>
-                      <p className="mb-0 fw-medium">Saul</p>
-                      <p className="mb-0 text-muted small">Happy</p>
-                    </div>
-                  </div>
+                  ) : (
+                    <div className="avatar-placeholder">{session?.user?.name?.charAt(0) || "U"}</div>
+                  )}
+                </div>
+                <div className="profile-info">
+                  <h2 className="profile-name">{session?.user?.name || "Usuario"}</h2>
+                  <p className="profile-email">{session?.user?.email || ""}</p>
+                  <button
+                    className={`btn ${isEditing ? "btn-success" : "btn-outline-primary"} btn-sm mt-2`}
+                    onClick={handleEditToggle}
+                  >
+                    {isEditing ? (
+                      <>
+                        <i className="bi bi-check-lg me-2"></i>Guardar cambios
+                      </>
+                    ) : (
+                      <>
+                        <i className="bi bi-pencil me-2"></i>Editar perfil
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
-            </div>
-            {/* Tarjeta 2 */}
-            <div className="col">
-              <div className="card h-100">
-                <div className="card-body">
-                  <h6 className="card-title fw-bold mb-3">"Muy Buen Servicio"</h6>
-                  <div className="d-flex align-items-center">
-                    <Image
-                      src="/assets/img/imagen_femenino.jpg"
-                      className="rounded-circle me-3"
-                      alt="Imagen de usuario"
-                      width={50}
-                      height={50}
-                      style={{ objectFit: 'cover' }}
-                    />
-                    <div>
-                      <p className="mb-0 fw-medium">Ana</p>
-                      <p className="mb-0 text-muted small">Satisfied</p>
+
+              <div className="profile-body">
+                <div className="row">
+                  <div className="col-md-8">
+                    <div className="profile-section">
+                      <h3 className="section-title">Información Personal</h3>
+                      <div className="section-content">
+                        {isEditing ? (
+                          <div className="row g-3">
+                            <div className="col-md-6">
+                              <label className="form-label">Nombre</label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                name="nombre"
+                                value={editData.nombre}
+                                onChange={handleInputChange}
+                              />
+                            </div>
+                            <div className="col-md-6">
+                              <label className="form-label">Apellidos</label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                name="apellidos"
+                                value={editData.apellidos}
+                                onChange={handleInputChange}
+                              />
+                            </div>
+                            <div className="col-md-6">
+                              <label className="form-label">Edad</label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                name="edad"
+                                value={editData.edad}
+                                onChange={handleInputChange}
+                              />
+                            </div>
+                            <div className="col-md-6">
+                              <label className="form-label">Ubicación</label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                name="ubicacion"
+                                value={editData.ubicacion}
+                                onChange={handleInputChange}
+                              />
+                            </div>
+                            <div className="col-md-6">
+                              <label className="form-label">Email</label>
+                              <input
+                                type="email"
+                                className="form-control"
+                                value={session?.user?.email || ""}
+                                disabled
+                              />
+                              <small className="text-muted">El email no se puede modificar</small>
+                            </div>
+                            <div className="col-md-6">
+                              <label className="form-label">Teléfono</label>
+                              <input
+                                type="tel"
+                                className="form-control"
+                                name="telefono"
+                                value={editData.telefono || ""}
+                                onChange={handleInputChange}
+                              />
+                            </div>
+                            <div className="col-12">
+                              <label className="form-label">Géneros Preferidos</label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                name="generos_preferidos"
+                                value={editData.generos_preferidos}
+                                onChange={handleInputChange}
+                              />
+                            </div>
+                            <div className="col-12">
+                              <label className="form-label">Información sobre mí</label>
+                              <textarea
+                                className="form-control"
+                                name="biografia"
+                                rows="4"
+                                value={editData.biografia}
+                                onChange={handleInputChange}
+                              ></textarea>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="info-grid">
+                            <div className="info-item">
+                              <div className="info-label">Nombre</div>
+                              <div className="info-value">{userData.nombre}</div>
+                            </div>
+                            <div className="info-item">
+                              <div className="info-label">Apellidos</div>
+                              <div className="info-value">{userData.apellidos}</div>
+                            </div>
+                            <div className="info-item">
+                              <div className="info-label">Edad</div>
+                              <div className="info-value">{userData.edad}</div>
+                            </div>
+                            <div className="info-item">
+                              <div className="info-label">Ubicación</div>
+                              <div className="info-value">{userData.ubicacion}</div>
+                            </div>
+                            <div className="info-item">
+                              <div className="info-label">Email</div>
+                              <div className="info-value">{session?.user?.email || "ejemplo@email.com"}</div>
+                            </div>
+                            <div className="info-item">
+                              <div className="info-label">Teléfono</div>
+                              <div className="info-value">{userData.telefono || "No especificado"}</div>
+                            </div>
+                            <div className="info-item">
+                              <div className="info-label">Géneros Preferidos</div>
+                              <div className="info-value">
+                                {userData.generos_preferidos.split(",").map((genero, index) => (
+                                  <span key={index} className="genre-tag">
+                                    {genero.trim()}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="info-item full-width">
+                              <div className="info-label">Información sobre mí</div>
+                              <div className="info-value bio-text">{userData.biografia}</div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="profile-section">
+                      <h3 className="section-title">Actividad Reciente</h3>
+                      <div className="section-content">
+                        <div className="activity-timeline">
+                          <div className="activity-item">
+                            <div className="activity-icon">
+                              <i className="bi bi-heart-fill"></i>
+                            </div>
+                            <div className="activity-content">
+                              <p className="activity-text">
+                                Has añadido <strong>Cien años de soledad</strong> a tus favoritos
+                              </p>
+                              <p className="activity-time">Hace 2 días</p>
+                            </div>
+                          </div>
+                          <div className="activity-item">
+                            <div className="activity-icon">
+                              <i className="bi bi-upload"></i>
+                            </div>
+                            <div className="activity-content">
+                              <p className="activity-text">
+                                Has subido <strong>El código Da Vinci</strong> para intercambio
+                              </p>
+                              <p className="activity-time">Hace 1 semana</p>
+                            </div>
+                          </div>
+                          <div className="activity-item">
+                            <div className="activity-icon">
+                              <i className="bi bi-arrow-left-right"></i>
+                            </div>
+                            <div className="activity-content">
+                              <p className="activity-text">
+                                Has completado un intercambio con <strong>Laura P.</strong>
+                              </p>
+                              <p className="activity-time">Hace 2 semanas</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-            {/* Tarjeta 3 */}
-            <div className="col">
-              <div className="card h-100">
-                <div className="card-body">
-                  <h6 className="card-title fw-bold mb-3">"Increíble Experiencia"</h6>
-                  <div className="d-flex align-items-center">
-                    <Image
-                      src="/assets/img/icono_masculino2.png"
-                      className="rounded-circle me-3"
-                      alt="Imagen de usuario"
-                      width={50}
-                      height={50}
-                      style={{ objectFit: 'cover' }}
-                    />
-                    <div>
-                      <p className="mb-0 fw-medium">Carlos</p>
-                      <p className="mb-0 text-muted small">Excited</p>
+
+                  <div className="col-md-4">
+                    <div className="profile-section">
+                      <h3 className="section-title">Estadísticas</h3>
+                      <div className="section-content">
+                        <div className="stats-grid">
+                          <div className="stat-item">
+                            <div className="stat-icon">
+                              <i className="bi bi-book"></i>
+                            </div>
+                            <div className="stat-content">
+                              <div className="stat-value">12</div>
+                              <div className="stat-label">Libros subidos</div>
+                            </div>
+                          </div>
+                          <div className="stat-item">
+                            <div className="stat-icon">
+                              <i className="bi bi-arrow-left-right"></i>
+                            </div>
+                            <div className="stat-content">
+                              <div className="stat-value">8</div>
+                              <div className="stat-label">Intercambios</div>
+                            </div>
+                          </div>
+                          <div className="stat-item">
+                            <div className="stat-icon">
+                              <i className="bi bi-heart"></i>
+                            </div>
+                            <div className="stat-content">
+                              <div className="stat-value">15</div>
+                              <div className="stat-label">Favoritos</div>
+                            </div>
+                          </div>
+                          <div className="stat-item">
+                            <div className="stat-icon">
+                              <i className="bi bi-star"></i>
+                            </div>
+                            <div className="stat-content">
+                              <div className="stat-value">4.8</div>
+                              <div className="stat-label">Valoración</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* Tarjeta 4 */}
-            <div className="col">
-              <div className="card h-100">
-                <div className="card-body">
-                  <h6 className="card-title fw-bold mb-3">"Recomendado 100%"</h6>
-                  <div className="d-flex align-items-center">
-                    <Image
-                      src="/assets/img/imagen_femenino2.avif"
-                      className="rounded-circle me-3"
-                      alt="Imagen de usuario"
-                      width={50}
-                      height={50}
-                      style={{ objectFit: 'cover' }}
-                    />
-                    <div>
-                      <p className="mb-0 fw-medium">Laura</p>
-                      <p className="mb-0 text-muted small">Impressed</p>
+
+                    <div className="profile-section">
+                      <h3 className="section-title">Libros Favoritos</h3>
+                      <div className="section-content">
+                        <div className="favorite-books">
+                          <div className="favorite-book">
+                            <div className="book-cover">
+                              <Image
+                                src="/assets/img/libro1.jpg"
+                                alt="Cien años de soledad"
+                                width={60}
+                                height={90}
+                                className="img-fluid rounded"
+                              />
+                            </div>
+                            <div className="book-info">
+                              <h5 className="book-title">Cien años de soledad</h5>
+                              <p className="book-author">Gabriel García Márquez</p>
+                            </div>
+                          </div>
+                          <div className="favorite-book">
+                            <div className="book-cover">
+                              <Image
+                                src="/assets/img/libro2.jpg"
+                                alt="El principito"
+                                width={60}
+                                height={90}
+                                className="img-fluid rounded"
+                              />
+                            </div>
+                            <div className="book-info">
+                              <h5 className="book-title">El principito</h5>
+                              <p className="book-author">Antoine de Saint-Exupéry</p>
+                            </div>
+                          </div>
+                          <div className="favorite-book">
+                            <div className="book-cover">
+                              <Image
+                                src="/assets/img/libro3.jpg"
+                                alt="1984"
+                                width={60}
+                                height={90}
+                                className="img-fluid rounded"
+                              />
+                            </div>
+                            <div className="book-info">
+                              <h5 className="book-title">1984</h5>
+                              <p className="book-author">George Orwell</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-center mt-3">
+                          <a href="/libros/misLibros" className="btn btn-sm btn-outline-primary">
+                            Ver todos
+                          </a>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -253,5 +395,5 @@ export function OpinionesPerfil() {
         </div>
       </div>
     </div>
-  );
+  )
 }

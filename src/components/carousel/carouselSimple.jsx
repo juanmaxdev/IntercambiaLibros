@@ -47,12 +47,35 @@ export default function CarouselSimple() {
     fetchGeneros()
   }, [])
 
+  // Aplicar estilos de hover usando un estilo en línea
+  useEffect(() => {
+    const styleElement = document.createElement("style")
+    styleElement.textContent = `
+      .genre-card {
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .genre-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      }
+      .genre-card:hover .genre-image {
+        transform: scale(1.05);
+      }
+    `
+    document.head.appendChild(styleElement)
+
+    return () => {
+      document.head.removeChild(styleElement)
+    }
+  }, [])
+
   if (loading) {
     return (
       <div className="container-fluid">
         <div className="border-bottom m-4 pb-2">
           <div className="d-flex justify-content-center justify-content-md-start ps-lg-5 ms-lg-5">
-            <Link href="/views/books/bookList" className="text-decoration-none">
+            <Link href="/libros/generos" className="text-decoration-none">
               <h4 className="m-0 ps-1">GÉNEROS</h4>
             </Link>
           </div>
@@ -71,7 +94,7 @@ export default function CarouselSimple() {
       <div className="container-fluid">
         <div className="border-bottom m-4 pb-2">
           <div className="d-flex justify-content-center justify-content-md-start ps-lg-5 ms-lg-5">
-            <Link href="/views/books/bookList" className="text-decoration-none">
+            <Link href="/libros/generos" className="text-decoration-none">
               <h4 className="m-0 ps-1">GÉNEROS</h4>
             </Link>
           </div>
@@ -88,7 +111,7 @@ export default function CarouselSimple() {
       <div id="carouselSimpleGenero" className="carousel slide" data-bs-ride="carousel" data-bs-interval="7000">
         <div className="border-bottom m-4 pb-2">
           <div className="d-flex justify-content-center justify-content-md-start ps-lg-5 ms-lg-5">
-            <Link href="/views/books/bookList" className="text-decoration-none">
+            <Link href="/libros/generos" className="text-decoration-none">
               <h4 className="m-0 ps-1">GÉNEROS</h4>
             </Link>
           </div>
@@ -105,21 +128,30 @@ export default function CarouselSimple() {
                 <div className="row justify-content-center p-3">
                   {group.map((genero) => (
                     <div key={`genero-${genero.id}`} className="col-lg-2 col-md-4 col-sm-6 col-12 mb-3">
-                      <div className="card h-100">
-                        <Image
-                          src={genero.imagen || "/placeholder.svg?height=300&width=200"}
-                          className="card-img-top"
-                          alt={`Imagen de ${genero.nombre}`}
-                          height={300}
-                          width={100}
-                          style={{ objectFit: "cover", width: "100%", height: "400px" }}
-                        />
-                        <div className="card-body d-flex flex-column justify-content-center p-0">
-                          <a href="#" className="btn border-0 w-100 text-center text-nowrap">
-                            {genero.nombre.toUpperCase()}
-                          </a>
+                      <Link
+                        href={`/libros/generos?genre=${encodeURIComponent(genero.nombre)}`}
+                        className="text-decoration-none"
+                      >
+                        <div className="card h-100 genre-card">
+                          <div className="position-relative overflow-hidden" style={{ height: "400px" }}>
+                            <Image
+                              src={genero.imagen || "/placeholder.svg?height=300&width=200"}
+                              className="card-img-top genre-image"
+                              alt={`Imagen de ${genero.nombre}`}
+                              fill
+                              style={{
+                                objectFit: "cover",
+                                transition: "transform 0.3s ease",
+                              }}
+                            />
+                          </div>
+                          <div className="card-body d-flex flex-column justify-content-center p-0">
+                            <div className="btn border-0 w-100 text-center text-nowrap">
+                              {genero.nombre.toUpperCase()}
+                            </div>
+                          </div>
                         </div>
-                      </div>
+                      </Link>
                     </div>
                   ))}
                 </div>
@@ -165,58 +197,59 @@ export default function CarouselSimple() {
     </div>
   )
 }
+
 {
-  /* Carousel de los ultimos Libros */
+  /* ---- Carousel de los ultimos Libros ---- */
 }
 
 export function CarouselNuevosLibros() {
-  const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [groupedBooks, setGroupedBooks] = useState([]);
+  const [books, setBooks] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [groupedBooks, setGroupedBooks] = useState([])
 
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        setLoading(true);
-        const response = await fetch('/api/libros', {
-          cache: 'no-store',
+        setLoading(true)
+        const response = await fetch("/api/libros", {
+          cache: "no-store",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-        });
+        })
 
         if (!response.ok) {
-          throw new Error(`Error al obtener los libros: ${response.status}`);
+          throw new Error(`Error al obtener los libros: ${response.status}`)
         }
 
-        const data = await response.json();
+        const data = await response.json()
 
         // Ordenar los libros por fecha de subida (más recientes primero)
         const sortedBooks = data.sort((a, b) => {
-          const dateA = new Date(a.fecha_subida);
-          const dateB = new Date(b.fecha_subida);
-          return dateB - dateA; // Orden descendente (más reciente primero)
-        });
+          const dateA = new Date(a.fecha_subida)
+          const dateB = new Date(b.fecha_subida)
+          return dateB - dateA // Orden descendente (más reciente primero)
+        })
 
-        setBooks(sortedBooks);
+        setBooks(sortedBooks)
 
         // Agrupar los libros en grupos de 5 para el carrusel
-        const groups = [];
+        const groups = []
         for (let i = 0; i < Math.min(sortedBooks.length, 15); i += 5) {
-          groups.push(sortedBooks.slice(i, i + 5));
+          groups.push(sortedBooks.slice(i, i + 5))
         }
-        setGroupedBooks(groups);
+        setGroupedBooks(groups)
       } catch (err) {
-        console.error('Error fetching books:', err);
-        setError(err.message);
+        console.error("Error fetching books:", err)
+        setError(err.message)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchBooks();
-  }, []);
+    fetchBooks()
+  }, [])
 
   if (loading) {
     return (
@@ -234,7 +267,7 @@ export function CarouselNuevosLibros() {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -251,7 +284,7 @@ export function CarouselNuevosLibros() {
           Error al cargar los libros: {error}
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -270,7 +303,7 @@ export function CarouselNuevosLibros() {
             groupedBooks.map((group, groupIndex) => (
               <div
                 key={`group-${groupIndex}`}
-                className={`carousel-item ${groupIndex === 0 ? 'active' : ''}`}
+                className={`carousel-item ${groupIndex === 0 ? "active" : ""}`}
                 data-bs-interval="7000"
               >
                 <div className="row justify-content-center p-3">
@@ -301,7 +334,7 @@ export function CarouselNuevosLibros() {
               type="button"
               data-bs-target="#carouselNuevosLibros"
               data-bs-slide="prev"
-              style={{ top: '20%' }}
+              style={{ top: "20%" }}
             >
               <Image src="/assets/icons/Back.gif" alt="atras" width={65} height={65} unoptimized />
               <span className="visually-hidden">Previous</span>
@@ -311,7 +344,7 @@ export function CarouselNuevosLibros() {
               type="button"
               data-bs-target="#carouselNuevosLibros"
               data-bs-slide="next"
-              style={{ top: '20%' }}
+              style={{ top: "20%" }}
             >
               <Image src="/assets/icons/Forward1.gif" alt="atras" width={50} height={50} unoptimized />
               <span className="visually-hidden">Next</span>
@@ -320,5 +353,5 @@ export function CarouselNuevosLibros() {
         )}
       </div>
     </div>
-  );
+  )
 }

@@ -22,8 +22,14 @@ const nextConfig = {
                 hostname: 'heythjlroyqoqhqbmtlc.supabase.co',
                 pathname: '/storage/v1/object/public/portada-libros/subidas/**',
             },
+            {
+                protocol: 'https',
+                hostname: 'lh3.googleusercontent.com',
+                pathname: '/**',
+            },
+            
         ],
-        domains: ['lh3.googleusercontent.com'],
+        
     },
     env: {
         NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
