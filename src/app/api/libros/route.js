@@ -1,4 +1,3 @@
-// pages/api/libros/index.js
 import { obtenerLibros } from '@/services/librosService';
 import { NextResponse } from 'next/server';
 
