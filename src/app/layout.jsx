@@ -6,6 +6,8 @@ import Footer from '@/components/footer/footer';
 import './styles/globals.css';
 import { Providers } from '@/utils/providers';
 import "@/app/styles/dropdownNav.css"
+import "@/app/styles/donations.css"
+import "bootstrap-icons/font/bootstrap-icons.css"
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

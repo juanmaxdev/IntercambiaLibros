@@ -1,9 +1,9 @@
 "use client"
-import "./styles.css"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import ComentariosLibro from "./comentarios-libro"
 import { useSession } from "next-auth/react"
+import "@/app/styles/books/styles.css"
 
 export default function LibroSeleccionado({ book }) {
   const router = useRouter()

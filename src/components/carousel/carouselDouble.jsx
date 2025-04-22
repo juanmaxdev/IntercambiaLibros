@@ -59,7 +59,7 @@ export default function CarouselDoble() {
         }
         setGroupedDonaciones(groups)
       } catch (err) {
-        console.error("Error fetching donations:", err)
+        console.error("Error fetching donaciones:", err)
         setError(err.message)
       } finally {
         setLoading(false)
@@ -106,7 +106,7 @@ export default function CarouselDoble() {
       <div id="carouselDonations" className="carousel slide" data-bs-ride="carousel" data-bs-interval="7000">
         <div className="border-bottom m-4 pt-3 pb-2">
           <div className="d-flex justify-content-center justify-content-md-start ps-lg-5 ms-lg-5">
-            <Link href="/views/books/donations" className="text-decoration-none">
+            <Link href="/libros/donaciones" className="text-decoration-none">
               <h4 className="m-0 ps-1">DONACIONES</h4>
             </Link>
           </div>

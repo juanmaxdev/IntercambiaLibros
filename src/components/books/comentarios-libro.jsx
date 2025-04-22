@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import "./comentarios.css"
+import "@/app/styles/books/comentarios.css"
 
 export default function ComentariosLibro({ titulo, session }) {
   // Inicializar comentarios como un array vacío para evitar el error de map en undefined
