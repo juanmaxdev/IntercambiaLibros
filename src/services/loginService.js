@@ -2,6 +2,11 @@ import { supabase } from '@/lib/supabase';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
+/**
+ * Iniciar sesión de un usuario.
+ * @param {Object} param0 - Objeto con correo electrónico y contraseña.
+ * @returns {Object} - Información del usuario y token JWT.
+ */
 export async function iniciarSesion({ correo_electronico, contrasena }) {
   try {
     // Buscar el usuario por correo electrónico
@@ -21,7 +26,7 @@ export async function iniciarSesion({ correo_electronico, contrasena }) {
       throw new Error('Correo o contraseña incorrectos');
     }
 
-    // Generar un token JWT (El token actúa como una prueba de que el usuario ha iniciado sesión correctamente)
+    // Generar un token JWT
     let token;
     try {
       token = jwt.sign(
@@ -49,5 +54,20 @@ export async function iniciarSesion({ correo_electronico, contrasena }) {
   } catch (err) {
     console.error('❌ Error en el servicio de inicio de sesión:', err);
     throw err;
+  }
+}
+
+/**
+ * Validar un token JWT.
+ * @param {string} token - Token JWT a validar.
+ * @returns {Object} - Información decodificada del token.
+ */
+export function validarToken(token) {
+  try {
+    const decoded = jwt.verify(token, process.env.AUTH_SECRET);
+    return decoded;
+  } catch (err) {
+    console.error('❌ Error al validar el token:', err);
+    throw new Error('Token inválido o expirado');
   }
 }

@@ -1,7 +1,63 @@
-"use client"
-import Image from "next/image"
+"use client";
+import Image from "next/image";
+import { useState } from "react";
 
 export function RegistroModal() {
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState(""); // Estado para el mensaje de éxito
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+
+    // Obtener los valores del formulario
+    const username = document.getElementById("usernameInput").value;
+    const email = document.getElementById("emailInput").value;
+    const password = document.getElementById("passwordInput").value;
+    const repeatPassword = document.getElementById("repeatPasswordInput").value;
+
+    // Validar contraseñas coincidan
+    if (password !== repeatPassword) {
+      setErrorMessage("Las contraseñas no coinciden");
+      return;
+    }
+
+    try {
+      // Enviar los datos a la API
+      const response = await fetch("/api/perfil/registro", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre_usuario: username,
+          correo_electronico: email,
+          contrasena: password,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Registro exitoso:", data);
+
+        // Mostrar mensaje de éxito
+        setSuccessMessage("Cuenta creada exitosamente. Ya puedes iniciar sesión.");
+        setErrorMessage(""); // Limpiar mensajes de error
+
+        // Ocultar el mensaje después de 3 segundos
+        setTimeout(() => {
+          setSuccessMessage("");
+          document.getElementById("modalRegistro").click(); // Cerrar el modal
+        }, 3000);
+      } else {
+        const error = await response.json();
+        setErrorMessage(error.message || "Error al registrar el usuario");
+      }
+    } catch (err) {
+      console.error("Error del servidor:", err);
+      setErrorMessage("Error del servidor. Inténtalo más tarde.");
+    }
+  };
+
   return (
     <div className="modal fade" id="modalRegistro" tabIndex={-1} aria-labelledby="modalRegistro" aria-hidden="true">
       <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -18,7 +74,7 @@ export function RegistroModal() {
                       <h4 className="mb-2">Crear cuenta</h4>
                       <Image src="/assets/img/lotus.png" width={120} height={120} alt="logo" />
                     </div>
-                    <form>
+                    <form onSubmit={handleRegister}>
                       <div className="form-floating mb-3">
                         <input
                           type="text"
@@ -59,6 +115,8 @@ export function RegistroModal() {
                           He leído y acepto la <a href="#">política de privacidad</a>
                         </label>
                       </div>
+                      {errorMessage && <p className="text-danger">{errorMessage}</p>}
+                      {successMessage && <p className="text-success">{successMessage}</p>}
                       <div className="mb-3">
                         <button className="btn btn-outline-primary w-100" type="submit">
                           Crear cuenta
@@ -88,5 +146,5 @@ export function RegistroModal() {
         </div>
       </div>
     </div>
-  )
+  );
 }
