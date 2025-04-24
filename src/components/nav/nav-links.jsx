@@ -6,7 +6,15 @@ import { signOut } from "next-auth/react"
 export function NavLinks({ isAuthenticated }) {
   // Limpiar el estado de sesión cuando el usuario cierra sesión
   const handleSignOut = async () => {
+    // Limpiar localStorage para ambos tipos de autenticación
     localStorage.removeItem("sessionStarted")
+    localStorage.removeItem("authToken")
+    localStorage.removeItem("userId")
+    localStorage.removeItem("userName")
+    localStorage.removeItem("userEmail")
+    localStorage.removeItem("authType")
+
+    // Cerrar sesión con NextAuth
     await signOut({ callbackUrl: "/" })
   }
 

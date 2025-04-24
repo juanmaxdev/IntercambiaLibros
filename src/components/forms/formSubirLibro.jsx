@@ -2,22 +2,23 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
+import { useAuth } from "@/app/hooks/use-auth"
 import Link from "next/link"
 import Image from "next/image"
 import "@/app/styles/stylesFormSubirLibro.css"
 
 export default function FormSubirLibro() {
   const router = useRouter()
-  const { data: session, status } = useSession()
-  const isAuthenticated = status === "authenticated"
+  const { data: session, status: nextAuthStatus } = useSession()
+  const { isLoggedIn, userId, userName, userEmail, loading: authLoading } = useAuth()
 
   // Redirigir si no está autenticado
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (!authLoading && !isLoggedIn) {
       // Redirigir a la página principal con un parámetro para mostrar el modal de login
       router.push("/?login=true")
     }
-  }, [status, router])
+  }, [isLoggedIn, authLoading, router])
 
   // Estado para almacenar los datos del formulario
   const [formData, setFormData] = useState({
@@ -225,13 +226,16 @@ export default function FormSubirLibro() {
         formDataToSend.append("titulo", formData.titulo)
         formDataToSend.append("autor", formData.autor)
         formDataToSend.append("genero_id", formData.genero_id)
-        formDataToSend.append("estado_libro", formData.estado_libro) // Cambio de estado_libro a estado
+        formDataToSend.append("estado_libro", formData.estado_libro)
         formDataToSend.append("descripcion", formData.descripcion)
         formDataToSend.append("donacion", formData.donacion)
         formDataToSend.append("ubicacion", formData.ubicacion)
         formDataToSend.append("tipo_tapa", formData.tipo_tapa || "")
         formDataToSend.append("editorial", formData.editorial || "")
-        formDataToSend.append("metodoIntercambio", formData.metodo_intercambio) // Cambio de metodo_intercambio a metodoIntercambiodonación)
+        formDataToSend.append("metodoIntercambio", formData.metodo_intercambio)
+
+        // Añadir el ID de usuario, ya sea de NextAuth o de credenciales
+        formDataToSend.append("usuario_id", userId || session?.user?.id || session?.user?.email || "")
 
         // Generar nombre de archivo con fecha actual
         if (formData.archivo) {
@@ -313,7 +317,7 @@ export default function FormSubirLibro() {
   }, [formData, isSubmitted])
 
   // Si no está autenticado, mostrar mensaje de carga mientras se redirige
-  if (status === "loading" || status === "unauthenticated") {
+  if (authLoading || (!isLoggedIn && nextAuthStatus !== "unauthenticated")) {
     return (
       <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
         <div className="text-center">
@@ -330,8 +334,7 @@ export default function FormSubirLibro() {
   return (
     <div className="container-fluid">
       <div className="row">
-        <div className="col-2 ps-0">
-        </div>
+        <div className="col-2 ps-0"></div>
         <div className="col-10 mb-5">
           {/* FORMULARIO */}
           <h4 className="mb-4">Subir Libro</h4>

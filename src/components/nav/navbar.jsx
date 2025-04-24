@@ -10,21 +10,31 @@ import { SearchBar } from "./search-bar"
 import { NavLinks } from "./nav-links"
 import { LoginModal } from "./login-modal"
 import { RegistroModal } from "./registro-modal"
+import { useAuth } from "@/app/hooks/use-auth"
 
 export default function Nav() {
-  const { data: session, status } = useSession()
-  const isAuthenticated = status === "authenticated"
+  const { data: session } = useSession()
+  const { isLoggedIn, userName, userEmail, userImage, authType } = useAuth()
   const [showToast, setShowToast] = useState(false)
   const [toastMessage, setToastMessage] = useState("")
 
   // Verificar si el usuario acaba de iniciar sesión (usando localStorage)
   useEffect(() => {
-    if (isAuthenticated && !localStorage.getItem("sessionStarted")) {
+    if (isLoggedIn && localStorage.getItem("sessionStarted")) {
       setToastMessage("Sesión iniciada correctamente")
       setShowToast(true)
-      localStorage.setItem("sessionStarted", "true")
+      localStorage.removeItem("sessionStarted") // Eliminar para que no se muestre de nuevo al recargar
     }
-  }, [isAuthenticated])
+  }, [isLoggedIn])
+
+  // Crear un objeto de sesión unificado para pasar a los componentes
+  const unifiedSession = {
+    user: {
+      name: userName || session?.user?.name || "Usuario",
+      email: userEmail || session?.user?.email || "",
+      image: userImage || session?.user?.image || null,
+    },
+  }
 
   return (
     <>
@@ -34,7 +44,7 @@ export default function Nav() {
             <div className="d-flex w-100 justify-content-between align-items-center">
               {/* Menú izquierdo */}
               <ul className="navbar-nav d-flex flex-row align-items-center">
-                <NavLinks isAuthenticated={isAuthenticated} />
+                <NavLinks isAuthenticated={isLoggedIn} />
                 <li className="nav-item">
                   <Link className="nav-link active p-0" aria-current="page" href="/">
                     <Image
@@ -63,7 +73,7 @@ export default function Nav() {
               {/* Menú derecho */}
               <ul className="navbar-nav d-flex flex-row align-items-center">
                 {/* Mostrar "Subir Libro" solo si el usuario está autenticado */}
-                {isAuthenticated && (
+                {isLoggedIn && (
                   <li className="nav-item me-3">
                     <Link className="nav-link d-flex align-items-center gap-2 text-nowrap" href="/subirLibro">
                       <Image src="/assets/icons/cloud-upload.svg" alt="iconoSubirLibro" width={18} height={18} />
@@ -74,7 +84,7 @@ export default function Nav() {
 
                 {/* Mostrar "Iniciar sesión" o el nombre del usuario según el estado de autenticación */}
                 <li className="nav-item me-3 dropdown" style={{ position: "relative" }}>
-                  {isAuthenticated ? <UserMenu session={session} /> : <LoginButton />}
+                  {isLoggedIn ? <UserMenu session={unifiedSession} authType={authType} /> : <LoginButton />}
                 </li>
                 <li className="nav-item">
                   <Link className="nav-link d-flex align-items-center gap-2 text-nowrap" href="/">
@@ -87,7 +97,7 @@ export default function Nav() {
           </div>
         </nav>
         {/* Modales renderizados solo cuando el usuario no está autenticado */}
-        {!isAuthenticated && (
+        {!isLoggedIn && (
           <>
             <LoginModal />
             <RegistroModal />
