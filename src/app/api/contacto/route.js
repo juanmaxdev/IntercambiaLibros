@@ -1,39 +1,36 @@
-import { supabase } from '@/lib/supabase';
+import { obtenerMensajes, guardarMensaje } from '@/services/contactoService';
 
-export default async function handler(req, res) {
-  if (req.method === 'GET') {
-    const { data, error } = await supabase.from('contacto').select('*');
-    if (error) {
-      return res.status(500).json({ message: 'Error al obtener los mensajes', error: error.message });
-    }
-    return res.status(200).json(data);
+export async function GET() {
+  try {
+    const mensajes = await obtenerMensajes();
+    return new Response(JSON.stringify(mensajes), { status: 200 });
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ message: 'Error al obtener los mensajes', error: error.message }),
+      { status: 500 }
+    );
   }
+}
 
-  if (req.method === 'POST') {
-    const { nombre, apellidos, email, titulo, mensaje } = req.body;
+export async function POST(req) {
+  try {
+    const body = await req.json();
+    const { nombre, apellidos, email, titulo, mensaje } = body;
 
-    // ✅ Verifica solo los campos obligatorios
+    // Validar campos obligatorios
     if (!nombre || !email || !titulo || !mensaje) {
-      return res.status(400).json({ message: 'Faltan campos obligatorios' });
+      return new Response(
+        JSON.stringify({ message: 'Faltan campos obligatorios' }),
+        { status: 400 }
+      );
     }
 
-    const { data, error } = await supabase
-      .from('contacto')
-      .insert([{
-        nombre,
-        apellidos,
-        email,
-        titulo,
-        mensaje,
-        fecha_envio: new Date().toISOString().slice(0, 16), // fecha hasta los minutos
-      }]);
-
-    if (error) {
-      return res.status(500).json({ message: 'Error al guardar el mensaje', error: error.message });
-    }
-
-    return res.status(201).json({ message: 'Mensaje enviado correctamente' });
+    const resultado = await guardarMensaje({ nombre, apellidos, email, titulo, mensaje });
+    return new Response(JSON.stringify(resultado), { status: 201 });
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ message: 'Error al guardar el mensaje', error: error.message }),
+      { status: 500 }
+    );
   }
-
-  return res.status(405).json({ message: 'Método no permitido' });
 }

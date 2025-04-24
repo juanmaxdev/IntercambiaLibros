@@ -22,6 +22,38 @@ export function LoginModal() {
     }
   }
 
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("floatingInput").value;
+    const password = document.getElementById("floatingPassword").value;
+
+    try {
+      const response = await fetch("/api/perfil/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ correo_electronico: email, contrasena: password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Inicio de sesión exitoso:", data);
+
+        // Almacenar el token en localStorage
+        localStorage.setItem("token", data.token);
+
+        // Redirigir a la página principal
+        window.location.href = "/"; // Redirige a la página principal
+      } else {
+        const error = await response.json();
+        console.error("Error al iniciar sesión:", error.message);
+      }
+    } catch (err) {
+      console.error("Error del servidor:", err);
+    }
+  };
+
   useEffect(() => {
     let timeout
 
@@ -67,7 +99,7 @@ export function LoginModal() {
                     <div className="text-center mb-4">
                       <Image src="/assets/img/Logo2.png" width={160} height={40} alt="logo" />
                     </div>
-                    <form>
+                    <form onSubmit={handleLogin}>
                       <div className="form-floating mb-3">
                         <input
                           type="text"
@@ -100,7 +132,11 @@ export function LoginModal() {
                         </button>
                       </div>
                       <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-3">
-                        <button className="btn btn-outline-primary w-100 w-sm-75 mb-2 mb-sm-0" type="submit">
+                        <button
+                          className="btn btn-outline-primary w-100 w-sm-75 mb-2 mb-sm-0"
+                          type="submit"
+                          onClick={handleLogin}
+                        >
                           Iniciar Sesión
                         </button>
                         <a className="text-muted ms-sm-3" href="#!">

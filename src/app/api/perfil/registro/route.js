@@ -1,56 +1,49 @@
-import { supabase } from '@/lib/supabase';
-import bcrypt from 'bcrypt';
+import { registrarUsuario } from '@/services/registroService';
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Método no permitido' });
-  }
-
-  const {
-    nombre_usuario,
-    correo_electronico,
-    contrasena,
-    ubicacion = '',
-    biografia = ''
-  } = req.body;
-
-  if (!nombre_usuario || !correo_electronico || !contrasena) {
-    return res.status(400).json({
-      message: 'Nombre, correo y contraseña son obligatorios'
-    });
-  }
-
+export async function POST(req) {
   try {
-    const hashedPassword = await bcrypt.hash(contrasena, 10);
+    const body = await req.json();
+    const { nombre_usuario, 
+      correo_electronico, 
+      contrasena, 
+      ubicacion = null, 
+      biografia = null 
+    } = body;
 
-    const { data, error } = await supabase
-      .from('usuarios')
-      .insert([{
-        nombre_usuario,
-        correo_electronico,
-        contrasena: hashedPassword,
-        ubicacion,
-        biografia,
-        fecha_registro: new Date().toISOString(),
-        reputacion: 0,
-      }])
-      .select();
-
-    if (error) {
-      console.error('❌ Error Supabase:', error);
-      return res.status(500).json({
-        message: 'Error al crear el usuario',
-        error: error.message || error.details || error
-      });
+    // Validar campos obligatorios
+    if (!nombre_usuario || !correo_electronico || !contrasena) {
+      return new Response(
+        JSON.stringify({ message: 'Nombre, correo y contraseña son obligatorios' }),
+        { status: 400 }
+      );
     }
 
-    return res.status(201).json({
-      message: 'Usuario creado con éxito',
-      user: data[0],
+    // Llamar al servicio para registrar al usuario
+    const resultado = await registrarUsuario({
+      nombre_usuario,
+      correo_electronico,
+      contrasena,
+      ubicacion,
+      biografia,
     });
 
-  } catch (err) {
-    console.error('❌ Error general:', err);
-    return res.status(500).json({ message: 'Error del servidor' });
+    // Responder con éxito
+    return new Response(JSON.stringify(resultado), { status: 201 });
+  } catch (error) {
+    console.error('❌ Error en la API de registro:', error);
+
+    // Manejo de errores específicos
+    if (error.message.includes('No se pudo registrar el usuario')) {
+      return new Response(
+        JSON.stringify({ message: error.message }),
+        { status: 400 }
+      );
+    }
+
+    // Respuesta genérica para errores del servidor
+    return new Response(
+      JSON.stringify({ message: 'Error del servidor', error: error.message }),
+      { status: 500 }
+    );
   }
 }
