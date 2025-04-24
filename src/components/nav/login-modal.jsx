@@ -22,10 +22,13 @@ export function LoginModal() {
     }
   }
 
+  // Modificar la función handleLogin para guardar los datos del usuario en localStorage
+  // y actualizar la UI después del inicio de sesión exitoso
+
   const handleLogin = async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("floatingInput").value;
-    const password = document.getElementById("floatingPassword").value;
+    e.preventDefault()
+    const email = document.getElementById("floatingInput").value
+    const password = document.getElementById("floatingPassword").value
 
     try {
       const response = await fetch("/api/perfil/login", {
@@ -34,25 +37,43 @@ export function LoginModal() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ correo_electronico: email, contrasena: password }),
-      });
+      })
 
       if (response.ok) {
-        const data = await response.json();
-        console.log("Inicio de sesión exitoso:", data);
+        const data = await response.json()
+        console.log("Inicio de sesión exitoso:", data)
 
         // Almacenar el token en localStorage
-        localStorage.setItem("token", data.token);
+        localStorage.setItem("authToken", data.token)
 
-        // Redirigir a la página principal
-        window.location.href = "/"; // Redirige a la página principal
+        // Almacenar información del usuario en localStorage para simular la sesión
+        localStorage.setItem("userId", data.user.id)
+        localStorage.setItem("userName", data.user.nombre_usuario)
+        localStorage.setItem("userEmail", data.user.correo_electronico)
+        localStorage.setItem("sessionStarted", "true") // Para mostrar la notificación
+        localStorage.setItem("authType", "credentials") // Para identificar el tipo de autenticación
+
+        // Cerrar el modal
+        const modalElement = document.getElementById("modalIniciarSesion")
+        if (modalElement && window.bootstrap) {
+          const bsModal = window.bootstrap.Modal.getInstance(modalElement)
+          if (bsModal) {
+            bsModal.hide()
+          }
+        }
+
+        // Recargar la página para actualizar la UI
+        window.location.reload()
       } else {
-        const error = await response.json();
-        console.error("Error al iniciar sesión:", error.message);
+        const error = await response.json()
+        console.error("Error al iniciar sesión:", error.message)
+        alert("Error al iniciar sesión: " + (error.message || "Credenciales incorrectas"))
       }
     } catch (err) {
-      console.error("Error del servidor:", err);
+      console.error("Error del servidor:", err)
+      alert("Error del servidor. Por favor, inténtalo de nuevo más tarde.")
     }
-  };
+  }
 
   useEffect(() => {
     let timeout

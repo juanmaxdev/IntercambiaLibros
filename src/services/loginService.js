@@ -31,7 +31,7 @@ export async function iniciarSesion({ correo_electronico, contrasena }) {
     try {
       token = jwt.sign(
         { id: usuario.id, correo_electronico: usuario.correo_electronico },
-        process.env.AUTH_SECRET,
+        process.env.NEXTAUTH_SECRET,
         { expiresIn: '7d' }
       );
       console.log('✅ Token generado:', token);
@@ -64,7 +64,7 @@ export async function iniciarSesion({ correo_electronico, contrasena }) {
  */
 export function validarToken(token) {
   try {
-    const decoded = jwt.verify(token, process.env.AUTH_SECRET);
+    const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
     return decoded;
   } catch (err) {
     console.error('❌ Error al validar el token:', err);

@@ -4,7 +4,7 @@ import { signOut } from "next-auth/react"
 import Link from "next/link"
 import Image from "next/image"
 
-export function UserMenu({ session }) {
+export function UserMenu({ session, authType = "nextauth" }) {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef(null)
 
@@ -26,10 +26,24 @@ export function UserMenu({ session }) {
     }
   }, [])
 
-  // Función para cerrar sesión
+  // Función para cerrar sesión según el tipo de autenticación
   const handleSignOut = async () => {
-    localStorage.removeItem("sessionStarted")
-    await signOut({ callbackUrl: "/" })
+    if (authType === "credentials") {
+      // Limpiar localStorage para cerrar sesión con credenciales
+      localStorage.removeItem("authToken")
+      localStorage.removeItem("userId")
+      localStorage.removeItem("userName")
+      localStorage.removeItem("userEmail")
+      localStorage.removeItem("authType")
+      localStorage.removeItem("sessionStarted")
+
+      // Recargar la página para actualizar la UI
+      window.location.href = "/"
+    } else {
+      // Cerrar sesión con NextAuth
+      localStorage.removeItem("sessionStarted")
+      await signOut({ callbackUrl: "/" })
+    }
   }
 
   return (
