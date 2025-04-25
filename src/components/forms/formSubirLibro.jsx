@@ -126,17 +126,25 @@ export default function FormSubirLibro() {
     if (fileInput) fileInput.value = ""
   }
 
+  // Limpiar la URL de vista previa al desmontar el componente
+  // Esto es importante para evitar fugas de memoria
+  // y liberar recursos del navegador
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
+
   // Validar el formulario
   const validateForm = () => {
     const tempErrors = {}
     let formIsValid = true
 
     // Validar título
-    if (!formData.titulo) {
-      tempErrors.titulo = "El título es obligatorio"
-      formIsValid = false
-    } else if (formData.titulo.length < 3) {
-      tempErrors.titulo = "El título debe tener al menos 3 caracteres"
+    if (!formData.titulo || formData.titulo.length < 3) {
+      tempErrors.titulo = "El título es obligatorio y debe tener al menos 3 caracteres"
       formIsValid = false
     }
 
@@ -205,79 +213,68 @@ export default function FormSubirLibro() {
       formIsValid = false
     }
 
+    // Validar ISBN
+    if (formData.isbn && !/^\d{10}(\d{3})?$/.test(formData.isbn)) {
+      tempErrors.isbn = "El ISBN debe tener 10 o 13 caracteres numéricos";
+      formIsValid = false;
+    }
+
     setErrors(tempErrors)
     return formIsValid
   }
 
+  // Función para resetear el input de archivo
+  const resetFileInput = () => {
+    const fileInput = document.getElementById("archivoInput")
+    if (fileInput) fileInput.value = ""
+  }
+
   // Función para manejar el envío del formulario
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsSubmitted(true)
-    setSuccessMessage("")
+    e.preventDefault();
+    setIsSubmitted(true);
+    setSuccessMessage("");
 
     if (validateForm()) {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
-        // Crear un objeto FormData para enviar los datos, incluyendo la imagen
-        const formDataToSend = new FormData()
+        const formDataToSend = new FormData();
 
-        // Añadir todos los campos al FormData con los nombres correctos que espera el servidor
-        formDataToSend.append("isbn", formData.isbn || "")
-        formDataToSend.append("titulo", formData.titulo)
-        formDataToSend.append("autor", formData.autor)
-        formDataToSend.append("genero_id", formData.genero_id)
-        formDataToSend.append("estado_libro", formData.estado_libro)
-        formDataToSend.append("descripcion", formData.descripcion)
-        formDataToSend.append("donacion", formData.donacion)
-        formDataToSend.append("ubicacion", formData.ubicacion)
-        formDataToSend.append("tipo_tapa", formData.tipo_tapa || "")
-        formDataToSend.append("editorial", formData.editorial || "")
-        formDataToSend.append("metodoIntercambio", formData.metodo_intercambio)
+        // Añadir todos los campos al FormData
+        formDataToSend.append("isbn", formData.isbn || "");
+        formDataToSend.append("titulo", formData.titulo);
+        formDataToSend.append("autor", formData.autor);
+        formDataToSend.append("genero_id", formData.genero_id);
+        formDataToSend.append("estado_libro", formData.estado_libro);
+        formDataToSend.append("descripcion", formData.descripcion);
+        formDataToSend.append("donacion", formData.donacion);
+        formDataToSend.append("ubicacion", formData.ubicacion);
+        formDataToSend.append("tipo_tapa", formData.tipo_tapa || "");
+        formDataToSend.append("editorial", formData.editorial || "");
+        formDataToSend.append("metodoIntercambio", formData.metodo_intercambio);
+        formDataToSend.append("usuario_id", userId || session?.user?.id || session?.user?.email || "");
 
-        // Añadir el ID de usuario, ya sea de NextAuth o de credenciales
-        formDataToSend.append("usuario_id", userId || session?.user?.id || session?.user?.email || "")
-
-        // Generar nombre de archivo con fecha actual
+        // Añadir el archivo al FormData
         if (formData.archivo) {
-          const now = new Date()
-          const timestamp = now.toISOString().replace(/[:.]/g, "-")
-          const originalFileName = formData.archivo.name
-          const fileExtension = originalFileName.split(".").pop()
-          const newFileName = `${formData.titulo.replace(/\s+/g, "_")}_${timestamp}.${fileExtension}`
-
-          // Construir la ruta completa para la imagen
-          const imagePath = `https://heythjlroyqoqhqbmtlc.supabase.co/storage/v1/object/public/portada-libros/subidas/${newFileName}`
-
-          // Añadir la imagen al FormData con el nombre "archivo"
-          formDataToSend.append("archivo", formData.archivo)
-
-          // Añadir la ruta de la imagen al FormData con el nombre "imagenes"
-          formDataToSend.append("imagenes", imagePath)
+          formDataToSend.append("archivo", formData.archivo);
         }
 
-        // Depuración - mostrar las entradas del FormData
-        console.log("Contenido del FormData:")
-        for (const [key, value] of formDataToSend.entries()) {
-          console.log(`${key}: ${value instanceof File ? value.name : value}`)
-        }
-
-        // Enviar los datos al servidor
-        const response = await fetch("/api/libros", {
+        const response = await fetch("/api/libros/subirLibros", {
           method: "POST",
           body: formDataToSend,
-          // No establecer Content-Type, el navegador lo hará automáticamente con el boundary correcto
-        })
+        });
 
         if (!response.ok) {
-          const errorText = await response.text()
-          console.error("Error del servidor:", errorText)
-          throw new Error(`Error en la solicitud: ${response.status} - ${errorText}`)
+          const errorText = await response.text();
+          console.error("Error del servidor:", errorText);
+          setErrors({ server: errorText || "Hubo un problema al enviar el formulario. Inténtalo de nuevo más tarde." });
+          throw new Error(`Error en la solicitud: ${response.status} - ${errorText}`);
         }
 
-        const result = await response.json()
-        setSuccessMessage("Libro registrado correctamente")
+        const result = await response.json();
+        setSuccessMessage("Libro registrado correctamente");
 
-        // Resetear el formulario después de enviar
+        // Resetear el formulario
         setFormData({
           isbn: "",
           titulo: "",
@@ -291,23 +288,20 @@ export default function FormSubirLibro() {
           tipo_tapa: "",
           editorial: "",
           metodo_intercambio: "",
-        })
-        setImagePreview(null)
-        setIsSubmitted(false)
-
-        // Resetear el input de archivo
-        const fileInput = document.getElementById("archivoInput")
-        if (fileInput) fileInput.value = ""
+        });
+        setImagePreview(null);
+        setIsSubmitted(false);
+        resetFileInput();
       } catch (error) {
-        console.error("Error al enviar el formulario:", error)
-        alert(`Error al enviar el formulario: ${error.message}`)
+        console.error("Error al enviar el formulario:", error);
+        alert(`Error al enviar el formulario: ${error.message}`);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     } else {
-      console.log("Formulario con errores")
+      console.log("Formulario con errores");
     }
-  }
+  };
 
   // Validar cuando cambian los datos y ya se ha intentado enviar
   useEffect(() => {
@@ -416,7 +410,7 @@ export default function FormSubirLibro() {
             <div className="form-floating my-3">
               <input
                 type="text"
-                className="form-control"
+                className={`form-control ${errors.isbn ? "is-invalid" : ""}`}
                 id="floatingisbn"
                 placeholder="ISBN"
                 name="isbn"
@@ -424,6 +418,7 @@ export default function FormSubirLibro() {
                 onChange={handleChange}
               />
               <label htmlFor="floatingIsbn">ISBN</label>
+              {errors.isbn && <div className="invalid-feedback">{errors.isbn}</div>}
             </div>
 
             <div className="form-floating my-3">

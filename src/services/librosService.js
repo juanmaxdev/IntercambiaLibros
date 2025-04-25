@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import fs from 'fs';
 
 export async function obtenerLibros() {
   // Traemos todos los campos de libros + usuario y género relacionados
@@ -40,7 +41,7 @@ export async function obtenerLibros() {
   return libros;
 }
 
-export async function subidaLibros(req) {
+export async function subidaLibros({ fields, files }) {
   const {
     isbn,
     titulo,
@@ -55,30 +56,62 @@ export async function subidaLibros(req) {
     tipo_tapa = '',
     editorial = '',
     metodo_intercambio = 'Presencial',
-  } = req.body;
+  } = fields;
 
-  let urlImagen = req.body.imagenes || '';
+  // Validaciones
+  if (!titulo || titulo.length < 3) throw new Error('El título es obligatorio y debe tener al menos 3 caracteres');
+  if (!autor || autor.length < 3) throw new Error('El autor es obligatorio y debe tener al menos 3 caracteres');
+  if (!genero_id) throw new Error('El género es obligatorio');
+  if (!estado_libro) throw new Error('El estado del libro es obligatorio');
+  if (!descripcion || descripcion.length < 20) throw new Error('La descripción es obligatoria y debe tener al menos 20 caracteres');
+  if (isbn && !/^\d{10}(\d{3})?$/.test(isbn)) throw new Error('El ISBN debe tener 10 o 13 caracteres numéricos');
+  if (!ubicacion || ubicacion.trim().length < 5) throw new Error('La ubicación debe tener al menos 5 caracteres válidos');
 
-  if (req.file) {
-    const { buffer, originalname, mimetype } = req.file;
-    const ext = originalname.split('.').pop();
+  let urlImagen = '';
+
+  // Manejo del archivo
+  if (files.archivo) {
+    const file = files.archivo;
+    const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    if (!validTypes.includes(file.mimetype)) throw new Error('El archivo debe ser una imagen (JPG, PNG)');
+    if (file.size > 2 * 1024 * 1024) throw new Error('El archivo no debe superar los 2MB');
+
+    const ext = file.originalFilename.split('.').pop();
     const fileName = `${Date.now()}.${ext}`;
     const filePath = `subidas/${fileName}`;
 
     const { error: uploadError } = await supabase
       .storage
       .from('portada-libros')
-      .upload(filePath, buffer, { contentType: mimetype });
+      .upload(filePath, fs.readFileSync(file.filepath), { contentType: file.mimetype });
 
     if (uploadError) {
       console.error('Error al subir imagen:', uploadError);
       throw new Error('Error al subir la imagen');
     }
 
-    urlImagen = `https://heythjlroyqoqhqbmtlc.supabase.co/storage/v1/object/public/portada-libros/${filePath}`;
+    // Obtener la URL pública de la imagen
+    const { publicURL, error: urlError } = supabase
+      .storage
+      .from('portada-libros')
+      .getPublicUrl(filePath);
+
+    if (urlError) {
+      console.error('Error al obtener la URL pública:', urlError);
+      throw new Error('Error al obtener la URL pública de la imagen');
+    }
+
+    urlImagen = publicURL;
+
+    // Eliminar el archivo temporal
+    try {
+      fs.unlinkSync(file.filepath);
+    } catch (err) {
+      console.error('Error al eliminar el archivo temporal:', err);
+    }
   }
 
-  const fecha_subida = new Date().toISOString().slice(0, 16);
+  const fecha_subida = new Date().toISOString().slice(0, 16); // Formato YYYY-MM-DD
 
   const { data, error } = await supabase
     .from('libros')
@@ -105,7 +138,11 @@ export async function subidaLibros(req) {
 
   if (error) {
     console.error('Error al insertar libro:', error);
-    throw new Error(error.message);
+    throw new Error(`Error al insertar libro en la base de datos: ${error.message}`);
+  }
+
+  if (!data || data.length === 0) {
+    throw new Error('No se pudo insertar el libro en la base de datos');
   }
 
   return data[0];
