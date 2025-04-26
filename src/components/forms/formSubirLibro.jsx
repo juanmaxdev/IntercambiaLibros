@@ -240,7 +240,19 @@ export default function FormSubirLibro() {
       try {
         const formDataToSend = new FormData();
 
-        // Añadir todos los campos al FormData
+        // Verificar si la sesión está disponible antes de enviar el formulario
+        if (!session || !session.user || !session.user.email) {
+          console.error("La sesión no está disponible o el usuario no está autenticado.");
+          setErrors({ server: "No se pudo obtener la información del usuario. Por favor, inicia sesión nuevamente." });
+          setIsLoading(false);
+          return;
+        }
+
+        // Asignar el correo electrónico del usuario como usuario_id
+        formDataToSend.append("usuario_id", session.user.email);
+        console.log("📦 Enviando usuario_id (email):", session.user.email);
+
+        // Añadir otros campos al FormData
         formDataToSend.append("isbn", formData.isbn || "");
         formDataToSend.append("titulo", formData.titulo);
         formDataToSend.append("autor", formData.autor);
@@ -252,9 +264,7 @@ export default function FormSubirLibro() {
         formDataToSend.append("tipo_tapa", formData.tipo_tapa || "");
         formDataToSend.append("editorial", formData.editorial || "");
         formDataToSend.append("metodoIntercambio", formData.metodo_intercambio);
-        formDataToSend.append("usuario_id", userId || session?.user?.id || session?.user?.email || "");
 
-        // Añadir el archivo al FormData
         if (formData.archivo) {
           formDataToSend.append("archivo", formData.archivo);
         }
