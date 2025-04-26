@@ -61,14 +61,14 @@ export default function ModernSidebar() {
           <li className="nav-item">
             <Link
               href="/perfil"
-              className={`nav-link ${isActive("/perfil") && !isActive("/perfil/misDatos") && !isActive("/perfil/mensajes") && !isActive("/perfil/transacciones") && !isActive("/perfil/reportes") ? "active" : ""}`}
+              className={`nav-link ${isActive("/perfil") && !isActive("/perfil/misLibros") && !isActive("/perfil/mensajes") && !isActive("/perfil/transacciones") && !isActive("/perfil/reportes") ? "active" : ""}`}
             >
               <i className="bi bi-person"></i>
               {!collapsed && <span>Mi Perfil</span>}
             </Link>
           </li>
           <li className="nav-item">
-            <Link href="/libros/misLibros" className={`nav-link ${isActive("/libros/misLibros") ? "active" : ""}`}>
+            <Link href="/perfil/misLibros" className={`nav-link ${isActive("/perfil/misLibros") ? "active" : ""}`}>
               <i className="bi bi-book"></i>
               {!collapsed && <span>Mis Libros</span>}
             </Link>

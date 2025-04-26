@@ -77,7 +77,6 @@ export default function Reportes() {
     }
     // Si no hay errores, puedes proceder a enviar los datos al servidor
     setErrors({});
-    console.log('Formulario válido:', formValues);
     
     const dataForm = {
       nombre: formValues.nombre,
