@@ -36,7 +36,7 @@ export function NavLinks({ isAuthenticated }) {
           </Link>
         </li>
         <li>
-          <Link className="dropdown-item" href="/books/newBooks">
+          <Link className="dropdown-item" href="/libros/novedades">
             Nuevos Libros
           </Link>
         </li>
