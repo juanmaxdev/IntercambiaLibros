@@ -1,4 +1,3 @@
-import { enviarMensaje } from '@/services/chatService';
 import { NextResponse } from 'next/server';
 import { enviarMensaje } from '@/services/chatService';
 

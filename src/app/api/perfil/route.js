@@ -1,14 +1,17 @@
+import { auth } from "@/server/auth";
 import { obtenerPerfil, actualizarPerfil } from "@/services/perfilService";
 
-export async function GET(req) {
+export async function GET() {
   try {
-    const email = req.headers.get("email");
+    const session = await auth();
+    const email = session?.user?.email;
 
     if (!email) {
-      return new Response(JSON.stringify({ error: "El email es obligatorio" }), { status: 400 });
+      return new Response(JSON.stringify({ error: "No autorizado" }), { status: 401 });
     }
 
     const usuario = await obtenerPerfil(email);
+
     return new Response(JSON.stringify(usuario), { status: 200 });
   } catch (error) {
     console.error("Error al obtener el perfil:", error);
@@ -18,14 +21,16 @@ export async function GET(req) {
 
 export async function PUT(req) {
   try {
-    const body = await req.json();
-    const { email, ...updatedData } = body;
+    const session = await auth();
+    const email = session?.user?.email;
 
     if (!email) {
-      return new Response(JSON.stringify({ error: "El email es obligatorio" }), { status: 400 });
+      return new Response(JSON.stringify({ error: "No autorizado" }), { status: 401 });
     }
 
-    const result = await actualizarPerfil(email, updatedData);
+    const body = await req.json();
+    const result = await actualizarPerfil(email, body);
+
     return new Response(JSON.stringify(result), { status: 200 });
   } catch (error) {
     console.error("Error al actualizar el perfil:", error);

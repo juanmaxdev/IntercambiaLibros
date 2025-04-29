@@ -10,63 +10,54 @@ export default function PerfilUser() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
-  const [userData, setUserData] = useState(null); // Datos del usuario
-  const [editData, setEditData] = useState(null); // Datos editables
+  const [userData, setUserData] = useState(null);
+  const [editData, setEditData] = useState(null);
 
-  // Redirigir si no está autenticado
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/?login=true");
     }
   }, [status, router]);
 
-  // Obtener los datos del usuario al cargar el componente
   useEffect(() => {
     const fetchUserData = async () => {
-      if (session?.user?.email) {
-        try {
-          const response = await fetch("/api/perfil", {
-            method: "GET",
-            headers: {
-              email: session.user.email, // Enviar el email del usuario
-            },
-          });
+      try {
+        const response = await fetch("/api/perfil", {
+          method: "GET",
+        });
 
-          if (response.ok) {
-            const data = await response.json();
-            setUserData(data);
-            setEditData(data); // Inicializar los datos editables
-          } else {
-            console.error("Error al obtener los datos del usuario");
-          }
-        } catch (error) {
-          console.error("Error del servidor:", error);
+        if (response.ok) {
+          const data = await response.json();
+          setUserData(data);
+          setEditData(data);
+        } else {
+          console.error("Error al obtener los datos del usuario");
         }
+      } catch (error) {
+        console.error("Error del servidor:", error);
       }
     };
 
-    fetchUserData();
-  }, [session]);
+    if (status === "authenticated") {
+      fetchUserData();
+    }
+  }, [status]);
 
   const handleEditToggle = async () => {
     if (isEditing) {
-      // Guardar cambios
       try {
         const response = await fetch("/api/perfil", {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            email: session.user.email, // Enviar el email del usuario
-            ...editData, // Enviar los datos actualizados
-          }),
+          body: JSON.stringify(editData),
         });
 
         if (response.ok) {
           const data = await response.json();
           console.log(data.message);
-          setUserData({ ...editData }); // Actualizar los datos locales
+          setUserData({ ...editData });
         } else {
           console.error("Error al actualizar los datos del usuario");
         }
@@ -104,12 +95,10 @@ export default function PerfilUser() {
     <div className="profile-page">
       <div className="container-fluid">
         <div className="row">
-          {/* Sidebar moderna */}
           <div className="col-lg-3 col-xl-2 px-0">
             <ModernSidebar activeItem="perfil" />
           </div>
 
-          {/* Contenido principal */}
           <div className="col-lg-9 col-xl-10 p-0">
             <div className="profile-content">
               <div className="profile-header">
@@ -157,11 +146,43 @@ export default function PerfilUser() {
                       <div className="section-content">
                         {isEditing ? (
                           <div className="row g-3">
-                            {/* Campos editables */}
+                            <div className="col-12">
+                              <label className="form-label">Nombre</label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                name="nombre_usuario"
+                                value={editData?.nombre_usuario || ""}
+                                onChange={handleInputChange}
+                              />
+                            </div>
+                            <div className="col-12">
+                              <label className="form-label">Ubicación</label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                name="ubicacion"
+                                value={editData?.ubicacion || ""}
+                                onChange={handleInputChange}
+                              />
+                            </div>
+                            <div className="col-12">
+                              <label className="form-label">Biografía</label>
+                              <textarea
+                                className="form-control"
+                                name="biografia"
+                                rows="3"
+                                value={editData?.biografia || ""}
+                                onChange={handleInputChange}
+                              />
+                            </div>
                           </div>
                         ) : (
                           <div className="info-grid">
-                            {/* Información no editable */}
+                            <p><strong>Nombre:</strong> {userData?.nombre_usuario}</p>
+                            <p><strong>Correo:</strong> {userData?.correo_electronico}</p>
+                            <p><strong>Ubicación:</strong> {userData?.ubicacion}</p>
+                            <p><strong>Biografía:</strong> {userData?.biografia}</p>
                           </div>
                         )}
                       </div>
@@ -174,36 +195,28 @@ export default function PerfilUser() {
                       <div className="section-content">
                         <div className="stats-grid">
                           <div className="stat-item">
-                            <div className="stat-icon">
-                              <i className="bi bi-book"></i>
-                            </div>
+                            <div className="stat-icon"><i className="bi bi-book"></i></div>
                             <div className="stat-content">
                               <div className="stat-value">12</div>
                               <div className="stat-label">Libros subidos</div>
                             </div>
                           </div>
                           <div className="stat-item">
-                            <div className="stat-icon">
-                              <i className="bi bi-arrow-left-right"></i>
-                            </div>
+                            <div className="stat-icon"><i className="bi bi-arrow-left-right"></i></div>
                             <div className="stat-content">
                               <div className="stat-value">8</div>
                               <div className="stat-label">Intercambios</div>
                             </div>
                           </div>
                           <div className="stat-item">
-                            <div className="stat-icon">
-                              <i className="bi bi-heart"></i>
-                            </div>
+                            <div className="stat-icon"><i className="bi bi-heart"></i></div>
                             <div className="stat-content">
                               <div className="stat-value">15</div>
                               <div className="stat-label">Favoritos</div>
                             </div>
                           </div>
                           <div className="stat-item">
-                            <div className="stat-icon">
-                              <i className="bi bi-star"></i>
-                            </div>
+                            <div className="stat-icon"><i className="bi bi-star"></i></div>
                             <div className="stat-content">
                               <div className="stat-value">4.8</div>
                               <div className="stat-label">Valoración</div>
@@ -213,6 +226,7 @@ export default function PerfilUser() {
                       </div>
                     </div>
                   </div>
+
                 </div>
               </div>
             </div>
