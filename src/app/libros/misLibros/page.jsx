@@ -1,111 +1,65 @@
-"use client"
-import { useState, useEffect } from "react"
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
-import Link from "next/link"
-import ModernSidebar from "@/components/perfil/sideBar"
-import "@/app/styles/books/mis-libros.css"
+"use client";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import ModernSidebar from "@/components/perfil/sideBar";
+import "@/app/styles/books/mis-libros.css";
 
 export default function MisLibrosPage() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
-  const [libros, setLibros] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState("favoritos")
-  const [searchTerm, setSearchTerm] = useState("")
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [libros, setLibros] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("favoritos");
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Redirigir si no está autenticado
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/?login=true")
+      router.push("/?login=true");
     }
-  }, [status, router])
+  }, [status, router]);
 
-  // Cargar libros (simulado por ahora)
+  // Cargar libros desde la API
   useEffect(() => {
-    // Simulación de carga de datos
     const fetchLibros = async () => {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
-        // En el futuro, esto se reemplazará con una llamada API real
-        // const response = await fetch(`/api/libros/favoritos?usuario_id=${session?.user?.id}`);
-        // const data = await response.json();
+        if (session?.user?.email) {
+          const response = await fetch("/api/libros/usuario", {
+            method: "GET",
+            headers: {
+              correo_electronico: session.user.email, // Enviar el correo electrónico del usuario logueado
+            },
+          });
 
-        // Datos de ejemplo para mostrar la interfaz
-        const mockData = [
-          {
-            id: 1,
-            titulo: "Cien años de soledad",
-            autor: "Gabriel García Márquez",
-            imagenes: "/assets/img/libro1.jpg",
-            genero: "Novela",
-            fecha_agregado: "2023-12-15",
-          },
-          {
-            id: 2,
-            titulo: "El principito",
-            autor: "Antoine de Saint-Exupéry",
-            imagenes: "/assets/img/libro2.jpg",
-            genero: "Infantil",
-            fecha_agregado: "2023-11-20",
-          },
-          {
-            id: 3,
-            titulo: "1984",
-            autor: "George Orwell",
-            imagenes: "/assets/img/libro3.jpg",
-            genero: "Ciencia Ficción",
-            fecha_agregado: "2024-01-05",
-          },
-          {
-            id: 4,
-            titulo: "Harry Potter y la piedra filosofal",
-            autor: "J.K. Rowling",
-            imagenes: "/assets/img/libro4.jpg",
-            genero: "Fantasía",
-            fecha_agregado: "2024-02-10",
-          },
-          {
-            id: 5,
-            titulo: "El código Da Vinci",
-            autor: "Dan Brown",
-            imagenes: "/assets/img/libro5.jpg",
-            genero: "Misterio",
-            fecha_agregado: "2024-03-01",
-          },
-          {
-            id: 6,
-            titulo: "Don Quijote de la Mancha",
-            autor: "Miguel de Cervantes",
-            imagenes: "/assets/img/libro6.jpg",
-            genero: "Clásico",
-            fecha_agregado: "2023-10-12",
-          },
-        ]
-
-        setTimeout(() => {
-          setLibros(mockData)
-          setIsLoading(false)
-        }, 1000)
+          if (response.ok) {
+            const data = await response.json();
+            setLibros(data); // Guardar los libros en el estado
+          } else {
+            console.error("Error al obtener los libros:", await response.text());
+          }
+        }
       } catch (error) {
-        console.error("Error al cargar los libros:", error)
-        setIsLoading(false)
+        console.error("Error del servidor:", error);
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
 
     if (status === "authenticated") {
-      fetchLibros()
+      fetchLibros();
     }
-  }, [status, session])
+  }, [status, session]);
 
   // Filtrar libros según la búsqueda
   const filteredLibros = libros.filter(
     (libro) =>
       libro.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      libro.autor.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      libro.genero.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+      libro.autor.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // Si no está autenticado, mostrar mensaje de carga mientras se redirige
   if (status === "loading" || status === "unauthenticated") {
@@ -119,7 +73,7 @@ export default function MisLibrosPage() {
           <p>Debes iniciar sesión para ver tus libros.</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -209,11 +163,7 @@ export default function MisLibrosPage() {
                   <p className="text-muted">
                     {searchTerm
                       ? `No hay resultados para "${searchTerm}". Intenta con otra búsqueda.`
-                      : activeTab === "favoritos"
-                        ? "Aún no has añadido libros a tus favoritos."
-                        : activeTab === "subidos"
-                          ? "Aún no has subido ningún libro."
-                          : "No tienes intercambios activos."}
+                      : "Aún no has subido ningún libro."}
                   </p>
                   {!searchTerm && (
                     <Link href="/libros/generos" className="btn btn-outline-primary mt-3">
@@ -249,7 +199,7 @@ export default function MisLibrosPage() {
                           <div className="book-meta">
                             <span className="book-genre">{libro.genero}</span>
                             <span className="book-date">
-                              {new Date(libro.fecha_agregado).toLocaleDateString("es-ES", {
+                              {new Date(libro.fecha_subida).toLocaleDateString("es-ES", {
                                 year: "numeric",
                                 month: "short",
                                 day: "numeric",
@@ -267,5 +217,5 @@ export default function MisLibrosPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

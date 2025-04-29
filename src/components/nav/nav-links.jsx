@@ -26,12 +26,12 @@ export function NavLinks({ isAuthenticated }) {
       </a>
       <ul className="dropdown-menu" style={{ position: "absolute", left: "0", right: "auto" }}>
         <li>
-          <Link className="dropdown-item" href="/books/bookList">
+          <Link className="dropdown-item" href="/libros/generos">
             Generos
           </Link>
         </li>
         <li>
-          <Link className="dropdown-item" href="/books/donations">
+          <Link className="dropdown-item" href="/libros/donaciones">
             Donaciones
           </Link>
         </li>

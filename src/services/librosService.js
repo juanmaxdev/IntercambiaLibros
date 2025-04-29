@@ -40,6 +40,53 @@ export async function obtenerLibros() {
   return libros;
 }
 
+export async function obtenerLibrosSubidosPorUsuario(correoElectronico) {
+  if (!correoElectronico) {
+    throw new Error("El correo electrónico es obligatorio");
+  }
+
+  try {
+    // Obtener el usuario_id a partir del correo_electronico
+    const { data: usuario, error: errorUsuario } = await supabase
+      .from('usuarios') // Asegúrate de que esta sea la tabla correcta
+      .select('id') // Seleccionamos solo el ID del usuario
+      .eq('correo_electronico', correoElectronico)
+      .single();
+
+    if (errorUsuario || !usuario) {
+      console.error('❌ Error al obtener el usuario:', errorUsuario?.message || "Usuario no encontrado");
+      throw new Error('No se pudo encontrar el usuario con el correo proporcionado');
+    }
+
+    const usuarioId = usuario.id;
+
+    // Obtener los libros subidos por el usuario
+    const { data: libros, error: errorLibros } = await supabase
+      .from('libros') // Asegúrate de que esta sea la tabla correcta
+      .select(`
+        id,
+        titulo,
+        autor,
+        imagenes,
+        genero_id,
+        estado_libro,
+        descripcion,
+        fecha_subida
+      `)
+      .eq('usuario_id', usuarioId);
+
+    if (errorLibros) {
+      console.error('❌ Error al obtener los libros del usuario:', errorLibros.message);
+      throw new Error('Error al obtener los libros del usuario');
+    }
+
+    return libros;
+  } catch (error) {
+    console.error('Error en el servicio obtenerLibrosSubidosPorUsuario:', error);
+    throw error;
+  }
+}
+
 export async function subidaLibros({ fields }) {
   const {
     isbn,
