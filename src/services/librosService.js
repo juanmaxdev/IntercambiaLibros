@@ -87,64 +87,50 @@ export async function obtenerLibrosSubidosPorUsuario(correoElectronico) {
   }
 }
 
-export async function subidaLibros({ fields }) {
-  const {
-    isbn,
-    titulo,
-    autor,
-    genero_id,
-    estado_libro,
-    descripcion,
-    donacion,
-    ubicacion,
-    usuario_id,
-    valoracion_del_libro = 0,
-    tipo_tapa = '',
-    editorial = '',
-    metodo_intercambio = 'Presencial',
-    imagenes = '', // La URL pública de la imagen ya debe venir desde route.js
-  } = fields;
-
-  // Validaciones
-  if (!titulo || titulo.length < 3) throw new Error('El título es obligatorio y debe tener al menos 3 caracteres');
-  if (!autor || autor.length < 3) throw new Error('El autor es obligatorio y debe tener al menos 3 caracteres');
-  if (!genero_id) throw new Error('El género es obligatorio');
-  if (!estado_libro) throw new Error('El estado del libro es obligatorio');
-  if (!descripcion || descripcion.length < 20) throw new Error('La descripción debe tener al menos 20 caracteres');
-  if (isbn && !/^\d{10}(\d{3})?$/.test(isbn)) throw new Error('El ISBN debe tener 10 o 13 caracteres numéricos');
-  if (!ubicacion || ubicacion.trim().length < 5) throw new Error('La ubicación debe tener al menos 5 caracteres');
-
-  const fecha_subida = new Date().toISOString().slice(0, 16); // Formato YYYY-MM-DD
+// Inserta un libro en la tabla 'libros'
+export async function guardarLibroEnBD({
+  isbn,
+  titulo,
+  autor,
+  genero_id,
+  estado_libro,
+  descripcion,
+  donacion,
+  ubicacion,
+  usuario_id,
+  tipo_tapa = "",
+  editorial = "",
+  metodo_intercambio = "Presencial",
+  imagenes = "",
+}) {
+  const fecha_subida = new Date().toISOString().slice(0, 16);
 
   const { data, error } = await supabase
-    .from('libros')
-    .insert([{
+  .from("libros")
+  .insert([
+    {
       isbn,
       titulo,
       autor,
-      genero_id,
+      genero_id: parseInt(genero_id, 10),
       estado_libro,
       descripcion,
       donacion,
       ubicacion,
-      imagenes,
       usuario_id,
-      fecha_subida,
-      valoracion_del_libro,
       tipo_tapa,
       editorial,
       metodo_intercambio,
-    }])
-    .select();
+      imagenes,
+      fecha_subida,
+    },
+  ])
+  .select();  // Seleccionamos el libro recién insertado
 
   if (error) {
-    console.error('❌ Error al insertar libro:', error);
-    throw new Error(`Error al insertar libro en la base de datos: ${error.message}`);
+    console.error("❌ Error al insertar el libro:", error);
+    throw new Error("No se pudo guardar el libro en la base de datos.");
   }
 
-  if (!data || data.length === 0) {
-    throw new Error('No se pudo insertar el libro en la base de datos');
-  }
-
-  return data[0];
+  return data?.[0];
 }

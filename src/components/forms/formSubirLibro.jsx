@@ -185,22 +185,19 @@ export default function FormSubirLibro() {
     }
 
     // Validar archivo
-    if (!formData.archivo) {
-      tempErrors.archivo = "Debes subir al menos una imagen"
-      formIsValid = false
-    } else {
+    if (formData.archivo) {
       // Validar que sea una imagen
-      const validTypes = ["image/jpeg", "image/png", "image/jpg"]
+      const validTypes = ["image/jpeg", "image/png", "image/jpg"];
       if (!validTypes.includes(formData.archivo.type)) {
-        tempErrors.archivo = "El archivo debe ser una imagen (JPG, PNG)"
-        formIsValid = false
+        tempErrors.archivo = "El archivo debe ser una imagen (JPG, PNG)";
+        formIsValid = false;
       }
 
       // Validar tamaño (máximo 2MB)
-      const maxSize = 2 * 1024 * 1024 // 2MB en bytes
+      const maxSize = 2 * 1024 * 1024; // 2MB en bytes
       if (formData.archivo.size > maxSize) {
-        tempErrors.archivo = "La imagen no debe superar los 2MB"
-        formIsValid = false
+        tempErrors.archivo = "La imagen no debe superar los 2MB";
+        formIsValid = false;
       }
     }
 
@@ -234,53 +231,54 @@ export default function FormSubirLibro() {
     e.preventDefault();
     setIsSubmitted(true);
     setSuccessMessage("");
-
+  
     if (validateForm()) {
       setIsLoading(true);
       try {
         const formDataToSend = new FormData();
-
-        // Verificar si la sesión está disponible antes de enviar el formulario
-        if (!session || !session.user || !session.user.email) {
-          console.error("La sesión no está disponible o el usuario no está autenticado.");
-          setErrors({ server: "No se pudo obtener la información del usuario. Por favor, inicia sesión nuevamente." });
+  
+        // Verificar si hay sesión y email
+        if (!session?.user?.email) {
+          setErrors({ server: "Debes iniciar sesión para subir un libro." });
           setIsLoading(false);
           return;
         }
-
-        // Añadir otros campos al FormData
+  
+        // 📦 Construir FormData correctamente
         formDataToSend.append("isbn", formData.isbn || "");
         formDataToSend.append("titulo", formData.titulo);
         formDataToSend.append("autor", formData.autor);
-        formDataToSend.append("genero_id", formData.genero_id);
+        formDataToSend.append("genero_id", String(formData.genero_id)); // asegurar tipo string
         formDataToSend.append("estado_libro", formData.estado_libro);
         formDataToSend.append("descripcion", formData.descripcion);
-        formDataToSend.append("donacion", formData.donacion);
+        formDataToSend.append("donacion", String(formData.donacion)); // convertir boolean a string
         formDataToSend.append("ubicacion", formData.ubicacion);
         formDataToSend.append("tipo_tapa", formData.tipo_tapa || "");
         formDataToSend.append("editorial", formData.editorial || "");
-        formDataToSend.append("metodoIntercambio", formData.metodo_intercambio);
-
+        formDataToSend.append("metodoIntercambio", formData.metodo_intercambio || "Presencial");
+  
         if (formData.archivo) {
           formDataToSend.append("archivo", formData.archivo);
         }
-
+  
+        // 🚀 Enviar al backend (sin duplex porque es navegador)
         const response = await fetch("/api/libros/subirLibros", {
           method: "POST",
-          body: formDataToSend, // Elimina la opción `duplex`
+          body: formDataToSend,
+          duplex: "half", // Esto es para Next.js 13+
         });
-
+  
         if (!response.ok) {
           const errorText = await response.text();
           console.error("Error del servidor:", errorText);
-          setErrors({ server: errorText || "Hubo un problema al enviar el formulario. Inténtalo de nuevo más tarde." });
-          throw new Error(`Error en la solicitud: ${response.status} - ${errorText}`);
+          setErrors({ server: errorText || "Error al subir el libro." });
+          throw new Error(`Error: ${response.status} - ${errorText}`);
         }
-
+  
         const result = await response.json();
         setSuccessMessage("Libro registrado correctamente");
-
-        // Resetear el formulario
+  
+        // Resetear estado
         setFormData({
           isbn: "",
           titulo: "",
@@ -308,6 +306,7 @@ export default function FormSubirLibro() {
       console.log("Formulario con errores");
     }
   };
+  
 
   // Validar cuando cambian los datos y ya se ha intentado enviar
   useEffect(() => {
@@ -474,9 +473,8 @@ export default function FormSubirLibro() {
                 <option value="" disabled>
                   Tipo de tapa
                 </option>
-                <option value="Tapa dura">Tapa dura</option>
-                <option value="Tapa blanda">Tapa blanda</option>
-                <option value="Espiral">Espiral</option>
+                <option value="Dura">Tapa dura</option>
+                <option value="Blanda">Tapa blanda</option>
               </select>
               <label htmlFor="tipo_tapa">Tipo de tapa</label>
             </div>
@@ -530,7 +528,6 @@ export default function FormSubirLibro() {
                 id="archivoInput"
                 accept=".jpg,.jpeg,.png"
                 onChange={handleFileChange}
-                required
               />
               {errors.archivo && <div className="invalid-feedback">{errors.archivo}</div>}
               <small className="form-text text-muted">Formatos permitidos: JPG, PNG. Tamaño máximo: 2MB</small>
