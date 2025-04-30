@@ -1,9 +1,17 @@
 import { supabase } from '@/lib/supabase';
 import { subidaLibros } from '@/services/librosService';
 import { getUsuarioId } from '@/services/getUsuarioId';
+import { auth } from "@/server/auth";
 
 export async function POST(req) {
   try {
+    const session = await auth();
+    const emailUsuario = session?.user?.email;
+
+    if (!emailUsuario) {
+      return Response.json({ error: "No autorizado" }, { status: 401 });
+    }
+
     const formData = await req.formData();
     const archivo = formData.get("archivo");
 
@@ -11,10 +19,7 @@ export async function POST(req) {
       return Response.json({ error: "El archivo es obligatorio" }, { status: 400 });
     }
 
-    // 🎯 1. Obtener el email del usuario enviado desde el frontend
-    const emailUsuario = formData.get("usuario_id");
-
-    // 🎯 2. Usar el servicio para obtener el ID real (UUID)
+    // Obtener el ID real (UUID) del usuario
     let usuario_id;
     try {
       usuario_id = await getUsuarioId(emailUsuario);
@@ -23,10 +28,10 @@ export async function POST(req) {
       return Response.json({ error: "No se pudo encontrar el usuario." }, { status: 400 });
     }
 
-    // 🧾 Extraer los demás campos
+    // Extraer los demás campos
     const titulo = formData.get("titulo");
     const autor = formData.get("autor");
-    const genero_id = formData.get("genero_id");
+    const genero_id = parseInt(formData.get("genero_id"), 10);
     const estado_libro = formData.get("estado_libro");
     const descripcion = formData.get("descripcion");
     const donacion = formData.get("donacion") === "true";
@@ -36,7 +41,7 @@ export async function POST(req) {
     const editorial = formData.get("editorial") || "";
     const metodo_intercambio = formData.get("metodoIntercambio") || "Presencial";
 
-    // 📤 Subir imagen a Supabase
+    // Subir imagen a Supabase
     const ext = archivo.name.split('.').pop();
     const filePath = `subidas/${Date.now()}.${ext}`;
 
@@ -61,7 +66,7 @@ export async function POST(req) {
       return Response.json({ error: 'Error al obtener la URL pública del archivo' }, { status: 500 });
     }
 
-    // ✅ Guardar libro en la base de datos
+    // Guardar libro en la base de datos
     const libroGuardado = await subidaLibros({
       fields: {
         isbn,
@@ -72,7 +77,7 @@ export async function POST(req) {
         descripcion,
         donacion,
         ubicacion,
-        usuario_id, // ✅ Ahora ya es el UUID real
+        usuario_id,
         tipo_tapa,
         editorial,
         metodo_intercambio,

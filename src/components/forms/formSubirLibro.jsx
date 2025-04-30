@@ -248,10 +248,6 @@ export default function FormSubirLibro() {
           return;
         }
 
-        // Asignar el correo electrónico del usuario como usuario_id
-        formDataToSend.append("usuario_id", session.user.email);
-        console.log("📦 Enviando usuario_id (email):", session.user.email);
-
         // Añadir otros campos al FormData
         formDataToSend.append("isbn", formData.isbn || "");
         formDataToSend.append("titulo", formData.titulo);
@@ -271,7 +267,7 @@ export default function FormSubirLibro() {
 
         const response = await fetch("/api/libros/subirLibros", {
           method: "POST",
-          body: formDataToSend,
+          body: formDataToSend, // Elimina la opción `duplex`
         });
 
         if (!response.ok) {
