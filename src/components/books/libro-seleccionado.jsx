@@ -5,7 +5,6 @@ import ComentariosLibro from "./comentarios-libro"
 import { useSession } from "next-auth/react"
 import "@/app/styles/books/styles.css"
 import { useState } from "react"
-import { enviarMensaje } from "@/services/mensajesService"
 
 export default function LibroSeleccionado({ book }) {
   const router = useRouter()
@@ -31,48 +30,22 @@ export default function LibroSeleccionado({ book }) {
     book.autor?.toUpperCase() || "AUTOR DESCONOCIDO"
   }`
 
+  // Modificar la función contactarVendedor para usar correo_usuario en lugar de usuario_id
   // Función para contactar con el vendedor
-  const contactarVendedor = async () => {
-    // Verificar si el usuario está autenticado
-    if (status === "loading") {
-      return // Esperar a que cargue la sesión
-    }
+  const contactarVendedor = (e) => {
+    e.preventDefault()
 
-    console.log("Estado de la sesión:", session , session.user, session.user.id)
-    
-    if (!session || !session.user || !session.user.email) {
-      alert("Debes iniciar sesión para contactar con el vendedor")
+    if (!session) {
+      // Si no hay sesión, mostrar modal de login
+      document.getElementById("loginModal").classList.add("show")
+      document.getElementById("loginModal").style.display = "block"
       return
     }
 
-    // Verificar que no sea el propio usuario
-    if (session.user.id === book.usuario_id) {
-      alert("No puedes contactar contigo mismo")
-      return
-    }
-
-    try {
-      setEnviandoMensaje(true)
-      
-      console.log("Enviando mensaje con:", {
-        remitenteId: session.user.email,
-        destinatarioId: book.usuario_id,
-        libro: book.titulo
-      })
-
-      // Enviar un mensaje inicial
-      const mensajeInicial = `Hola, estoy interesado en tu libro "${book.titulo}". ¿Podríamos hablar sobre él?`
-
-      await enviarMensaje(session.user.email, book.usuario_id, mensajeInicial)
-
-      // Redirigir a la página de mensajes con el ID del vendedor
-      router.push(`/perfil/mensajes?contacto=${book.usuario_id}`)
-    } catch (error) {
-      console.log("Error al contactar al vendedor:", error)
-      alert("Ocurrió un error al contactar al vendedor. Por favor, inténtalo de nuevo.")
-    } finally {
-      setEnviandoMensaje(false)
-    }
+    // Redirigir a la página de mensajes con el contacto y libro como parámetros
+    router.push(
+      `/perfil/mensajes?contacto=${encodeURIComponent(book.correo_usuario)}&libro=${encodeURIComponent(book.titulo)}`,
+    )
   }
 
   return (
@@ -148,10 +121,10 @@ export default function LibroSeleccionado({ book }) {
             <p className="fw-semibold pt-3">Agregar a lista de deseados</p>
           </div>
           <div className="container d-flex justify-content-between gap-5 mt-3">
-            <button 
-              type="button" 
-              className="btn btn-dark mt-5" 
-              onClick={contactarVendedor} 
+            <button
+              type="button"
+              className="btn btn-dark mt-5"
+              onClick={contactarVendedor}
               disabled={enviandoMensaje || status === "loading"}
             >
               {enviandoMensaje ? (
