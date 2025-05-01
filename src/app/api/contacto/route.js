@@ -26,7 +26,8 @@ export async function POST(req) {
     }
 
     const resultado = await guardarMensaje({ nombre, apellidos, email, titulo, mensaje });
-    return new Response(JSON.stringify(resultado), { status: 201 });
+    return new Response(JSON.stringify(resultado),
+    { status: 201 });
   } catch (error) {
     return new Response(
       JSON.stringify({ message: 'Error al guardar el mensaje', error: error.message }),

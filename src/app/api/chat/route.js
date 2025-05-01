@@ -1,46 +1,46 @@
-import { supabase } from '@/lib/supabase';
+import { NextResponse } from "next/server"
+import { supabase } from "@/lib/supabase"
 
-export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    const { id_emisor, id_receptor, isbn, mensaje, fecha_envio } = req.body;
+export async function POST(request) {
+  const { remitente_id, destinatario_id, contenido } = await request.json()
 
-    if (!id_emisor || !id_receptor || !isbn || !mensaje) {
-      return res.status(400).json({ message: 'Faltan campos obligatorios' });
-    }
-
-    const { data, error } = await supabase
-      .from('chat')
-      .insert([
-        {
-          id_emisor,
-          id_receptor,
-          isbn,
-          mensaje,
-          fecha_envio: fecha_envio || new Date().toISOString(),
-        },
-      ])
-      .select();
-
-    if (error) return res.status(500).json({ error: error.message });
-
-    return res.status(201).json({ message: 'Mensaje enviado con éxito', mensaje: data[0] });
+  if (!remitente_id || !destinatario_id || !contenido) {
+    return NextResponse.json({ message: "Faltan campos obligatorios" }, { status: 400 })
   }
 
-  if (req.method === 'GET') {
-    const { id_emisor, id_receptor, isbn } = req.query;
+  const { data, error } = await supabase
+    .from("mensajes")
+    .insert([
+      {
+        remitente_id,
+        destinatario_id,
+        contenido,
+        fecha: new Date().toISOString(),
+      },
+    ])
+    .select()
 
-    let query = supabase.from('chat').select('*');
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    if (id_emisor && id_receptor && isbn) {
-      query = query.or(`and(id_emisor.eq.${id_emisor},id_receptor.eq.${id_receptor},isbn.eq.${isbn}),and(id_emisor.eq.${id_receptor},id_receptor.eq.${id_emisor},isbn.eq.${isbn})`);
-    }
+  return NextResponse.json({ message: "Mensaje enviado con éxito", mensaje: data[0] }, { status: 201 })
+}
 
-    const { data, error } = await query.order('fecha_envio', { ascending: true });
+export async function GET(request) {
+  const url = new URL(request.url)
+  const remitente_id = url.searchParams.get("remitente_id")
+  const destinatario_id = url.searchParams.get("destinatario_id")
 
-    if (error) return res.status(500).json({ error: error.message });
+  let query = supabase.from("mensajes").select("*")
 
-    return res.status(200).json(data);
+  if (remitente_id && destinatario_id) {
+    query = query.or(
+      `and(remitente_id.eq.${remitente_id},destinatario_id.eq.${destinatario_id}),and(remitente_id.eq.${destinatario_id},destinatario_id.eq.${remitente_id})`,
+    )
   }
 
-  return res.status(405).json({ message: 'Método no permitido' });
+  const { data, error } = await query.order("fecha", { ascending: true })
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  return NextResponse.json(data, { status: 200 })
 }

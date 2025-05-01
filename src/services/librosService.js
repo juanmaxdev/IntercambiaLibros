@@ -21,7 +21,7 @@ export async function obtenerLibros() {
       tipo_tapa,
       editorial,
       metodo_intercambio,
-      usuarios:usuario_id ( nombre_usuario ),
+      usuarios:usuario_id ( nombre_usuario, correo_electronico ),
       generos:genero_id ( nombre )
     `);
 
@@ -34,6 +34,7 @@ export async function obtenerLibros() {
   const libros = data.map(({ usuarios, generos, ...rest }) => ({
     ...rest,
     nombre_usuario: usuarios?.nombre_usuario ?? 'Desconocido',
+    correo_usuario: usuarios?.correo_electronico ?? 'Sin correo',
     nombre_genero: generos?.nombre ?? 'Sin género',
   }));
 
