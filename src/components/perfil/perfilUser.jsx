@@ -45,6 +45,38 @@ export default function PerfilUser() {
     })
   }
 
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("floatingInput").value;
+    const password = document.getElementById("floatingPassword").value;
+
+    try {
+      const response = await fetch("/api/perfil/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ correo_electronico: email, contrasena: password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Inicio de sesión exitoso:", data);
+
+        // Almacenar el token en localStorage
+        localStorage.setItem("token", data.token);
+
+        // Redirigir al perfil del usuario
+        window.location.href = "/perfil/perfilUser.jsx"; // Cambia "/perfil" por la ruta de tu perfil
+      } else {
+        const error = await response.json();
+        console.error("Error al iniciar sesión:", error.message);
+      }
+    } catch (err) {
+      console.error("Error del servidor:", err);
+    }
+  };
+
   // Si no está autenticado, mostrar mensaje de carga mientras se redirige
   if (status === "loading" || status === "unauthenticated") {
     return (

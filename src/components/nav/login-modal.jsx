@@ -22,6 +22,59 @@ export function LoginModal() {
     }
   }
 
+  // Modificar la función handleLogin para guardar los datos del usuario en localStorage
+  // y actualizar la UI después del inicio de sesión exitoso
+
+  const handleLogin = async (e) => {
+    e.preventDefault()
+    const email = document.getElementById("floatingInput").value
+    const password = document.getElementById("floatingPassword").value
+
+    try {
+      const response = await fetch("/api/perfil/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ correo_electronico: email, contrasena: password }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log("Inicio de sesión exitoso:", data)
+
+        // Almacenar el token en localStorage
+        localStorage.setItem("authToken", data.token)
+
+        // Almacenar información del usuario en localStorage para simular la sesión
+        localStorage.setItem("userId", data.user.id)
+        localStorage.setItem("userName", data.user.nombre_usuario)
+        localStorage.setItem("userEmail", data.user.correo_electronico)
+        localStorage.setItem("sessionStarted", "true") // Para mostrar la notificación
+        localStorage.setItem("authType", "credentials") // Para identificar el tipo de autenticación
+
+        // Cerrar el modal
+        const modalElement = document.getElementById("modalIniciarSesion")
+        if (modalElement && window.bootstrap) {
+          const bsModal = window.bootstrap.Modal.getInstance(modalElement)
+          if (bsModal) {
+            bsModal.hide()
+          }
+        }
+
+        // Recargar la página para actualizar la UI
+        window.location.reload()
+      } else {
+        const error = await response.json()
+        console.error("Error al iniciar sesión:", error.message)
+        alert("Error al iniciar sesión: " + (error.message || "Credenciales incorrectas"))
+      }
+    } catch (err) {
+      console.error("Error del servidor:", err)
+      alert("Error del servidor. Por favor, inténtalo de nuevo más tarde.")
+    }
+  }
+
   useEffect(() => {
     let timeout
 
@@ -67,7 +120,7 @@ export function LoginModal() {
                     <div className="text-center mb-4">
                       <Image src="/assets/img/Logo2.png" width={160} height={40} alt="logo" />
                     </div>
-                    <form>
+                    <form onSubmit={handleLogin}>
                       <div className="form-floating mb-3">
                         <input
                           type="text"
@@ -100,7 +153,11 @@ export function LoginModal() {
                         </button>
                       </div>
                       <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-3">
-                        <button className="btn btn-outline-primary w-100 w-sm-75 mb-2 mb-sm-0" type="submit">
+                        <button
+                          className="btn btn-outline-primary w-100 w-sm-75 mb-2 mb-sm-0"
+                          type="submit"
+                          onClick={handleLogin}
+                        >
                           Iniciar Sesión
                         </button>
                         <a className="text-muted ms-sm-3" href="#!">

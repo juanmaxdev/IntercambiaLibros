@@ -176,7 +176,7 @@ export default function MisLibrosPage() {
                   </li>
                 </ul>
 
-                <div className="search-container">
+                <div className="search-container--inside">
                   <div className="input-group">
                     <span className="input-group-text bg-white border-end-0">
                       <i className="bi bi-search"></i>

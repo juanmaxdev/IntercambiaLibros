@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { useSession } from "next-auth/react"
+import { useAuth } from "@/app/hooks/use-auth"
 import { useSearchParams } from "next/navigation"
 import CarouselDoble from "@/components/carousel/carouselDouble"
 import CarouselSimple, { CarouselNuevosLibros } from "@/components/carousel/carouselSimple"
@@ -15,8 +15,7 @@ import "@/app/styles/home.css"
 
 export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false)
-  const { data: session } = useSession()
-  const isAuthenticated = !!session
+  const { isLoggedIn } = useAuth()
   const searchParams = useSearchParams()
   const showLogin = searchParams.get("login") === "true"
 
@@ -26,7 +25,7 @@ export default function Home() {
     setIsLoaded(true)
 
     // Mostrar modal de login solo si se solicita Y el usuario NO está autenticado
-    if (showLogin && !isAuthenticated && typeof window !== "undefined") {
+    if (showLogin && !isLoggedIn && typeof window !== "undefined") {
       // Pequeño retraso para asegurar que el DOM está listo
       setTimeout(() => {
         const modalElement = document.getElementById("modalIniciarSesion")
@@ -41,7 +40,7 @@ export default function Home() {
     return () => {
       document.body.classList.remove("home-page")
     }
-  }, [showLogin, isAuthenticated])
+  }, [showLogin, isLoggedIn])
 
   return (
     <>
@@ -112,7 +111,7 @@ export default function Home() {
               <h2 className="mb-3">¿Listo para compartir tus libros?</h2>
               <p className="lead mb-4">Únete a nuestra comunidad y comienza a intercambiar historias hoy mismo.</p>
               <div className="d-flex justify-content-center gap-3">
-                {isAuthenticated ? (
+                {isLoggedIn ? (
                   <Link href="/subirLibro" className="btn btn-light px-4 py-2">
                     Subir un libro
                   </Link>

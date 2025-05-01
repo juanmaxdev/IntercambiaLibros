@@ -4,10 +4,12 @@ import Image from "next/image"
 import ComentariosLibro from "./comentarios-libro"
 import { useSession } from "next-auth/react"
 import "@/app/styles/books/styles.css"
+import { useState } from "react"
 
 export default function LibroSeleccionado({ book }) {
   const router = useRouter()
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
+  const [enviandoMensaje, setEnviandoMensaje] = useState(false)
 
   // Si no hay datos del libro, mostrar un mensaje
   if (!book) {
@@ -22,11 +24,29 @@ export default function LibroSeleccionado({ book }) {
       </div>
     )
   }
-
+  console.log("Propiedades de book:", book)
   // Crear un título completo con el título y autor del libro
   const tituloCompleto = `${book.titulo?.toUpperCase() || "TÍTULO DESCONOCIDO"} - ${
     book.autor?.toUpperCase() || "AUTOR DESCONOCIDO"
   }`
+
+  // Modificar la función contactarVendedor para usar correo_usuario en lugar de usuario_id
+  // Función para contactar con el vendedor
+  const contactarVendedor = (e) => {
+    e.preventDefault()
+
+    if (!session) {
+      // Si no hay sesión, mostrar modal de login
+      document.getElementById("loginModal").classList.add("show")
+      document.getElementById("loginModal").style.display = "block"
+      return
+    }
+
+    // Redirigir a la página de mensajes con el contacto y libro como parámetros
+    router.push(
+      `/perfil/mensajes?contacto=${encodeURIComponent(book.correo_usuario)}&libro=${encodeURIComponent(book.titulo)}`,
+    )
+  }
 
   return (
     <div className="container-fluid mt-5">
@@ -101,8 +121,20 @@ export default function LibroSeleccionado({ book }) {
             <p className="fw-semibold pt-3">Agregar a lista de deseados</p>
           </div>
           <div className="container d-flex justify-content-between gap-5 mt-3">
-            <button type="button" className="btn btn-dark mt-5">
-              Contactar con el vendedor
+            <button
+              type="button"
+              className="btn btn-dark mt-5"
+              onClick={contactarVendedor}
+              disabled={enviandoMensaje || status === "loading"}
+            >
+              {enviandoMensaje ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Procesando...
+                </>
+              ) : (
+                "Contactar con el vendedor"
+              )}
             </button>
             <button type="button" className="btn btn-dark mt-5">
               Solicitar intercambio

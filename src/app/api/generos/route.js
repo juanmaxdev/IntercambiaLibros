@@ -1,15 +1,12 @@
-import { supabase } from '@/lib/supabase';
+import { obtenerGeneros } from '@/services/generosService';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-    const { data, error } = await supabase
-      .from('generos')
-      .select('id, nombre, imagen');
-
-    if (error) {
-      return NextResponse.json({ message: 'Error al obtener géneros', error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json(data);
-  
+  try {
+    const generos = await obtenerGeneros();
+    return NextResponse.json(generos);
+  } catch (error) {
+    console.error('❌ Error en la API de géneros:', error.message);
+    return NextResponse.json({ message: 'Error al obtener géneros', error: error.message }, { status: 500 });
+  }
 }
