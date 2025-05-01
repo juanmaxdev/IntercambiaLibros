@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import { createClient } from "@supabase/supabase-js";
 
-// Cliente Supabase para servidor (usar service role key)
+// Cliente Supabase para servidor (permite escritura con service role)
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -16,31 +16,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   pages: {
-    signIn: "/login", // Página de login personalizada
-    error: "/error",  // Página de error personalizada
+    signIn: "/login",
+    error: "/error",
   },
   session: {
-    maxAge: 30 * 60, // 30 minutos en segundos
+    maxAge: 30 * 60, // 30 minutos
   },
   callbacks: {
     async signIn({ user }) {
       const { email, name } = user;
 
       try {
-        // Buscar si el usuario ya existe en la tabla "usuarios"
-        const { data: existingUser, error: fetchError } = await supabase
+        // Buscar si ya existe el usuario en Supabase
+        const { data: existingUser } = await supabase
           .from("usuarios")
           .select("id")
           .eq("correo_electronico", email)
-          .single();
+          .maybeSingle(); // ← evita error si no lo encuentra
 
-        if (fetchError) {
-          console.error("❌ Error buscando usuario:", fetchError.message);
-          return false;
-        }
-
+        // Si no existe, insertarlo
         if (!existingUser) {
-          // Insertar nuevo usuario si no existe
           const { error: insertError } = await supabase.from("usuarios").insert([
             {
               correo_electronico: email,
@@ -49,7 +44,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               reputacion: 0,
               ubicacion: "No especificada",
               biografia: "Nuevo usuario",
-              contrasena: null, // no hay contraseña para Google
+              contrasena: null,
             },
           ]);
 
@@ -58,20 +53,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return false;
           }
 
-          console.log("✅ Usuario creado correctamente con Google:", email);
+          console.log("✅ Usuario creado correctamente:", email);
         } else {
-          console.log("ℹ️ Usuario ya registrado, continúa login:", email);
+          console.log("ℹ️ Usuario ya registrado:", email);
         }
 
-        return true; // Permitir login
+        return true;
       } catch (err) {
-        console.error("❌ Error inesperado en signIn callback:", err);
+        console.error("❌ Error en signIn callback:", err);
         return false;
       }
     },
 
     async redirect({ url, baseUrl }) {
-      // Opcional: siempre redirigir al perfil tras login
       return "/perfil";
     },
   },
