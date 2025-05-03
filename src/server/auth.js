@@ -19,23 +19,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     Credentials({
       name: "Credenciales",
       credentials: {
-        email: { label: "Correo", type: "text" },
-        password: { label: "Contraseña", type: "password" },
+        correo_electronico: { label: "Correo", type: "text" },
+        contrasena: { label: "Contraseña", type: "password" },
       },
       async authorize(credentials) {
-        const { email, password } = credentials;
+        const { correo_electronico, contrasena } = credentials;
 
         const { data: user, error } = await supabase
           .from("usuarios")
           .select("*")
-          .eq("correo_electronico", email)
+          .eq("correo_electronico", correo_electronico)
           .single();
 
         if (error || !user) {
           throw new Error("Usuario no encontrado");
         }
 
-        const passwordCorrecta = await bcrypt.compare(password, user.contrasena);
+        const passwordCorrecta = await bcrypt.compare(contrasena, user.contrasena);
         if (!passwordCorrecta) {
           throw new Error("Contraseña incorrecta");
         }

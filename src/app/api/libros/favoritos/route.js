@@ -1,3 +1,4 @@
+import { auth } from "@/server/auth";
 import { librosFavoritos, agregarLibroAFavoritos, eliminarLibroDeFavoritos, } from "@/services/favoritosService";
   
   export async function GET() {

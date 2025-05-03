@@ -31,7 +31,7 @@ export function LoginModal() {
     const password = document.getElementById("floatingPassword").value
 
     try {
-      const response = await fetch("/api/perfil/login", {
+      const response = await fetch("/api/perfil", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

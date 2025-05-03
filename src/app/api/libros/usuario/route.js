@@ -1,3 +1,4 @@
+import { auth } from "@/server/auth";
 import { obtenerLibrosSubidosPorUsuario } from "@/services/librosService";
 
 export async function GET(req) {
