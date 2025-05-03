@@ -26,54 +26,30 @@ export function LoginModal() {
   // y actualizar la UI después del inicio de sesión exitoso
 
   const handleLogin = async (e) => {
-    e.preventDefault()
-    const email = document.getElementById("floatingInput").value
-    const password = document.getElementById("floatingPassword").value
-
-    try {
-      const response = await fetch("/api/perfil", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ correo_electronico: email, contrasena: password }),
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        console.log("Inicio de sesión exitoso:", data)
-
-        // Almacenar el token en localStorage
-        localStorage.setItem("authToken", data.token)
-
-        // Almacenar información del usuario en localStorage para simular la sesión
-        localStorage.setItem("userId", data.user.id)
-        localStorage.setItem("userName", data.user.nombre_usuario)
-        localStorage.setItem("userEmail", data.user.correo_electronico)
-        localStorage.setItem("sessionStarted", "true") // Para mostrar la notificación
-        localStorage.setItem("authType", "credentials") // Para identificar el tipo de autenticación
-
-        // Cerrar el modal
-        const modalElement = document.getElementById("modalIniciarSesion")
-        if (modalElement && window.bootstrap) {
-          const bsModal = window.bootstrap.Modal.getInstance(modalElement)
-          if (bsModal) {
-            bsModal.hide()
-          }
-        }
-
-        // Recargar la página para actualizar la UI
-        window.location.reload()
-      } else {
-        const error = await response.json()
-        console.error("Error al iniciar sesión:", error.message)
-        alert("Error al iniciar sesión: " + (error.message || "Credenciales incorrectas"))
+    e.preventDefault();
+    const correo_electronico = document.getElementById("floatingInput").value;
+    const contrasena = document.getElementById("floatingPassword").value;
+  
+    const result = await signIn("credentials", {
+      redirect: false,
+      email: correo_electronico,
+      password: contrasena,
+    });
+  
+    if (result.ok) {
+      // Cierra el modal
+      const modalElement = document.getElementById("modalIniciarSesion");
+      if (modalElement && window.bootstrap) {
+        const bsModal = window.bootstrap.Modal.getInstance(modalElement);
+        if (bsModal) bsModal.hide();
       }
-    } catch (err) {
-      console.error("Error del servidor:", err)
-      alert("Error del servidor. Por favor, inténtalo de nuevo más tarde.")
+  
+      window.location.href = "/perfil";
+    } else {
+      alert("Correo o contraseña incorrectos.");
     }
-  }
+  };
+  
 
   useEffect(() => {
     let timeout
