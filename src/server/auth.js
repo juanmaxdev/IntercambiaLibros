@@ -1,12 +1,9 @@
-import NextAuth from "next-auth";
-import Google from "next-auth/providers/google";
-import { createClient } from "@supabase/supabase-js";
+import NextAuth from "next-auth"
+import Google from "next-auth/providers/google"
+import { createClient } from "@supabase/supabase-js"
 
 // Cliente Supabase para servidor (permite escritura con service role)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -24,7 +21,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   callbacks: {
     async signIn({ user }) {
-      const { email, name } = user;
+      const { email, name } = user
 
       try {
         // Buscar si ya existe el usuario en Supabase
@@ -32,7 +29,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           .from("usuarios")
           .select("id")
           .eq("correo_electronico", email)
-          .maybeSingle(); // ← evita error si no lo encuentra
+          .maybeSingle() // ← evita error si no lo encuentra
 
         // Si no existe, insertarlo
         if (!existingUser) {
@@ -46,27 +43,30 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               biografia: "Nuevo usuario",
               contrasena: null,
             },
-          ]);
+          ])
 
           if (insertError) {
-            console.error("❌ Error creando usuario con Google:", insertError.message);
-            return false;
+            console.error("❌ Error creando usuario con Google:", insertError.message)
+            return false
           }
 
-          console.log("✅ Usuario creado correctamente:", email);
+          console.log("✅ Usuario creado correctamente:", email)
         } else {
-          console.log("ℹ️ Usuario ya registrado:", email);
+          console.log("ℹ️ Usuario ya registrado:", email)
         }
 
-        return true;
+        return true
       } catch (err) {
-        console.error("❌ Error en signIn callback:", err);
-        return false;
+        console.error("❌ Error en signIn callback:", err)
+        return false
       }
     },
 
     async redirect({ url, baseUrl }) {
-      return "/perfil";
+      return "/perfil"
     },
   },
-});
+})
+
+// Exportamos getServerSession para uso en rutas API
+export const getServerSession = auth
