@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import ModernSidebar from "./sideBar";
@@ -22,19 +22,14 @@ export default function PerfilUser() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch("/api/perfil", {
-          method: "GET",
-        });
-
+        const response = await fetch("/api/perfil");
         if (response.ok) {
           const data = await response.json();
           setUserData(data);
           setEditData(data);
-        } else {
-          console.error("Error al obtener los datos del usuario");
         }
-      } catch (error) {
-        console.error("Error del servidor:", error);
+      } catch (err) {
+        console.error("Error obteniendo perfil:", err);
       }
     };
 
@@ -46,44 +41,52 @@ export default function PerfilUser() {
   const handleEditToggle = async () => {
     if (isEditing) {
       try {
-        const response = await fetch("/api/perfil", {
+        const res = await fetch("/api/perfil", {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(editData),
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          console.log(data.message);
+        if (res.ok) {
           setUserData({ ...editData });
+          alert("Perfil actualizado");
         } else {
-          console.error("Error al actualizar los datos del usuario");
+          alert("Error al guardar cambios");
         }
-      } catch (error) {
-        console.error("Error del servidor:", error);
+      } catch (err) {
+        console.error(err);
       }
     }
 
     setIsEditing(!isEditing);
   };
 
+  const handleLogin = async (e) => {
+    e.preventDefault();
+  
+    const res = await signIn("credentials", {
+      redirect: false,
+      email: correo, // del input
+      password: contrasena, // del input
+    });
+  
+    if (res.ok) {
+      router.push("/perfil");
+    } else {
+      setError("Correo o contraseña incorrectos");
+    }
+  }; 
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEditData({
-      ...editData,
-      [name]: value,
-    });
+    setEditData({ ...editData, [name]: value });
   };
 
   if (status === "loading" || !userData) {
     return (
       <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
         <div className="text-center">
-          <div className="spinner-border text-primary mb-3" role="status">
-            <span className="visually-hidden">Cargando...</span>
-          </div>
+          <div className="spinner-border text-primary mb-3" role="status" />
           <h4>Verificando sesión...</h4>
           <p>Debes iniciar sesión para ver tu perfil.</p>
         </div>
@@ -102,37 +105,31 @@ export default function PerfilUser() {
           <div className="col-lg-9 col-xl-10 p-0">
             <div className="profile-content">
               <div className="profile-header">
-                <div className="profile-cover">
-                  <div className="cover-overlay"></div>
-                </div>
+                <div className="profile-cover"><div className="cover-overlay"></div></div>
                 <div className="profile-avatar">
                   {session?.user?.image ? (
                     <Image
-                      src={session.user.image || "/placeholder.svg"}
+                      src={session.user.image}
                       alt="Foto de perfil"
                       width={120}
                       height={120}
                       className="avatar-img"
                     />
                   ) : (
-                    <div className="avatar-placeholder">{session?.user?.name?.charAt(0) || "U"}</div>
+                    <div className="avatar-placeholder">{userData?.nombre_usuario?.charAt(0) || "U"}</div>
                   )}
                 </div>
                 <div className="profile-info">
-                  <h2 className="profile-name">{session?.user?.name || "Usuario"}</h2>
-                  <p className="profile-email">{session?.user?.email || ""}</p>
+                  <h2 className="profile-name">{userData?.nombre_usuario || "Usuario"}</h2>
+                  <p className="profile-email">{userData?.correo_electronico}</p>
                   <button
                     className={`btn ${isEditing ? "btn-success" : "btn-outline-primary"} btn-sm mt-2`}
                     onClick={handleEditToggle}
                   >
                     {isEditing ? (
-                      <>
-                        <i className="bi bi-check-lg me-2"></i>Guardar cambios
-                      </>
+                      <><i className="bi bi-check-lg me-2"></i>Guardar cambios</>
                     ) : (
-                      <>
-                        <i className="bi bi-pencil me-2"></i>Editar perfil
-                      </>
+                      <><i className="bi bi-pencil me-2"></i>Editar perfil</>
                     )}
                   </button>
                 </div>

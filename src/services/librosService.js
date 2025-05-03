@@ -135,3 +135,17 @@ export async function guardarLibroEnBD({
 
   return data?.[0];
 }
+
+export async function eliminarLibroPorId(idLibro) {
+  const { error } = await supabase
+    .from("libros")
+    .delete()
+    .eq("id", idLibro);
+
+  if (error) {
+    console.error("❌ Error al eliminar libro:", error);
+    throw new Error("No se pudo eliminar el libro");
+  }
+
+  return true;
+}
