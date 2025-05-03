@@ -25,20 +25,31 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       async authorize(credentials) {
         const { correo_electronico, contrasena } = credentials;
 
+        console.log("Intentando iniciar sesión con:", correo_electronico);
+
         const { data: user, error } = await supabase
           .from("usuarios")
           .select("*")
           .eq("correo_electronico", correo_electronico)
           .single();
 
-        if (error || !user) {
-          throw new Error("Usuario no encontrado");
+        if (error) {
+          console.error("Error al consultar la base de datos:", error);
+          return null; // Devuelve null en lugar de lanzar un error
+        }
+
+        if (!user) {
+          console.error("Usuario no encontrado con el correo:", correo_electronico);
+          return null; // Devuelve null si el usuario no existe
         }
 
         const passwordCorrecta = await bcrypt.compare(contrasena, user.contrasena);
         if (!passwordCorrecta) {
-          throw new Error("Contraseña incorrecta");
+          console.error("Contraseña incorrecta para el usuario:", correo_electronico);
+          return null; // Devuelve null si la contraseña no coincide
         }
+
+        console.log("Inicio de sesión exitoso para:", correo_electronico);
 
         return {
           email: user.correo_electronico,

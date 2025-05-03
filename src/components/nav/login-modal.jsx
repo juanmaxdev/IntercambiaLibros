@@ -1,6 +1,6 @@
 "use client"
 import Image from "next/image"
-import { signIn } from "next-auth/react"
+import { useSession, signIn } from "next-auth/react"
 import { useEffect } from "react"
 // No importar bootstrap directamente
 
@@ -27,24 +27,17 @@ export function LoginModal() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+  
     const correo_electronico = document.getElementById("floatingInput").value;
     const contrasena = document.getElementById("floatingPassword").value;
   
     const result = await signIn("credentials", {
-      redirect: false,
-      email: correo_electronico,
-      password: contrasena,
+      correo_electronico,
+      contrasena,
     });
   
     if (result.ok) {
-      // Cierra el modal
-      const modalElement = document.getElementById("modalIniciarSesion");
-      if (modalElement && window.bootstrap) {
-        const bsModal = window.bootstrap.Modal.getInstance(modalElement);
-        if (bsModal) bsModal.hide();
-      }
-  
-      window.location.href = "/perfil";
+      window.location.reload(); // 🔄 Recarga la página para reflejar el estado de sesión
     } else {
       alert("Correo o contraseña incorrectos.");
     }
