@@ -1,11 +1,10 @@
-import { withAuth } from "next-auth/middleware";
-
-export default withAuth({
-  pages: {
-    signIn: "/login",
-  },
-});
+export { auth as middleware } from "auth"; // Usa la ruta a tu archivo server/auth.js si no está como "auth" global
 
 export const config = {
-  matcher: ["/perfil/:path*", "/mensajes/:path*", "/misLibros/:path*"],
+  matcher: [
+    "/perfil/:path*",
+    "/api/:path*",
+    "/misLibros/:path*",
+    "/subirLibro/:path*",
+  ],
 };
