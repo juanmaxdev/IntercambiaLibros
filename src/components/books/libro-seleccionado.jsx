@@ -3,49 +3,79 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import ComentariosLibro from "./comentarios-libro"
 import { useSession } from "next-auth/react"
+import { useState, useEffect } from "react"
 import "@/app/styles/books/styles.css"
-import { useState } from "react"
 
 export default function LibroSeleccionado({ book }) {
   const router = useRouter()
-  const { data: session, status } = useSession()
-  const [enviandoMensaje, setEnviandoMensaje] = useState(false)
+  const { data: session, status } = useSession();
+  const [enviandoMensaje, setEnviandoMensaje] = useState(false);
+  const [yaEsFavorito, setYaEsFavorito] = useState(false);
+  const [mensajeFavorito, setMensajeFavorito] = useState("");
 
-  // Si no hay datos del libro, mostrar un mensaje
+  useEffect(() => {
+    const verificarFavorito = async () => {
+      if (session?.user?.email) {
+        const res = await fetch(`/api/libros/favoritos/verificar?id=${book.id}`);
+        const data = await res.json();
+        setYaEsFavorito(data.enFavoritos);
+      }
+    };
+
+    verificarFavorito();
+  }, [session, book.id]);
+
+  const agregarAFavoritos = async () => {
+    if (!session?.user) {
+      alert("Debes iniciar sesión para añadir a favoritos.");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/libros/favoritos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id_libro: book.id }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "Error al guardar favorito");
+
+      setYaEsFavorito(true);
+      setMensajeFavorito("Libro añadido a favoritos");
+      setTimeout(() => setMensajeFavorito(""), 3000);
+    } catch (err) {
+      console.error("Error al añadir a favoritos:", err);
+      alert("No se pudo añadir a favoritos");
+    }
+  };
+
   if (!book) {
     return (
       <div className="container mt-5 text-center">
         <div className="alert alert-danger">
           No se pudo cargar la información del libro. Por favor, inténtalo de nuevo.
         </div>
-        <button className="btn btn-dark mt-3" onClick={() => router.push("/")}>
-          Volver a la página principal
-        </button>
+        <button className="btn btn-dark mt-3" onClick={() => router.push("/")}>Volver a la página principal</button>
       </div>
     )
   }
-  console.log("Propiedades de book:", book)
-  // Crear un título completo con el título y autor del libro
-  const tituloCompleto = `${book.titulo?.toUpperCase() || "TÍTULO DESCONOCIDO"} - ${
-    book.autor?.toUpperCase() || "AUTOR DESCONOCIDO"
-  }`
 
-  // Modificar la función contactarVendedor para usar correo_usuario en lugar de usuario_id
-  // Función para contactar con el vendedor
+  const tituloCompleto = `${book.titulo?.toUpperCase() || "TÍTULO DESCONOCIDO"} - ${book.autor?.toUpperCase() || "AUTOR DESCONOCIDO"}`;
+
   const contactarVendedor = (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!session) {
-      // Si no hay sesión, mostrar modal de login
-      document.getElementById("loginModal").classList.add("show")
-      document.getElementById("loginModal").style.display = "block"
-      return
+      document.getElementById("loginModal").classList.add("show");
+      document.getElementById("loginModal").style.display = "block";
+      return;
     }
 
-    // Redirigir a la página de mensajes con el contacto y libro como parámetros
     router.push(
-      `/perfil/mensajes?contacto=${encodeURIComponent(book.correo_usuario)}&libro=${encodeURIComponent(book.titulo)}`,
-    )
+      `/perfil/mensajes?contacto=${encodeURIComponent(book.correo_usuario)}&libro=${encodeURIComponent(book.titulo)}`
+    );
   }
 
   return (
@@ -95,11 +125,12 @@ export default function LibroSeleccionado({ book }) {
                 <p className="fst-italic">{book.donacion === false ? "Presencial" : "Donación"}</p>
                 <p className="fst-italic">{book.estado_libro || "-"}</p>
                 <p className="fst-italic">{book.ubicacion || "-"}</p>
-                <p className="pt-3 fst-italic">{book.nombre_usuario ? `${book.nombre_usuario}` : "-"}</p>
+                <p className="pt-3 fst-italic">{book.nombre_usuario || "-"}</p>
               </div>
             </div>
           </div>
         </div>
+
         <div className="col-5 col">
           <div className="container mt-5 pt-4">
             <h2 className="fw-semibold">{tituloCompleto}</h2>
@@ -114,13 +145,32 @@ export default function LibroSeleccionado({ book }) {
             </p>
             <p>🌱📚</p>
           </div>
+
           <div className="container d-flex align-items-center justify-content-center gap-2 mt-5">
-            <button type="button" className="btn btn-outline-danger rounded-circle border-0">
-              <Image src="/assets/icons/Cupid.gif" alt="Icono de corazón" width={50} height={50} unoptimized />
-            </button>
-            <p className="fw-semibold pt-3">Agregar a lista de deseados</p>
+            {!yaEsFavorito ? (
+              <>
+                <button
+                  type="button"
+                  className="btn btn-outline-danger rounded-circle border-0"
+                  onClick={agregarAFavoritos}
+                  title="Añadir a favoritos"
+                >
+                  <Image src="/assets/icons/Cupid.gif" alt="Icono de corazón" width={50} height={50} unoptimized />
+                </button>
+                <p className="fw-semibold pt-3 mb-0">Agregar a lista de deseados</p>
+              </>
+            ) : (
+              <p className="fw-semibold pt-3 text-success mb-0">✓ Ya está en favoritos</p>
+            )}
+
+            {mensajeFavorito && (
+              <div className="alert alert-success py-1 px-3 ms-3 mb-0" role="alert" style={{ fontSize: "0.9rem" }}>
+                {mensajeFavorito}
+              </div>
+            )}
           </div>
           <div className="container d-flex justify-content-center gap-5 mt-3">
+
             <button
               type="button"
               className="btn btn-dark mt-5"
@@ -138,17 +188,17 @@ export default function LibroSeleccionado({ book }) {
             </button>
           </div>
         </div>
+
         <div className="col-2 col" />
       </div>
+
       <div className="container-fluid my-5 ps-0">
-        {/* Componente de comentarios */}
         <ComentariosLibro titulo={book.titulo || ""} session={session} />
       </div>
+
       <div className="container mt-4 mb-5 text-center">
-        <button className="btn btn-dark" onClick={() => router.push("/")}>
-          Volver a la galería de libros
-        </button>
+        <button className="btn btn-dark" onClick={() => router.push("/")}>Volver a la galería de libros</button>
       </div>
     </div>
-  )
+  );
 }
