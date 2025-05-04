@@ -1,4 +1,3 @@
-
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google"
@@ -67,17 +66,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     maxAge: 30 * 60,
   },
   callbacks: {
-
     async signIn({ user }) {
-      const { email, name } = user
+      const { email, name } = user;
 
       try {
+        if (!email || !name) {
+          console.error("❌ Datos incompletos para crear el usuario:", { email, name });
+          throw new Error("Datos incompletos para crear el usuario.");
+        }
+
         // Buscar si ya existe el usuario en Supabase
         const { data: existingUser } = await supabase
           .from("usuarios")
           .select("id")
           .eq("correo_electronico", email)
-          .maybeSingle() // ← evita error si no lo encuentra
+          .maybeSingle();
 
         // Si no existe, insertarlo
         if (!existingUser) {
@@ -91,40 +94,38 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               biografia: "Nuevo usuario",
               contrasena: null,
             },
-          ])
+          ]);
 
           if (insertError) {
-            console.error("❌ Error creando usuario con Google:", insertError.message)
-            return false
+            console.error("❌ Error creando usuario con Google:", insertError.message);
+            throw new Error("Error al crear el usuario. Inténtalo de nuevo.");
           }
 
-          console.log("✅ Usuario creado correctamente:", email)
+          console.log("✅ Usuario creado correctamente:", email);
         } else {
-          console.log("ℹ️ Usuario ya registrado:", email)
+          console.log("ℹ️ Usuario ya registrado:", email);
         }
 
-        return true
+        return true;
       } catch (err) {
-        console.error("❌ Error en signIn callback:", err)
-        return false
-
-   
+        console.error("❌ Error en signIn callback:", err);
+        return false;
+      }
+    },
 
     async redirect({ url, baseUrl }) {
-      return "/perfil"
-
+      return "/perfil";
     },
-  },
-})
 
-{/* async jwt({ token, user }) {
+    async jwt({ token, user }) {
       if (user) {
         token.email = user.email;
         token.name = user.name;
-
       }
       return token;
     },
-*/}
+  },
+});
+
 // Exportamos getServerSession para uso en rutas API
 export const getServerSession = auth
