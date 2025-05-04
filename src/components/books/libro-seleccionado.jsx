@@ -120,7 +120,7 @@ export default function LibroSeleccionado({ book }) {
             </button>
             <p className="fw-semibold pt-3">Agregar a lista de deseados</p>
           </div>
-          <div className="container d-flex justify-content-between gap-5 mt-3">
+          <div className="container d-flex justify-content-center gap-5 mt-3">
             <button
               type="button"
               className="btn btn-dark mt-5"
@@ -135,9 +135,6 @@ export default function LibroSeleccionado({ book }) {
               ) : (
                 "Contactar con el vendedor"
               )}
-            </button>
-            <button type="button" className="btn btn-dark mt-5">
-              Solicitar intercambio
             </button>
           </div>
         </div>

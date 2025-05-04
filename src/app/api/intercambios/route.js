@@ -158,6 +158,17 @@ export async function PATCH(request) {
       return NextResponse.json({ error: "No autorizado para actualizar este intercambio" }, { status: 403 })
     }
 
+    // Verificar que el intercambio esté en estado pendiente para poder cambiarlo
+    if (intercambio.estado !== "pendiente" && estado !== "completado") {
+      return NextResponse.json(
+        {
+          error: "Este intercambio ya ha sido respondido anteriormente",
+          intercambio: intercambio,
+        },
+        { status: 400 },
+      )
+    }
+
     // Actualizar el estado del intercambio
     const { data, error } = await supabase
       .from("intercambios")
