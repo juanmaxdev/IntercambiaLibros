@@ -55,19 +55,34 @@ export const obtenerConversaciones = async (userEmail) => {
       // Verificar si hay mensajes no leídos
       const noLeido = !mensaje.leido && mensaje.destinatario_id === userEmail
 
+      // Formatear el contenido del mensaje para mensajes de intercambio
+      let contenidoMostrado = mensaje.contenido
+      try {
+        const contenidoJson = JSON.parse(mensaje.contenido)
+        if (contenidoJson.tipo === "solicitud_intercambio") {
+          contenidoMostrado = "Solicitud de intercambio enviada"
+        } else if (contenidoJson.tipo === "respuesta_intercambio") {
+          contenidoMostrado = contenidoJson.respuesta === "aceptada" ? "Intercambio aceptado" : "Intercambio rechazado"
+        } else if (contenidoJson.tipo === "confirmacion_entrega") {
+          contenidoMostrado = "Entrega confirmada"
+        }
+      } catch (e) {
+        // No es un JSON, mantener el contenido original
+      }
+
       if (!contactosMap.has(contactoEmail)) {
         contactosMap.set(contactoEmail, {
           id: contactoInfo.id,
           nombre: contactoInfo.nombre,
           email: contactoEmail,
-          ultimoMensaje: mensaje.contenido,
+          ultimoMensaje: contenidoMostrado,
           fecha: mensaje.fecha,
           noLeidos: noLeido ? 1 : 0,
         })
       } else {
         const contactoExistente = contactosMap.get(contactoEmail)
         if (new Date(mensaje.fecha) > new Date(contactoExistente.fecha)) {
-          contactoExistente.ultimoMensaje = mensaje.contenido
+          contactoExistente.ultimoMensaje = contenidoMostrado
           contactoExistente.fecha = mensaje.fecha
         }
         if (noLeido) {

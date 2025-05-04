@@ -1,14 +1,14 @@
-import NextAuth from "next-auth";
+
+import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials";
-import Google from "next-auth/providers/google";
-import { createClient } from "@supabase/supabase-js";
+import Google from "next-auth/providers/google"
+import { createClient } from "@supabase/supabase-js"
 import bcrypt from "bcrypt";
 
-// Cliente Supabase (Service Role Key)
+// Cliente Supabase para servidor (permite escritura con service role)
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+  process.env.NEXT_PUBLIC_SUPABASE_URL, 
+  process.env.SUPABASE_SERVICE_ROLE_KEY)
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -67,25 +67,64 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     maxAge: 30 * 60,
   },
   callbacks: {
-    async jwt({ token, user }) {
+
+    async signIn({ user }) {
+      const { email, name } = user
+
+      try {
+        // Buscar si ya existe el usuario en Supabase
+        const { data: existingUser } = await supabase
+          .from("usuarios")
+          .select("id")
+          .eq("correo_electronico", email)
+          .maybeSingle() // ← evita error si no lo encuentra
+
+        // Si no existe, insertarlo
+        if (!existingUser) {
+          const { error: insertError } = await supabase.from("usuarios").insert([
+            {
+              correo_electronico: email,
+              nombre_usuario: name,
+              fecha_registro: new Date().toISOString(),
+              reputacion: 0,
+              ubicacion: "No especificada",
+              biografia: "Nuevo usuario",
+              contrasena: null,
+            },
+          ])
+
+          if (insertError) {
+            console.error("❌ Error creando usuario con Google:", insertError.message)
+            return false
+          }
+
+          console.log("✅ Usuario creado correctamente:", email)
+        } else {
+          console.log("ℹ️ Usuario ya registrado:", email)
+        }
+
+        return true
+      } catch (err) {
+        console.error("❌ Error en signIn callback:", err)
+        return false
+
+   
+
+    async redirect({ url, baseUrl }) {
+      return "/perfil"
+
+    },
+  },
+})
+
+{/* async jwt({ token, user }) {
       if (user) {
         token.email = user.email;
         token.name = user.name;
+
       }
       return token;
     },
-    async session({ session, token }) {
-      if (token) {
-        session.user.email = token.email;
-        session.user.name = token.name;
-      }
-      return session;
-    },
-    async signIn({ user }) {
-      return true;
-    },
-    async redirect() {
-      return "/perfil";
-    },
-  },
-});
+*/}
+// Exportamos getServerSession para uso en rutas API
+export const getServerSession = auth
