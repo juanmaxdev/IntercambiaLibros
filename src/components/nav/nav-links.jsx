@@ -20,7 +20,7 @@ export function NavLinks({ isAuthenticated }) {
 
   return (
     // Asegurarnos de que el menú desplegable tenga la posición correcta
-    <li className="nav-item dropdown me-3 position-relative">
+    <li className="nav-item dropdown me-2 position-relative">
       <a className="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
         <Image src="/assets/icons/list.svg" alt="iconoMenu" width={35} height={25} />
       </a>

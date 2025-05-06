@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react"
 import { useSession } from "next-auth/react"
 import { useSearchParams } from "next/navigation"
+import "@/app/styles/perfil/mensajes.css"
 import SideBar from "@components/perfil/sideBar"
 import {
   obtenerConversaciones,
@@ -519,7 +520,34 @@ export default function Mensajes() {
   // Función para confirmar la entrega de un intercambio
   const confirmarEntregaIntercambio = async (intercambioId) => {
     try {
+      // Verificar si el botón ya fue pulsado
+      if (enviando) {
+        return // Evitar múltiples clics
+      }
+
       setEnviando(true)
+
+      // Verificar si el intercambio ya ha sido confirmado por este usuario
+      const { data: intercambioActual, error: errorConsulta } = await supabase
+        .from("intercambios")
+        .select("*")
+        .eq("id", intercambioId)
+        .single()
+
+      if (errorConsulta) {
+        throw new Error("Error al verificar el estado del intercambio")
+      }
+
+      // Verificar si el usuario ya confirmó
+      const esUsuarioOfrece = intercambioActual.usuario_id_ofrece === session.user.id
+      if (
+        (esUsuarioOfrece && intercambioActual.confirmado_ofrece) ||
+        (!esUsuarioOfrece && intercambioActual.confirmado_recibe)
+      ) {
+        setError("Ya has confirmado la entrega de este intercambio")
+        setEnviando(false)
+        return
+      }
 
       // Actualizar el estado del intercambio en la base de datos
       const responseIntercambio = await fetch("/api/intercambios/confirmar", {
@@ -545,6 +573,7 @@ export default function Mensajes() {
         tipo: "confirmacion_entrega",
         intercambio_id: intercambioId,
         estado: data.estado, // "completado" o "pendiente_confirmacion"
+        timestamp: new Date().toISOString(), // Añadir timestamp para identificar el mensaje
       }
 
       // Enviar el mensaje como JSON
@@ -553,6 +582,9 @@ export default function Mensajes() {
       // Actualizar la interfaz
       await cargarMensajes(contactoSeleccionado.email)
       await cargarConversaciones()
+
+      // Mostrar mensaje de éxito
+      setError(null)
     } catch (error) {
       console.error("Error al confirmar la entrega:", error)
       setError("Error al confirmar la entrega. Por favor, intenta de nuevo.")
@@ -664,9 +696,21 @@ export default function Mensajes() {
                 <button
                   className="btn btn-primary btn-sm"
                   onClick={() => confirmarEntregaIntercambio(contenido.intercambio_id)}
-                  disabled={enviando}
+                  disabled={enviando || mensaje.yaConfirmado}
                 >
-                  Confirmar entrega completada
+                  {enviando ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      Confirmando...
+                    </>
+                  ) : mensaje.yaConfirmado ? (
+                    <>
+                      <i className="bi bi-check-circle me-2"></i>
+                      Entrega confirmada
+                    </>
+                  ) : (
+                    "Confirmar entrega completada"
+                  )}
                 </button>
               </div>
             )}
@@ -1226,120 +1270,6 @@ export default function Mensajes() {
           </div>
         </div>
       )}
-
-      <style jsx global>{`
-        .avatar-placeholder {
-          width: 40px;
-          height: 40px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: bold;
-        }
-        
-        .message-bubble {
-          box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-        
-        .content-wrapper {
-          border-radius: 12px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-          padding: 2rem;
-        }
-        
-        .empty-state {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          height: 100%;
-        }
-
-        .conversation-header {
-          background: linear-gradient(135deg, #5a8c5a 0%, #3a6d7c 100%);
-          border-bottom: none;
-        }
-
-        .selected-conversation {
-          background-color: rgba(90, 140, 90, 0.1) !important;
-          border-left: 3px solid #5a8c5a;
-        }
-
-        .intercambio-solicitud {
-          background: linear-gradient(to right bottom, #f8f9fa, #e9f5e9);
-          border-radius: 8px;
-          border: 1px solid #d1e7dd;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .placeholder-imagen {
-          width: 40px;
-          height: 60px;
-          background-color: #e9ecef;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 4px;
-        }
-
-        .libro-item {
-          padding: 8px;
-          border-radius: 6px;
-          background-color: white;
-          border: 1px solid #dee2e6;
-          transition: all 0.2s ease;
-        }
-
-        .libro-item:hover {
-          box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-          transform: translateY(-2px);
-        }
-
-        .estado-intercambio {
-          font-weight: 500;
-          margin-top: 8px;
-        }
-
-        .modal-backdrop {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: rgba(0, 0, 0, 0.5);
-          z-index: 1040;
-        }
-
-        .modal {
-          position: fixed;
-          top: 0;
-          left: 0;
-          z-index: 1050;
-          width: 100%;
-          height: 100%;
-          overflow-x: hidden;
-          overflow-y: auto;
-          outline: 0;
-        }
-
-        .modal-dialog {
-          position: relative;
-          width: auto;
-          margin: 1.75rem auto;
-          pointer-events: all;
-        }
-
-        .intercambio-respuesta {
-          border: 1px solid;
-          border-color: #d1e7dd;
-          box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .intercambio-confirmacion {
-          border: 1px solid #d1e7dd;
-          box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-      `}</style>
     </div>
   )
 }
