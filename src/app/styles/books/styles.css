@@ -2,28 +2,35 @@
   --text: rgb(11, 11, 22);
   --background: rgb(247, 247, 251);
   --primary: rgb(85, 83, 172);
-  --secondary: rgb(212, 167, 177 ,0.15);
-  --accent: rgba(192, 150, 125, 0.45);
+  --secondary: rgba(220, 240, 220, 0.6);
+  --accent: rgba(76, 175, 80, 0.25);
+  --forest-green: #2e7d32;
+  --light-green: #81c784;
+  --pale-green: rgba(240, 255, 240, 0.8);
 }
 
-.bg-text{
+.bg-text {
   color: var(--text);
 }
 
-.bg-background{
+.bg-background {
   background-color: var(--background);
 }
 
-.bg-primario{
+.bg-primario {
   background-color: var(--primary);
 }
 
-.bg-secondario{
+.bg-secondario {
   background-color: var(--secondary);
 }
 
-.bg-ascent{
+.bg-ascent {
   background-color: var(--accent);
+}
+
+.text-forest-green {
+  color: var(--forest-green);
 }
 
 html,
@@ -33,6 +40,7 @@ body {
   padding: 0;
   display: flex;
   flex-direction: column;
+  background-color: #f8faf8;
 }
 
 footer {
@@ -42,23 +50,178 @@ footer {
 main {
   flex: 1;
 }
+
 .custom-rectangle {
   width: 25rem;
   height: 55rem;
   clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 87%, 0% 100%);
+  background: linear-gradient(135deg, rgba(240, 255, 240, 0.9) 0%, rgba(220, 240, 220, 0.7) 100%);
+  border: 1px solid rgba(144, 238, 144, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 100, 0, 0.15);
 }
+
+/* Hacer el rectángulo responsive */
+@media (max-width: 992px) {
+  .custom-rectangle {
+    width: 100%;
+    max-width: 25rem;
+    height: auto;
+    min-height: 40rem;
+    margin: 0 auto;
+    padding-bottom: 3rem;
+  }
+
+  .book-details {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .custom-rectangle {
+    max-width: 22rem;
+    min-height: 38rem;
+  }
+
+  .book-details {
+    font-size: 0.85rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  .fs-5 {
+    font-size: 1rem !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .custom-rectangle {
+    max-width: 18rem;
+    min-height: 35rem;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 92%, 0% 100%);
+  }
+
+  .book-details {
+    font-size: 0.8rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  .container-fluid {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .btn {
+    font-size: 0.9rem;
+    padding: 0.375rem 0.75rem;
+  }
+}
+
 .custom-container-comment {
-  width: 90rem;
-  height: 19rem;
+  width: 100%;
+  max-width: 1200px;
+  min-height: 19rem;
+  max-height: none; /* Permitir que se expanda según sea necesario */
+  position: relative;
+  overflow: hidden; /* Evitar que el contenido sobresalga */
+  transition: height 0.3s ease;
 }
 
 .formulario-comentario {
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.8);
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 100, 0, 0.1);
 }
 
 .formulario-comentario textarea {
   resize: vertical;
   min-height: 100px;
+  border-color: rgba(144, 238, 144, 0.5);
+}
+
+/* Estilos para botones */
+.btn-primary-green {
+  background-color: #4caf50;
+  border-color: #4caf50;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-primary-green:hover {
+  background-color: #388e3c;
+  border-color: #388e3c;
+  color: white;
+}
+
+.btn-primary-green:focus {
+  box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
+}
+
+/* Animaciones suaves */
+.fade-in {
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Mejoras visuales para elementos interactivos */
+a {
+  color: var(--forest-green);
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: var(--light-green);
+  text-decoration: none;
+}
+
+/* Estilos para scrollbars personalizados */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(240, 255, 240, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(76, 175, 80, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(76, 175, 80, 0.7);
+}
+
+/* Ajustes responsivos adicionales */
+@media (max-width: 768px) {
+  .custom-container-comment {
+    margin: 0 auto;
+    border-radius: 8px;
+  }
+
+  .formulario-comentario {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .custom-container-comment {
+    border-radius: 0;
+  }
+
+  body {
+    font-size: 0.9rem;
+  }
 }

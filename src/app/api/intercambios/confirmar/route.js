@@ -46,21 +46,6 @@ export async function POST(request) {
       return NextResponse.json({ error: "No autorizado para confirmar este intercambio" }, { status: 403 })
     }
 
-    // Verificar si el usuario ya ha confirmado
-    if (
-      (intercambio.usuario_id_ofrece === usuario.id && intercambio.confirmado_ofrece) ||
-      (intercambio.usuario_id_recibe === usuario.id && intercambio.confirmado_recibe)
-    ) {
-      return NextResponse.json(
-        {
-          mensaje: "Ya has confirmado este intercambio anteriormente",
-          intercambio: intercambio,
-          estado: intercambio.estado,
-        },
-        { status: 200 },
-      )
-    }
-
     // Actualizar el campo de confirmación correspondiente
     const updateData = {}
     if (intercambio.usuario_id_ofrece === usuario.id) {

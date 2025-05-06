@@ -1,3 +1,48 @@
+@font-face {
+  font-family: 'Roboto';
+  src: url('/assets/fonts/Roboto/static/Roboto-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('/assets/fonts/Montserrat/static/Montserrat-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Baskerville';
+  src: url('/assets/fonts/Libre_Baskerville/LibreBaskerville-italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Baskerville';
+  src: url('/assets/fonts/Libre_Baskerville/LibreBaskerville-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Garamond';
+  src: url('/assets/fonts/Cormorant_Garamond/static/CormorantGaramond-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Garamond';
+  src: url('/assets/fonts/Cormorant_Garamond/static/CormorantGaramond-MediumItalic.ttf') format('truetype');
+  font-weight: 500;
+  font-style: italic;
+}
+
+
+
+
 :root {
   --text: rgb(11, 11, 22);
   --background: rgb(247, 247, 251);
@@ -26,12 +71,12 @@ footer {
   background-color: var(--background);
 }
 
-html,
 body {
   background-color: var(--background);
+  font-family: 'Roboto', 'Montserrat', sans-serif;
   max-width: 100vw;
   overflow-x: hidden;
-  margin-top: 25px;
+  margin-top: 50px;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -39,7 +84,7 @@ body {
 
 main {
   flex: 1;
-  margin-top: 30px;
+  font-family: 'Roboto', 'Montserrat', sans-serif;
 }
 
 h1,
@@ -49,6 +94,8 @@ h4,
 h5,
 h6 {
   color: var(--text);
+  font-family: 'Baskerville', 'Garamond', sans-serif;
+  letter-spacing: 0.5px;
 }
 
 span,
@@ -56,7 +103,6 @@ p {
   color: var(--text);
 }
 
-/* Estilos para mantener el navbar consistente en todas las páginas */
 .navbar .nav-link {
   color: var(--text) !important;
   transition: none !important;
@@ -75,14 +121,13 @@ p {
   margin-left: 0.5em !important;
 }
 
-/* Eliminar efectos de hover en el navbar */
 .navbar a:hover,
 .navbar button:hover {
   background-color: transparent !important;
   color: var(--text) !important;
 }
 
-/* Eliminar estilos adicionales en el navbar */
+
 .navbar .dropdown-menu {
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }
@@ -92,7 +137,7 @@ p {
   color: var(--text) !important;
 }
 
-/* Asegurar que el contenido principal se adapte cuando el sidebar está colapsado */
+
 @media (min-width: 768px) {
   .modern-sidebar.collapsed + .col-md-9 {
     width: calc(100% - 80px);

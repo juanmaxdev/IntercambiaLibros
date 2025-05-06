@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react"
 import { useSession } from "next-auth/react"
 import { useSearchParams } from "next/navigation"
+import "@/app/styles/perfil/mensajes.css"
 import SideBar from "@components/perfil/sideBar"
 import {
   obtenerConversaciones,
@@ -10,6 +11,7 @@ import {
   marcarComoLeidos,
   obtenerUsuarioPorEmail,
 } from "@/services/mensajesService"
+import { supabase } from "@/lib/supabase"
 
 export default function Mensajes() {
   const { data: session, status } = useSession()
@@ -27,6 +29,15 @@ export default function Mensajes() {
   const [error, setError] = useState(null)
   const mensajesFinRef = useRef(null)
   const mensajesContenedorRef = useRef(null)
+
+  const [showIntercambioModal, setShowIntercambioModal] = useState(false)
+  const [librosUsuario, setLibrosUsuario] = useState([])
+  const [librosSeleccionados, setLibrosSeleccionados] = useState([])
+  const [cargandoLibros, setCargandoLibros] = useState(false)
+  const [libroContacto, setLibroContacto] = useState(null)
+  const [solicitudesIntercambio, setSolicitudesIntercambio] = useState([])
+  const [librosContacto, setLibrosContacto] = useState([])
+  const [libroContactoSeleccionado, setLibroContactoSeleccionado] = useState(null)
 
   // Cargar conversaciones al iniciar
   useEffect(() => {
@@ -50,12 +61,12 @@ export default function Mensajes() {
 
     inicializar()
 
-    // Actualizar mensajes cada 10 segundos si hay un contacto seleccionado
+    // Actualizar mensajes cada minuto si hay un contacto seleccionado
     const intervalo = setInterval(() => {
       if (session?.user?.email && contactoSeleccionado) {
         cargarMensajes(contactoSeleccionado.email)
       }
-    }, 10000)
+    }, 60000) // Cambiado de 10000 a 60000 (1 minuto)
 
     return () => clearInterval(intervalo)
   }, [session, status, contactoParam])
@@ -186,6 +197,25 @@ export default function Mensajes() {
     setError(null) // Limpiar errores al cambiar de contacto
   }
 
+  // Cerrar la conversación actual
+  const cerrarConversacion = () => {
+    setContactoSeleccionado(null)
+    setMensajes([])
+    setError(null)
+  }
+
+  // Cerrar una conversación específica
+  const cerrarConversacionEspecifica = (email) => {
+    // Si es la conversación actualmente seleccionada, la cerramos
+    if (contactoSeleccionado?.email === email) {
+      setContactoSeleccionado(null)
+      setMensajes([])
+    }
+
+    // Actualizamos la lista de conversaciones
+    setConversaciones((prevConversaciones) => prevConversaciones.filter((conv) => conv.email !== email))
+  }
+
   // Formatear fecha
   const formatearFecha = (fecha) => {
     return new Date(fecha).toLocaleString("es-ES", {
@@ -224,6 +254,515 @@ export default function Mensajes() {
       month: "2-digit",
       year: "numeric",
     })
+  }
+
+  // Función para abrir el modal de solicitud de intercambio
+  const handleSolicitarIntercambio = async () => {
+    if (!session?.user?.email) return
+
+    try {
+      setCargandoLibros(true)
+      // Obtener los libros del usuario actual
+      const response = await fetch("/api/libros/usuario", {
+        method: "GET",
+        headers: {
+          correo_electronico: session.user.email,
+        },
+      })
+
+      // Obtener los libros del contacto
+      const responseContacto = await fetch("/api/libros/usuario", {
+        method: "GET",
+        headers: {
+          correo_electronico: contactoSeleccionado.email,
+        },
+      })
+
+      if (response.ok && responseContacto.ok) {
+        const librosUsuarioData = await response.json()
+        const librosContactoData = await responseContacto.json()
+
+        // Filtrar libros que ya han sido intercambiados (si tienen esa propiedad)
+        const librosUsuarioFiltrados = librosUsuarioData.filter(
+          (libro) => !libro.estado_intercambio || libro.estado_intercambio !== "intercambiado",
+        )
+
+        const librosContactoFiltrados = librosContactoData.filter(
+          (libro) => !libro.estado_intercambio || libro.estado_intercambio !== "intercambiado",
+        )
+
+        setLibrosUsuario(librosUsuarioFiltrados)
+
+        // Si venimos de la página de un libro específico, buscar ese libro en los libros del contacto
+        if (libroParam) {
+          const libroEncontrado = librosContactoFiltrados.find((libro) => libro.titulo === libroParam)
+          if (libroEncontrado) {
+            setLibroContacto(libroEncontrado)
+          }
+        }
+
+        // Guardar los libros del contacto para mostrarlos en el modal
+        setLibrosContacto(librosContactoFiltrados)
+
+        // Si no tiene libros, mostrar el modal con mensaje
+        setShowIntercambioModal(true)
+      } else {
+        setError("Error al obtener los libros. Por favor, intenta de nuevo.")
+      }
+    } catch (error) {
+      console.error("Error al cargar libros:", error)
+      setError("Error al cargar los libros. Por favor, intenta de nuevo.")
+    } finally {
+      setCargandoLibros(false)
+    }
+  }
+
+  // Función para manejar la selección de libros
+  const handleSeleccionLibro = (libro) => {
+    setLibrosSeleccionados((prevSelected) => {
+      const isSelected = prevSelected.some((item) => item.id === libro.id)
+
+      if (isSelected) {
+        return prevSelected.filter((item) => item.id !== libro.id)
+      } else {
+        return [...prevSelected, libro]
+      }
+    })
+  }
+
+  // Función para verificar si un texto es un mensaje de intercambio en formato JSON
+  const esMensajeIntercambioTexto = (texto) => {
+    try {
+      const contenido = JSON.parse(texto)
+      return (
+        contenido.tipo === "solicitud_intercambio" ||
+        contenido.tipo === "respuesta_intercambio" ||
+        contenido.tipo === "confirmacion_entrega"
+      )
+    } catch (e) {
+      return false
+    }
+  }
+
+  // Función para manejar la selección del libro del contacto
+  const handleSeleccionLibroContacto = (libro) => {
+    setLibroContactoSeleccionado(libro)
+  }
+
+  // Función para enviar la solicitud de intercambio
+  const enviarSolicitudIntercambio = async () => {
+    if (librosSeleccionados.length === 0) {
+      setError("Debes seleccionar al menos un libro para el intercambio")
+      return
+    }
+
+    try {
+      setEnviando(true)
+
+      // Determinar qué libro del contacto se está solicitando
+      let libroContactoId = null
+      let libroContactoInfo = null
+
+      if (libroContacto) {
+        // Si venimos de la página de un libro específico
+        libroContactoId = libroContacto.id
+        libroContactoInfo = {
+          id: libroContacto.id,
+          titulo: libroContacto.titulo,
+          autor: libroContacto.autor,
+          imagen: libroContacto.imagenes,
+        }
+      } else if (libroContactoSeleccionado) {
+        // Si se ha seleccionado un libro del contacto en el modal
+        libroContactoId = libroContactoSeleccionado.id
+        libroContactoInfo = {
+          id: libroContactoSeleccionado.id,
+          titulo: libroContactoSeleccionado.titulo,
+          autor: libroContactoSeleccionado.autor,
+          imagen: libroContactoSeleccionado.imagenes,
+        }
+      }
+
+      // Registrar el intercambio en la base de datos
+      const responseIntercambio = await fetch("/api/intercambios", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          destinatario_id: contactoSeleccionado.email,
+          libros_ofrecidos: librosSeleccionados.map((libro) => libro.id),
+          libro_solicitado: libroContactoId,
+          mensaje: `Solicitud de intercambio de ${session.user.name || session.user.email}`,
+        }),
+      })
+
+      if (!responseIntercambio.ok) {
+        const errorData = await responseIntercambio.json()
+        throw new Error(errorData.error || "Error al registrar el intercambio")
+      }
+
+      const intercambioData = await responseIntercambio.json()
+
+      // Crear el mensaje especial de solicitud de intercambio
+      const mensajeIntercambio = {
+        tipo: "solicitud_intercambio",
+        intercambio_id: intercambioData.intercambio.id,
+        libros_ofrecidos: librosSeleccionados.map((libro) => ({
+          id: libro.id,
+          titulo: libro.titulo,
+          autor: libro.autor,
+          imagen: libro.imagenes,
+        })),
+        libro_solicitado: libroContactoInfo,
+        estado: "pendiente",
+        yaRespondido: false,
+      }
+
+      // Enviar el mensaje como JSON
+      await enviarMensaje(session.user.email, contactoSeleccionado.email, JSON.stringify(mensajeIntercambio))
+
+      // Actualizar la interfaz
+      setShowIntercambioModal(false)
+      setLibrosSeleccionados([])
+      setLibroContactoSeleccionado(null)
+      await cargarMensajes(contactoSeleccionado.email)
+      await cargarConversaciones()
+    } catch (error) {
+      console.error("Error al enviar solicitud de intercambio:", error)
+      setError("Error al enviar la solicitud de intercambio. Por favor, intenta de nuevo.")
+    } finally {
+      setEnviando(false)
+    }
+  }
+
+  // Función para responder a una solicitud de intercambio
+  const responderSolicitudIntercambio = async (mensajeId, respuesta, intercambioId) => {
+    try {
+      setEnviando(true)
+
+      // Verificar si el intercambio ya ha sido respondido
+      const { data: intercambio, error: errorConsulta } = await supabase
+        .from("intercambios")
+        .select("estado")
+        .eq("id", intercambioId)
+        .single()
+
+      if (errorConsulta) {
+        throw new Error("Error al verificar el estado del intercambio")
+      }
+
+      // Si ya no está en estado pendiente, no permitir responder de nuevo
+      if (intercambio.estado !== "pendiente") {
+        setError("Este intercambio ya ha sido respondido anteriormente.")
+        return
+      }
+
+      // Actualizar el estado del intercambio en la base de datos
+      const responseIntercambio = await fetch("/api/intercambios", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: intercambioId,
+          estado: respuesta === "aceptada" ? "pendiente_entrega" : "rechazado",
+          comentario: respuesta === "aceptada" ? "Intercambio aceptado" : "Intercambio rechazado",
+        }),
+      })
+
+      if (!responseIntercambio.ok) {
+        const errorData = await responseIntercambio.json()
+        throw new Error(errorData.error || "Error al actualizar el intercambio")
+      }
+
+      // Crear el mensaje de respuesta
+      const mensajeRespuesta = {
+        tipo: "respuesta_intercambio",
+        solicitud_id: mensajeId,
+        intercambio_id: intercambioId,
+        respuesta: respuesta, // "aceptada" o "rechazada"
+      }
+
+      // Enviar el mensaje como JSON
+      await enviarMensaje(session.user.email, contactoSeleccionado.email, JSON.stringify(mensajeRespuesta))
+
+      // Actualizar la interfaz
+      await cargarMensajes(contactoSeleccionado.email)
+      await cargarConversaciones()
+
+      // Actualizar el mensaje original para marcar que ya ha sido respondido
+      try {
+        // Obtener el mensaje original
+        const mensajeOriginal = mensajes.find((m) => m.id === mensajeId)
+        if (mensajeOriginal) {
+          const contenidoOriginal = JSON.parse(mensajeOriginal.contenido)
+          contenidoOriginal.yaRespondido = true
+          contenidoOriginal.estado = respuesta === "aceptada" ? "pendiente_entrega" : "rechazado"
+
+          // Actualizar el mensaje en la base de datos
+          await supabase
+            .from("mensajes")
+            .update({ contenido: JSON.stringify(contenidoOriginal) })
+            .eq("id", mensajeId)
+        }
+      } catch (e) {
+        console.error("Error al actualizar el mensaje original:", e)
+      }
+    } catch (error) {
+      console.error("Error al responder a la solicitud:", error)
+      setError("Error al responder a la solicitud. Por favor, intenta de nuevo.")
+    } finally {
+      setEnviando(false)
+    }
+  }
+
+  // Función para confirmar la entrega de un intercambio
+  const confirmarEntregaIntercambio = async (intercambioId) => {
+    try {
+      // Verificar si el botón ya fue pulsado
+      if (enviando) {
+        return // Evitar múltiples clics
+      }
+
+      setEnviando(true)
+
+      // Verificar si el intercambio ya ha sido confirmado por este usuario
+      const { data: intercambioActual, error: errorConsulta } = await supabase
+        .from("intercambios")
+        .select("*")
+        .eq("id", intercambioId)
+        .single()
+
+      if (errorConsulta) {
+        throw new Error("Error al verificar el estado del intercambio")
+      }
+
+      // Verificar si el usuario ya confirmó
+      const esUsuarioOfrece = intercambioActual.usuario_id_ofrece === session.user.id
+      if (
+        (esUsuarioOfrece && intercambioActual.confirmado_ofrece) ||
+        (!esUsuarioOfrece && intercambioActual.confirmado_recibe)
+      ) {
+        setError("Ya has confirmado la entrega de este intercambio")
+        setEnviando(false)
+        return
+      }
+
+      // Actualizar el estado del intercambio en la base de datos
+      const responseIntercambio = await fetch("/api/intercambios/confirmar", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          intercambio_id: intercambioId,
+          usuario_id: session.user.email,
+        }),
+      })
+
+      if (!responseIntercambio.ok) {
+        const errorData = await responseIntercambio.json()
+        throw new Error(errorData.error || "Error al confirmar la entrega")
+      }
+
+      const data = await responseIntercambio.json()
+
+      // Crear el mensaje de confirmación
+      const mensajeConfirmacion = {
+        tipo: "confirmacion_entrega",
+        intercambio_id: intercambioId,
+        estado: data.estado, // "completado" o "pendiente_confirmacion"
+        timestamp: new Date().toISOString(), // Añadir timestamp para identificar el mensaje
+      }
+
+      // Enviar el mensaje como JSON
+      await enviarMensaje(session.user.email, contactoSeleccionado.email, JSON.stringify(mensajeConfirmacion))
+
+      // Actualizar la interfaz
+      await cargarMensajes(contactoSeleccionado.email)
+      await cargarConversaciones()
+
+      // Mostrar mensaje de éxito
+      setError(null)
+    } catch (error) {
+      console.error("Error al confirmar la entrega:", error)
+      setError("Error al confirmar la entrega. Por favor, intenta de nuevo.")
+    } finally {
+      setEnviando(false)
+    }
+  }
+
+  // Función para verificar si un mensaje es una solicitud de intercambio
+  const esMensajeIntercambio = (mensaje) => {
+    try {
+      const contenido = JSON.parse(mensaje.contenido)
+      return (
+        contenido.tipo === "solicitud_intercambio" ||
+        contenido.tipo === "respuesta_intercambio" ||
+        contenido.tipo === "confirmacion_entrega"
+      )
+    } catch (e) {
+      return false
+    }
+  }
+
+  // Función para renderizar un mensaje de intercambio
+  const renderizarMensajeIntercambio = (mensaje) => {
+    try {
+      const contenido = JSON.parse(mensaje.contenido)
+
+      if (contenido.tipo === "solicitud_intercambio") {
+        return (
+          <div className="intercambio-solicitud p-3">
+            <div className="mb-2 fw-bold text-dark">Solicitud de intercambio</div>
+            <div className="mb-2 text-dark">Libros ofrecidos:</div>
+            <div className="libros-ofrecidos mb-3">
+              {contenido.libros_ofrecidos.map((libro) => (
+                <div key={libro.id} className="libro-item d-flex align-items-center mb-2">
+                  <div className="libro-imagen me-2">
+                    {libro.imagen ? (
+                      <img
+                        src={libro.imagen || "/placeholder.svg"}
+                        alt={libro.titulo}
+                        width="40"
+                        height="60"
+                        className="rounded"
+                      />
+                    ) : (
+                      <div className="placeholder-imagen">📚</div>
+                    )}
+                  </div>
+                  <div className="libro-info">
+                    <div className="libro-titulo fw-semibold text-dark">{libro.titulo}</div>
+                    <div className="libro-autor small text-secondary">{libro.autor}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {contenido.libro_solicitado && (
+              <div className="mb-3">
+                <div className="mb-2 text-dark">A cambio de:</div>
+                <div className="libro-item d-flex align-items-center">
+                  <div className="libro-imagen me-2">
+                    {contenido.libro_solicitado.imagen ? (
+                      <img
+                        src={contenido.libro_solicitado.imagen || "/placeholder.svg"}
+                        alt={contenido.libro_solicitado.titulo}
+                        width="40"
+                        height="60"
+                        className="rounded"
+                      />
+                    ) : (
+                      <div className="placeholder-imagen">📚</div>
+                    )}
+                  </div>
+                  <div className="libro-info">
+                    <div className="libro-titulo fw-semibold text-dark">{contenido.libro_solicitado.titulo}</div>
+                    {contenido.libro_solicitado.autor && (
+                      <div className="libro-autor small text-secondary">{contenido.libro_solicitado.autor}</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {mensaje.remitente_id !== session?.user?.email && contenido.estado === "pendiente" && (
+              <div className="d-flex gap-2">
+                <button
+                  className="btn btn-success btn-sm"
+                  onClick={() => responderSolicitudIntercambio(mensaje.id, "aceptada", contenido.intercambio_id)}
+                  disabled={enviando || contenido.yaRespondido}
+                >
+                  Aceptar intercambio
+                </button>
+                <button
+                  className="btn btn-danger btn-sm"
+                  onClick={() => responderSolicitudIntercambio(mensaje.id, "rechazada", contenido.intercambio_id)}
+                  disabled={enviando || contenido.yaRespondido}
+                >
+                  Rechazar
+                </button>
+              </div>
+            )}
+
+            {contenido.estado === "pendiente_entrega" && (
+              <div className="mt-3">
+                <div className="alert alert-info mb-2">
+                  <i className="bi bi-info-circle me-2"></i>
+                  Intercambio aceptado. Coordina la entrega con el otro usuario.
+                </div>
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => confirmarEntregaIntercambio(contenido.intercambio_id)}
+                  disabled={enviando || mensaje.yaConfirmado}
+                >
+                  {enviando ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      Confirmando...
+                    </>
+                  ) : mensaje.yaConfirmado ? (
+                    <>
+                      <i className="bi bi-check-circle me-2"></i>
+                      Entrega confirmada
+                    </>
+                  ) : (
+                    "Confirmar entrega completada"
+                  )}
+                </button>
+              </div>
+            )}
+
+            {contenido.estado === "completado" && (
+              <div className="alert alert-success mt-3">
+                <i className="bi bi-check-circle me-2"></i>
+                Intercambio completado exitosamente
+              </div>
+            )}
+
+            {contenido.estado === "rechazado" && (
+              <div className="alert alert-danger mt-3">
+                <i className="bi bi-x-circle me-2"></i>
+                Intercambio rechazado
+              </div>
+            )}
+          </div>
+        )
+      } else if (contenido.tipo === "respuesta_intercambio") {
+        return (
+          <div
+            className={`intercambio-respuesta p-2 ${contenido.respuesta === "aceptada" ? "bg-success-subtle" : "bg-danger-subtle"} rounded`}
+          >
+            <div className="fw-bold text-dark">
+              {contenido.respuesta === "aceptada" ? "¡Intercambio aceptado!" : "Intercambio rechazado"}
+            </div>
+            <div className="small text-dark">
+              {contenido.respuesta === "aceptada"
+                ? "Puedes contactar para coordinar la entrega."
+                : "Puedes intentar con otros libros."}
+            </div>
+          </div>
+        )
+      } else if (contenido.tipo === "confirmacion_entrega") {
+        return (
+          <div className="intercambio-confirmacion p-2 bg-success-subtle rounded">
+            <div className="fw-bold text-dark">
+              <i className="bi bi-check-circle-fill me-2 text-success"></i>
+              Entrega confirmada
+            </div>
+            <div className="small text-dark">
+              {mensaje.remitente_id === session?.user?.email
+                ? "Has confirmado la entrega del libro."
+                : "El otro usuario ha confirmado la entrega del libro."}
+            </div>
+          </div>
+        )
+      }
+    } catch (e) {
+      return mensaje.contenido
+    }
   }
 
   if (status === "loading") {
@@ -299,33 +838,51 @@ export default function Mensajes() {
                       </div>
                     ) : (
                       conversaciones.map((contacto) => (
-                        <button
+                        <div
                           key={contacto.email}
-                          className={`list-group-item list-group-item-action d-flex align-items-center p-3 ${
+                          className={`list-group-item d-flex align-items-center p-3 ${
                             contactoSeleccionado?.email === contacto.email ? "selected-conversation" : ""
                           }`}
-                          onClick={() => seleccionarContacto(contacto)}
                         >
-                          <div className="flex-shrink-0 me-3">
-                            <div className="avatar-placeholder rounded-circle bg-secondary text-white">
-                              {contacto.nombre.charAt(0).toUpperCase()}
+                          <button
+                            className="flex-grow-1 d-flex align-items-center border-0 bg-transparent text-start p-0"
+                            onClick={() => seleccionarContacto(contacto)}
+                          >
+                            <div className="flex-shrink-0 me-3">
+                              <div className="avatar-placeholder rounded-circle bg-secondary text-white">
+                                {contacto.nombre.charAt(0).toUpperCase()}
+                              </div>
                             </div>
-                          </div>
-                          <div className="flex-grow-1 text-start overflow-hidden">
-                            <div className="d-flex justify-content-between align-items-center w-100">
-                              <h6 className="mb-0 text-truncate">{contacto.nombre}</h6>
-                              <small className="text-muted ms-2 flex-shrink-0">
-                                {formatearFechaCorta(contacto.fecha)}
-                              </small>
+                            <div className="flex-grow-1 overflow-hidden">
+                              <div className="d-flex justify-content-between align-items-center w-100">
+                                <h6 className="mb-0 text-truncate">{contacto.nombre}</h6>
+                                <small className="text-muted ms-2 flex-shrink-0">
+                                  {formatearFechaCorta(contacto.fecha)}
+                                </small>
+                              </div>
+                              <div className="d-flex justify-content-between align-items-center">
+                                <p className="text-truncate mb-0 small">
+                                  {esMensajeIntercambioTexto(contacto.ultimoMensaje)
+                                    ? "Solicitud de intercambio enviada"
+                                    : contacto.ultimoMensaje}
+                                </p>
+                                {contacto.noLeidos > 0 && (
+                                  <span className="badge bg-danger rounded-pill ms-2">{contacto.noLeidos}</span>
+                                )}
+                              </div>
                             </div>
-                            <div className="d-flex justify-content-between align-items-center">
-                              <p className="text-truncate mb-0 small">{contacto.ultimoMensaje}</p>
-                              {contacto.noLeidos > 0 && (
-                                <span className="badge bg-danger rounded-pill ms-2">{contacto.noLeidos}</span>
-                              )}
-                            </div>
-                          </div>
-                        </button>
+                          </button>
+                          <button
+                            className="btn btn-sm text-muted ms-2"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              cerrarConversacionEspecifica(contacto.email)
+                            }}
+                            title="Cerrar conversación"
+                          >
+                            <i className="bi bi-x"></i>
+                          </button>
+                        </div>
                       ))
                     )}
                   </div>
@@ -345,13 +902,31 @@ export default function Mensajes() {
                   ) : contactoSeleccionado ? (
                     <>
                       <div className="card-header bg-light py-3">
-                        <div className="d-flex align-items-center">
-                          <div className="avatar-placeholder rounded-circle bg-secondary text-white me-3">
-                            {contactoSeleccionado.nombre.charAt(0).toUpperCase()}
+                        <div className="d-flex align-items-center justify-content-between w-100">
+                          <div className="d-flex align-items-center">
+                            <div className="avatar-placeholder rounded-circle bg-secondary text-white me-3">
+                              {contactoSeleccionado.nombre.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <h5 className="mb-0">{contactoSeleccionado.nombre}</h5>
+                              <small className="text-muted">{contactoSeleccionado.email}</small>
+                            </div>
                           </div>
-                          <div>
-                            <h5 className="mb-0">{contactoSeleccionado.nombre}</h5>
-                            <small className="text-muted">{contactoSeleccionado.email}</small>
+                          <div className="d-flex align-items-center">
+                            <button
+                              className="btn btn-outline-primary btn-sm me-2"
+                              onClick={() => handleSolicitarIntercambio()}
+                            >
+                              <i className="bi bi-arrow-left-right me-1"></i>
+                              Solicitar intercambio
+                            </button>
+                            <button
+                              className="btn btn-outline-secondary btn-sm"
+                              onClick={cerrarConversacion}
+                              title="Cerrar conversación"
+                            >
+                              <i className="bi bi-x-lg"></i>
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -401,7 +976,11 @@ export default function Mensajes() {
                                       }`}
                                       style={{ maxWidth: "75%", position: "relative" }}
                                     >
-                                      <div className="message-content">{mensaje.contenido}</div>
+                                      <div className="message-content">
+                                        {esMensajeIntercambio(mensaje)
+                                          ? renderizarMensajeIntercambio(mensaje)
+                                          : mensaje.contenido}
+                                      </div>
                                       <div
                                         className={`message-time small ${esRemitente ? "text-white-50" : "text-muted"}`}
                                         style={{ textAlign: "right", marginTop: "4px" }}
@@ -468,44 +1047,229 @@ export default function Mensajes() {
         </div>
       </div>
 
-      <style jsx>{`
-        .avatar-placeholder {
-          width: 40px;
-          height: 40px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: bold;
-        }
-        
-        .message-bubble {
-          box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-        
-        .content-wrapper {
-          border-radius: 12px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-          padding: 2rem;
-        }
-        
-        .empty-state {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          height: 100%;
-        }
+      {/* Modal de solicitud de intercambio */}
+      {showIntercambioModal && (
+        <div className="modal-backdrop" style={{ display: "block" }}>
+          <div className="modal fade show" style={{ display: "block" }} tabIndex="-1">
+            <div className="modal-dialog modal-lg">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Solicitar intercambio</h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => {
+                      setShowIntercambioModal(false)
+                      setLibrosSeleccionados([])
+                      setLibroContactoSeleccionado(null)
+                    }}
+                  ></button>
+                </div>
+                <div className="modal-body">
+                  {cargandoLibros ? (
+                    <div className="text-center py-4">
+                      <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Cargando...</span>
+                      </div>
+                      <p className="mt-3">Cargando tus libros...</p>
+                    </div>
+                  ) : librosUsuario.length === 0 ? (
+                    <div className="text-center py-4">
+                      <div className="alert alert-warning">
+                        <i className="bi bi-exclamation-triangle me-2"></i>
+                        No tienes libros disponibles para intercambio
+                      </div>
+                      <p>Debes subir al menos un libro para poder solicitar un intercambio.</p>
+                      <a href="/subirLibro" className="btn btn-primary mt-2">
+                        <i className="bi bi-plus-lg me-2"></i>
+                        Subir un libro
+                      </a>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="row">
+                        <div className="col-md-6">
+                          <h6 className="mb-3">Selecciona los libros que deseas ofrecer:</h6>
+                          <div className="row row-cols-1 row-cols-md-2 g-3">
+                            {librosUsuario.map((libro) => (
+                              <div className="col" key={libro.id}>
+                                <div
+                                  className={`card h-100 ${librosSeleccionados.some((l) => l.id === libro.id) ? "border-primary" : ""}`}
+                                  onClick={() => handleSeleccionLibro(libro)}
+                                  style={{ cursor: "pointer" }}
+                                >
+                                  <div className="card-img-top text-center pt-2">
+                                    {libro.imagenes ? (
+                                      <img
+                                        src={libro.imagenes || "/placeholder.svg"}
+                                        alt={libro.titulo}
+                                        style={{ height: "120px", objectFit: "contain" }}
+                                      />
+                                    ) : (
+                                      <div className="placeholder-image" style={{ height: "120px" }}>
+                                        <i className="bi bi-book fs-1"></i>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="card-body py-2">
+                                    <h6 className="card-title text-truncate" title={libro.titulo}>
+                                      {libro.titulo}
+                                    </h6>
+                                    <p className="card-text small text-truncate" title={libro.autor}>
+                                      {libro.autor}
+                                    </p>
+                                  </div>
+                                  <div className="card-footer bg-transparent py-2">
+                                    <div className="form-check">
+                                      <input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        checked={librosSeleccionados.some((l) => l.id === libro.id)}
+                                        onChange={() => handleSeleccionLibro(libro)}
+                                      />
+                                      <label className="form-check-label">Seleccionar</label>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
 
-        .conversation-header {
-          background: linear-gradient(135deg, #5a8c5a 0%, #3a6d7c 100%);
-          border-bottom: none;
-        }
-
-        .selected-conversation {
-          background-color: rgba(90, 140, 90, 0.1) !important;
-          border-left: 3px solid #5a8c5a;
-        }
-      `}</style>
+                        <div className="col-md-6">
+                          {libroContacto ? (
+                            // Si venimos de la página de un libro específico, mostrar solo ese libro
+                            <div>
+                              <h6 className="mb-3">Libro que deseas recibir:</h6>
+                              <div className="card mb-3">
+                                <div className="row g-0">
+                                  <div className="col-4">
+                                    {libroContacto.imagenes ? (
+                                      <img
+                                        src={libroContacto.imagenes || "/placeholder.svg"}
+                                        alt={libroContacto.titulo}
+                                        className="img-fluid rounded-start"
+                                        style={{ height: "100%", objectFit: "cover" }}
+                                      />
+                                    ) : (
+                                      <div className="placeholder-image h-100 d-flex align-items-center justify-content-center bg-light">
+                                        <i className="bi bi-book fs-1"></i>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="col-8">
+                                    <div className="card-body">
+                                      <h5 className="card-title">{libroContacto.titulo}</h5>
+                                      <p className="card-text">{libroContacto.autor}</p>
+                                      <p className="card-text">
+                                        <small className="text-muted">
+                                          Este es el libro que has seleccionado previamente
+                                        </small>
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ) : librosContacto && librosContacto.length > 0 ? (
+                            // Si no venimos de un libro específico, mostrar todos los libros del contacto
+                            <div>
+                              <h6 className="mb-3">Selecciona el libro que deseas recibir:</h6>
+                              <div className="row row-cols-1 row-cols-md-2 g-3">
+                                {librosContacto.map((libro) => (
+                                  <div className="col" key={libro.id}>
+                                    <div
+                                      className={`card h-100 ${libroContactoSeleccionado?.id === libro.id ? "border-success" : ""}`}
+                                      onClick={() => handleSeleccionLibroContacto(libro)}
+                                      style={{ cursor: "pointer" }}
+                                    >
+                                      <div className="card-img-top text-center pt-2">
+                                        {libro.imagenes ? (
+                                          <img
+                                            src={libro.imagenes || "/placeholder.svg"}
+                                            alt={libro.titulo}
+                                            style={{ height: "120px", objectFit: "contain" }}
+                                          />
+                                        ) : (
+                                          <div className="placeholder-image" style={{ height: "120px" }}>
+                                            <i className="bi bi-book fs-1"></i>
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div className="card-body py-2">
+                                        <h6 className="card-title text-truncate" title={libro.titulo}>
+                                          {libro.titulo}
+                                        </h6>
+                                        <p className="card-text small text-truncate" title={libro.autor}>
+                                          {libro.autor}
+                                        </p>
+                                      </div>
+                                      <div className="card-footer bg-transparent py-2">
+                                        <div className="form-check">
+                                          <input
+                                            className="form-check-input"
+                                            type="radio"
+                                            name="libroContacto"
+                                            checked={libroContactoSeleccionado?.id === libro.id}
+                                            onChange={() => handleSeleccionLibroContacto(libro)}
+                                          />
+                                          <label className="form-check-label">Seleccionar</label>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="alert alert-info">
+                              <i className="bi bi-info-circle me-2"></i>
+                              El otro usuario no tiene libros disponibles para intercambio.
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => {
+                      setShowIntercambioModal(false)
+                      setLibrosSeleccionados([])
+                      setLibroContactoSeleccionado(null)
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    disabled={
+                      librosSeleccionados.length === 0 ||
+                      enviando ||
+                      librosUsuario.length === 0 ||
+                      (!libroContacto && !libroContactoSeleccionado && librosContacto && librosContacto.length > 0)
+                    }
+                    onClick={enviarSolicitudIntercambio}
+                  >
+                    {enviando ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        Enviando...
+                      </>
+                    ) : (
+                      <>Solicitar intercambio</>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

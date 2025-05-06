@@ -18,23 +18,44 @@ export default function DonationsPage() {
   const booksPerPage = 10
   const filteredBooksRef = useRef([])
   const [genres, setGenres] = useState(["All"])
+  const [genreMap, setGenreMap] = useState({}) // Mapa de ID a nombre de género
   const [showAnimation, setShowAnimation] = useState(false)
   const { data: session, status } = useSession()
   const isAuthenticated = status === "authenticated"
   const router = useRouter()
 
-  // Cargar donaciones desde la API
+  // Cargar géneros y donaciones
   useEffect(() => {
-    async function fetchDonations() {
+    async function fetchData() {
       try {
         setIsLoading(true)
-        const response = await fetch("/api/libros/donaciones")
 
-        if (!response.ok) {
-          throw new Error(`Error al obtener las donaciones: ${response.status}`)
+        // 1. Primero cargar los géneros para tener el mapeo de ID a nombre
+        const generosResponse = await fetch("/api/generos")
+        if (!generosResponse.ok) {
+          throw new Error(`Error al obtener los géneros: ${generosResponse.status}`)
         }
 
-        const data = await response.json()
+        const generosData = await generosResponse.json()
+
+        // Crear un mapa de ID a nombre de género
+        const genreMapping = {}
+        generosData.forEach((genero) => {
+          genreMapping[genero.id] = genero.nombre
+        })
+        setGenreMap(genreMapping)
+
+        // Crear lista de géneros con "All" al principio
+        const allGenres = ["All", ...generosData.map((genero) => genero.nombre)]
+        setGenres(allGenres)
+
+        // 2. Luego cargar las donaciones
+        const donationsResponse = await fetch("/api/libros/donaciones")
+        if (!donationsResponse.ok) {
+          throw new Error(`Error al obtener las donaciones: ${donationsResponse.status}`)
+        }
+
+        const data = await donationsResponse.json()
 
         // Filtrar donaciones duplicadas basadas en libro_id
         const uniqueDonations = []
@@ -44,31 +65,33 @@ export default function DonationsPage() {
           const idToCheck = donation.libro_id || donation.id
           if (idToCheck && !seenIds.has(idToCheck)) {
             seenIds.add(idToCheck)
-            uniqueDonations.push({
+
+            // Añadir el nombre del género basado en el ID si está disponible
+            const donationWithGenre = {
               ...donation,
-              id: idToCheck, // Asegurar que el campo 'id' exista y sea igual a 'libro_id' o 'id'
-              donacion: true, // Marcar explícitamente como donación
-            })
+              id: idToCheck,
+              donacion: true,
+            }
+
+            // Si tenemos un genero_id, añadir el nombre del género
+            if (donation.genero_id && genreMapping[donation.genero_id]) {
+              donationWithGenre.nombre_genero = genreMapping[donation.genero_id]
+            }
+
+            uniqueDonations.push(donationWithGenre)
           }
         })
 
         setBooks(uniqueDonations)
-
-        // Extraer géneros únicos
-        const uniqueGenres = [
-          "All",
-          ...new Set(uniqueDonations.map((book) => book.categoria || book.nombre_genero).filter(Boolean)),
-        ]
-        setGenres(uniqueGenres)
       } catch (err) {
-        console.error("Error al cargar las donaciones:", err)
+        console.error("Error al cargar datos:", err)
         setError(err.message)
       } finally {
         setIsLoading(false)
       }
     }
 
-    fetchDonations()
+    fetchData()
   }, [])
 
   // Efecto para la animación
@@ -80,14 +103,30 @@ export default function DonationsPage() {
     return () => clearTimeout(timer)
   }, [])
 
-  // Filtrar libros por género - Modificar para usar categoría o nombre_genero
+  // Filtrar libros por género
   const filteredBooks =
     selectedGenre === "All"
       ? books
       : books.filter((book) => {
-          // Usar categoría o nombre_genero, lo que esté disponible
-          const bookGenre = book.categoria || book.nombre_genero || ""
-          return bookGenre === selectedGenre
+          // Intentar diferentes campos donde podría estar el género
+          const bookGenre = book.nombre_genero || book.categoria || ""
+          const bookGenreId = book.genero_id
+
+          // Verificar si coincide por nombre
+          if (bookGenre && bookGenre.toLowerCase() === selectedGenre.toLowerCase()) {
+            return true
+          }
+
+          // Verificar si coincide por ID
+          if (
+            bookGenreId &&
+            genreMap[bookGenreId] &&
+            genreMap[bookGenreId].toLowerCase() === selectedGenre.toLowerCase()
+          ) {
+            return true
+          }
+
+          return false
         })
 
   // Actualizar la referencia para evitar bucles infinitos
@@ -250,7 +289,10 @@ export default function DonationsPage() {
           Estos libros han sido generosamente donados por nuestra comunidad. ¡Encuentra el tuyo!
         </p>
 
-        <GenreSelector genres={genres} selectedGenre={selectedGenre} onSelectGenre={setSelectedGenre} />
+        <div className="genre-filter-container mb-4">
+          <h5 className="text-center mb-3">Filtrar por género</h5>
+          <GenreSelector genres={genres} selectedGenre={selectedGenre} onSelectGenre={setSelectedGenre} />
+        </div>
 
         {isLoading && visibleBooks.length === 0 ? (
           <div className="text-center my-4">

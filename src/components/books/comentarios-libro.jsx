@@ -232,11 +232,12 @@ export default function ComentariosLibro({ titulo, session }) {
   }
 
   return (
-    <div className="custom-container-comment bg-secondario ms-5 rounded">
-      <div className="row h-100">
-        <div className="col-7 col">
-          <h3 className="fw-semibold pt-4 ps-5 text-dark">Opiniones del libro</h3>
-          <div className="container mt-3 pt-2 ps-4 comentarios-container">
+    <div className="custom-container-comment mx-auto mx-md-5 rounded">
+      <div className="row g-0">
+        {/* Sección de comentarios - Ocupa toda la pantalla en móviles, 8 columnas en tablets/desktop */}
+        <div className="col-12 col-lg-8">
+          <h3 className="fw-semibold pt-4 ps-3 ps-md-5 text-dark">Opiniones del libro</h3>
+          <div className="container mt-3 pt-2 ps-3 ps-md-4 comentarios-container">
             {loading ? (
               <p className="fw-medium">Cargando comentarios...</p>
             ) : error ? (
@@ -262,81 +263,83 @@ export default function ComentariosLibro({ titulo, session }) {
 
                 {/* Implementación tipo acordeón para el formulario - solo visible si está autenticado */}
                 {isLoggedIn && (
-                  <div className="accordion mb-4" id="comentarioAccordion">
-                    <div className="accordion-item">
-                      <h2 className="accordion-header" id="headingOne">
-                        <button
-                          className={`accordion-button ${!mostrarFormulario ? "collapsed" : ""}`}
-                          type="button"
-                          onClick={() => setMostrarFormulario(!mostrarFormulario)}
-                          aria-expanded={mostrarFormulario}
-                          aria-controls="collapseOne"
+                  <div className="comentario-accordion-container">
+                    <div className="accordion mb-4" id="comentarioAccordion">
+                      <div className="accordion-item">
+                        <h2 className="accordion-header" id="headingOne">
+                          <button
+                            className={`accordion-button ${!mostrarFormulario ? "collapsed" : ""}`}
+                            type="button"
+                            onClick={() => setMostrarFormulario(!mostrarFormulario)}
+                            aria-expanded={mostrarFormulario}
+                            aria-controls="collapseOne"
+                          >
+                            {comentarios.length === 0 ? "Sé el primero en comentar" : "Agregar mi comentario"}
+                          </button>
+                        </h2>
+                        <div
+                          id="collapseOne"
+                          className={`accordion-collapse collapse ${mostrarFormulario ? "show" : ""}`}
+                          aria-labelledby="headingOne"
                         >
-                          {comentarios.length === 0 ? "Sé el primero en comentar" : "Agregar mi comentario"}
-                        </button>
-                      </h2>
-                      <div
-                        id="collapseOne"
-                        className={`accordion-collapse collapse ${mostrarFormulario ? "show" : ""}`}
-                        aria-labelledby="headingOne"
-                      >
-                        <div className="accordion-body comentario-form-container">
-                          <form onSubmit={handleSubmitComentario}>
-                            <div className="mb-3">
-                              <label htmlFor="valoracion" className="form-label">
-                                Tu valoración:
-                              </label>
-                              <div className="d-flex mb-2" onMouseLeave={handleRatingLeave}>
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                  <span
-                                    key={star}
-                                    onClick={() => handleRatingChange(star)}
-                                    onMouseEnter={() => handleRatingHover(star)}
-                                    style={{
-                                      fontSize: "28px",
-                                      color:
-                                        star <= (hoverRating || nuevoComentario.valoracion) ? "#FFD700" : "#C0C0C0",
-                                      cursor: "pointer",
-                                      marginRight: "5px",
-                                      transition: "color 0.2s ease",
-                                    }}
-                                  >
-                                    ★
-                                  </span>
-                                ))}
+                          <div className="accordion-body comentario-form-container">
+                            <form onSubmit={handleSubmitComentario}>
+                              <div className="mb-3">
+                                <label htmlFor="valoracion" className="form-label">
+                                  Tu valoración:
+                                </label>
+                                <div className="d-flex mb-2" onMouseLeave={handleRatingLeave}>
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <span
+                                      key={star}
+                                      onClick={() => handleRatingChange(star)}
+                                      onMouseEnter={() => handleRatingHover(star)}
+                                      style={{
+                                        fontSize: "28px",
+                                        color:
+                                          star <= (hoverRating || nuevoComentario.valoracion) ? "#FFD700" : "#C0C0C0",
+                                        cursor: "pointer",
+                                        marginRight: "5px",
+                                        transition: "color 0.2s ease",
+                                      }}
+                                    >
+                                      ★
+                                    </span>
+                                  ))}
+                                </div>
                               </div>
-                            </div>
-                            <div className="mb-3">
-                              <label htmlFor="comentario" className="form-label">
-                                Tu comentario:
-                              </label>
-                              <textarea
-                                className="form-control"
-                                id="comentario"
-                                name="comentario"
-                                rows="4"
-                                value={nuevoComentario.comentario}
-                                onChange={handleInputChange}
-                                maxLength={250}
-                                required
-                              ></textarea>
-                              <div className="text-end text-muted mt-1">
-                                <small>{nuevoComentario.comentario.length}/250 caracteres</small>
+                              <div className="mb-3">
+                                <label htmlFor="comentario" className="form-label">
+                                  Tu comentario:
+                                </label>
+                                <textarea
+                                  className="form-control"
+                                  id="comentario"
+                                  name="comentario"
+                                  rows="4"
+                                  value={nuevoComentario.comentario}
+                                  onChange={handleInputChange}
+                                  maxLength={250}
+                                  required
+                                ></textarea>
+                                <div className="text-end text-muted mt-1">
+                                  <small>{nuevoComentario.comentario.length}/250 caracteres</small>
+                                </div>
                               </div>
-                            </div>
-                            <div className="d-flex justify-content-end">
-                              <button
-                                type="button"
-                                className="btn btn-outline-secondary me-2"
-                                onClick={() => setMostrarFormulario(false)}
-                              >
-                                Cancelar
-                              </button>
-                              <button type="submit" className="btn btn-dark" disabled={enviando}>
-                                {enviando ? "Enviando..." : "Publicar comentario"}
-                              </button>
-                            </div>
-                          </form>
+                              <div className="d-flex justify-content-end">
+                                <button
+                                  type="button"
+                                  className="btn btn-outline-secondary me-2"
+                                  onClick={() => setMostrarFormulario(false)}
+                                >
+                                  Cancelar
+                                </button>
+                                <button type="submit" className="btn btn-primary-green" disabled={enviando}>
+                                  {enviando ? "Enviando..." : "Publicar comentario"}
+                                </button>
+                              </div>
+                            </form>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -344,96 +347,117 @@ export default function ComentariosLibro({ titulo, session }) {
                 )}
 
                 {/* Lista de comentarios - visible para todos los usuarios */}
-                {comentarios.length > 0 ? (
-                  <div className="comentarios-lista">
-                    {comentarios.map((comentario, index) => (
-                      <div key={index} className="comentario-item mb-4 pb-3 border-bottom">
-                        <div className="d-flex align-items-center mb-2">
-                          <div className="usuario-avatar me-2">
-                            {comentario.imagen_usuario ||
-                            (session?.user?.image && comentario.usuario_id === session?.user?.email) ? (
-                              <Image
-                                src={
-                                  session?.user?.image && comentario.usuario_id === session?.user?.email
-                                    ? session.user.image
-                                    : comentario.imagen_usuario || "/placeholder.svg"
-                                }
-                                alt="Avatar"
-                                width={40}
-                                height={40}
-                                className="rounded-circle"
-                              />
-                            ) : (
-                              <div className="avatar-placeholder rounded-circle">
-                                {(comentario.nombre_usuario || "U")[0].toUpperCase()}
-                              </div>
-                            )}
+                <div className="comentarios-lista-container">
+                  {comentarios.length > 0 ? (
+                    <div className="comentarios-lista">
+                      {comentarios.map((comentario, index) => (
+                        <div key={index} className="comentario-item mb-4 pb-3 border-bottom">
+                          <div className="d-flex align-items-center mb-2">
+                            <div className="usuario-avatar me-2">
+                              {comentario.imagen_usuario ||
+                              (session?.user?.image && comentario.usuario_id === session?.user?.email) ? (
+                                <Image
+                                  src={
+                                    session?.user?.image && comentario.usuario_id === session?.user?.email
+                                      ? session.user.image
+                                      : comentario.imagen_usuario || "/placeholder.svg"
+                                  }
+                                  alt="Avatar"
+                                  width={40}
+                                  height={40}
+                                  className="rounded-circle"
+                                />
+                              ) : (
+                                <div className="avatar-placeholder rounded-circle">
+                                  {(comentario.nombre_usuario || "U")[0].toUpperCase()}
+                                </div>
+                              )}
+                            </div>
+                            <div>
+                              <p className="fw-bold mb-0">
+                                {comentario.nombre_usuario ||
+                                  (comentario.usuario_id === session?.user?.email
+                                    ? session.user.name
+                                    : `${(comentario.usuario_id?.toString() || "").substring(0, 5) || "Anónimo"}`)}
+                              </p>
+                              <p className="text-muted small mb-0">
+                                {comentario.fecha_valoracion
+                                  ? formatearFecha(comentario.fecha_valoracion)
+                                  : comentario.fecha
+                                    ? formatearFecha(comentario.fecha)
+                                    : "Fecha desconocida"}
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="fw-bold mb-0">
-                              {comentario.nombre_usuario ||
-                                (comentario.usuario_id === session?.user?.email
-                                  ? session.user.name
-                                  : `${(comentario.usuario_id?.toString() || "").substring(0, 5) || "Anónimo"}`)}
-                            </p>
-                            <p className="text-muted small mb-0">
-                              {comentario.fecha_valoracion
-                                ? formatearFecha(comentario.fecha_valoracion)
-                                : comentario.fecha
-                                  ? formatearFecha(comentario.fecha)
-                                  : "Fecha desconocida"}
-                            </p>
+                          <div className="valoracion mb-2">
+                            {Array(5)
+                              .fill(0)
+                              .map((_, i) => (
+                                <span
+                                  key={i}
+                                  style={{
+                                    fontSize: "18px",
+                                    color: i < comentario.valoracion ? "#FFD700" : "#C0C0C0",
+                                  }}
+                                >
+                                  ★
+                                </span>
+                              ))}
                           </div>
+                          <p className="comentario-texto">{comentario.comentario}</p>
                         </div>
-                        <div className="valoracion mb-2">
-                          {Array(5)
-                            .fill(0)
-                            .map((_, i) => (
-                              <span
-                                key={i}
-                                style={{
-                                  fontSize: "18px",
-                                  color: i < comentario.valoracion ? "#FFD700" : "#C0C0C0",
-                                }}
-                              >
-                                ★
-                              </span>
-                            ))}
-                        </div>
-                        <p className="comentario-texto">{comentario.comentario}</p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="fw-medium mt-3">No hay comentarios para este libro todavía.</p>
-                )}
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="fw-medium mt-3">No hay comentarios para este libro todavía.</p>
+                  )}
+                </div>
               </>
             )}
           </div>
         </div>
-        <div className="col-2 col" />
-        <div className="col-3 col d-flex flex-column justify-content-center align-items-center border-start border-black">
-          <div className="d-flex flex-column me-3 pt-5 mt-4 porcentajes-container">
+
+        {/* Separador visible solo en móviles */}
+        <div className="d-lg-none w-100 my-3">
+          <hr className="mx-4" />
+        </div>
+
+        {/* Sección de valoraciones - Ocupa toda la pantalla en móviles, 4 columnas en tablets/desktop */}
+        <div className="col-12 col-lg-4 d-flex align-items-center">
+          <div className="ratings-summary w-100 px-4 mx-auto my-4 my-lg-0">
+            <h4 className="text-center mb-4 text-forest-green">Valoraciones</h4>
             {/* Generacion de estrellas para los comentarios */}
             {[5, 4, 3, 2, 1].map((rating) => (
-              <div key={rating} className="d-flex justify-content-between align-items-center mb-2">
-                <div className="d-flex">
+              <div key={rating} className="d-flex justify-content-between align-items-center mb-3">
+                <div className="d-flex stars-container">
                   {Array(rating)
                     .fill(0)
                     .map((_, i) => (
-                      <span key={i} style={{ fontSize: "24px", color: "#FFD700" }}>
+                      <span key={i} className="star-icon filled">
                         ★
                       </span>
                     ))}
                   {Array(5 - rating)
                     .fill(0)
                     .map((_, i) => (
-                      <span key={i} style={{ fontSize: "24px", color: "#C0C0C0" }}>
+                      <span key={i} className="star-icon empty">
                         ★
                       </span>
                     ))}
                 </div>
-                <p className="mb-0 ps-4 fw-bold">{porcentajes[rating]}%</p>
+                <div className="progress-container ms-2 flex-grow-1">
+                  <div className="progress" style={{ height: "8px" }}>
+                    <div
+                      className="progress-bar bg-success"
+                      role="progressbar"
+                      style={{ width: `${porcentajes[rating]}%` }}
+                      aria-valuenow={porcentajes[rating]}
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    ></div>
+                  </div>
+                </div>
+                <p className="mb-0 ms-2 fw-bold text-forest-green percentage-text">{porcentajes[rating]}%</p>
               </div>
             ))}
           </div>

@@ -10,44 +10,57 @@
 
 /* Ajustar el contenedor principal para evitar restricciones de altura */
 .custom-container-comment {
-  height: auto; /* Permitir que el contenedor crezca según el contenido */
-  overflow: visible; /* Asegurar que los elementos hijos sean visibles */
-  min-height: 400px;
   position: relative;
+  overflow: hidden; /* Evita que el contenido sobresalga */
+  min-height: 19rem;
+  max-height: none; /* Permite que se expanda según sea necesario */
+  transition: height 0.3s ease;
+  background: linear-gradient(135deg, rgba(240, 255, 240, 0.8) 0%, rgba(220, 240, 220, 0.6) 100%);
+  border: 1px solid rgba(144, 238, 144, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 100, 0, 0.1);
+  width: 100%; /* Ancho responsive */
+  max-width: 1200px; /* Ancho máximo para pantallas grandes */
 }
 
 /* Asegurar que el formulario no se corte */
 .comentario-form-container {
-  max-height: none; /* Eliminar restricciones de altura */
-  overflow: visible; /* Asegurar que el contenido sea visible */
-  position: relative;
-  z-index: 1000; /* Aumentar el z-index para que esté por encima de otros elementos */
-  background-color: white;
-  border-radius: 0.375rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 100, 0, 0.1);
+  padding: 15px;
+  max-height: 400px;
+  overflow-y: auto;
   margin-top: 10px; /* Añadir espacio en la parte superior */
 }
 
 #comentario {
   min-height: 100px;
   max-height: 200px;
+  border-color: rgba(144, 238, 144, 0.5);
 }
 
+.accordion-button {
+  background-color: #ffffff !important;
+  color: #2e7d32 !important;
+  border-color: rgba(144, 238, 144, 0.5) !important;
+  transition: all 0.3s ease;
+}
 
 .accordion-button:not(.collapsed) {
-  background-color: #f8f9fa;
-  color: #212529;
+  background-color: #ffffff !important;
+  color: #2e7d32 !important;
+  box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
 }
 
-
 .accordion-button:focus {
-  box-shadow: none;
-  border-color: rgba(0, 0, 0, 0.125);
+  box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
+  border-color: rgba(76, 175, 80, 0.5);
 }
 
 .comentarios-container {
   max-height: 600px;
   overflow-y: auto;
+  padding-right: 15px;
 }
 
 /* Asegurar que el formulario no se salga del contenedor */
@@ -65,17 +78,164 @@
 .avatar-placeholder {
   width: 40px;
   height: 40px;
-  background-color: #6c757d;
-  color: white;
+  background-color: rgba(76, 175, 80, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 18px;
+  color: #2e7d32;
 }
 
-/* Asegurar que la columna de porcentajes no se mueva */
-.porcentajes-container {
-  position: sticky;
-  top: 20px;
+/* Contenedor del acordeón de comentarios */
+.comentario-accordion-container {
+  position: relative;
+  z-index: 10; /* Asegura que esté por encima pero no demasiado alto */
+}
+
+/* Contenedor de la lista de comentarios */
+.comentarios-lista-container {
+  position: relative;
+  z-index: 5;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Estilos para el resumen de valoraciones */
+.ratings-summary {
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 8px rgba(0, 100, 0, 0.1);
+}
+
+.progress {
+  background-color: rgba(220, 220, 220, 0.5);
+  border-radius: 10px;
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, #4caf50, #81c784);
+  border-radius: 10px;
+}
+
+/* Estilos para botones */
+.btn-primary-green {
+  background-color: #4caf50;
+  border-color: #4caf50;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-primary-green:hover {
+  background-color: #388e3c;
+  border-color: #388e3c;
+  color: white;
+}
+
+.btn-primary-green:focus {
+  box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
+}
+
+/* Texto verde forestal */
+.text-forest-green {
+  color: #2e7d32;
+}
+
+/* Estilos para las estrellas */
+.star-icon {
+  font-size: 22px;
+  margin-right: 2px;
+}
+
+.star-icon.filled {
+  color: #ffd700;
+}
+
+.star-icon.empty {
+  color: #e0e0e0;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 1200px) {
+  .custom-container-comment {
+    max-width: 95%;
+  }
+}
+
+@media (max-width: 992px) {
+  .custom-container-comment {
+    width: 95%;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .ratings-summary {
+    border-top: 1px solid rgba(144, 238, 144, 0.3);
+    border-left: none !important;
+    padding-top: 20px;
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .comentarios-container {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    padding-left: 15px !important;
+  }
+
+  .star-icon {
+    font-size: 18px;
+  }
+
+  .percentage-text {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 576px) {
+  .custom-container-comment {
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .comentario-item {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  .stars-container {
+    min-width: 90px;
+  }
+
+  .progress-container {
+    margin-left: 5px !important;
+  }
+
+  .accordion-button {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .comentario-form-container {
+    padding: 10px;
+  }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.comentario-item {
+  animation: fadeIn 0.5s ease;
 }
