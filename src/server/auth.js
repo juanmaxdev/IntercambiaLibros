@@ -114,7 +114,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
 
     async redirect({ url, baseUrl }) {
-      return "/perfil";
+      return "/";
     },
 
     async jwt({ token, user }) {

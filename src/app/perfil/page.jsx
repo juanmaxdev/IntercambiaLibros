@@ -2,8 +2,8 @@ import PerfilUser from '@components/perfil/perfilUser';
 
 export default function Perfil() {
   return (
-    <main className="container-fluid">
+    <div className="container-fluid mt-4">
       <PerfilUser />
-    </main>
+    </div>
   );
 }

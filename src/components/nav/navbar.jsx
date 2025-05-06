@@ -90,7 +90,7 @@ export default function Nav() {
                     <Image
                       src="/assets/img/logo/Logo_small_true.jpg"
                       alt="logo"
-                      className="d-inline d-md-none"
+                      className="d-inline d-md-none me-2"
                       width={28}
                       height={28}
                       priority
@@ -106,7 +106,7 @@ export default function Nav() {
               <ul className="navbar-nav d-flex flex-row align-items-center">
                 {/* Mostrar "Subir Libro" solo si el usuario está autenticado */}
                 {isLoggedIn && (
-                  <li className="nav-item me-3">
+                  <li className="nav-item ms-3">
                     <Link className="nav-link d-flex align-items-center gap-2 text-nowrap" href="/subirLibro">
                       <Image src="/assets/icons/cloud-upload.svg" alt="iconoSubirLibro" width={18} height={18} />
                       <span className="d-none d-md-inline">Subir Libro</span>
@@ -115,7 +115,7 @@ export default function Nav() {
                 )}
 
                 {/* Mostrar "Iniciar sesión" o el nombre del usuario según el estado de autenticación */}
-                <li className="nav-item me-3 dropdown" style={{ position: "relative" }}>
+                <li className="nav-item dropdown" style={{ position: "relative" }}>
                   {isLoggedIn ? <UserMenu session={unifiedSession} authType={authType} /> : <LoginButton />}
                 </li>
                 {/* Notificaciones */}

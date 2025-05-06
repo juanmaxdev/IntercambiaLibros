@@ -2,8 +2,8 @@ import FormSubirLibro from '@components/forms/formSubirLibro';
 
 export default function Perfil() {
   return (
-    <main className="container-fluid">
+    <div className="container-fluid mt-5">
       <FormSubirLibro />
-    </main>
+    </div>
   );
 }

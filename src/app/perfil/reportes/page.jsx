@@ -2,8 +2,8 @@ import Reportes from '@components/perfil/reportes';
 
 export default function Perfil() {
   return (
-    <main className="container-fluid">
+    <div className="container-fluid mt-5">
       <Reportes />
-    </main>
+    </div>
   );
 }

@@ -44,11 +44,10 @@ export default function Home() {
 
   return (
     <>
-      <main className="container-fluid p-0">
         {/* Hero Section con efecto de degradado */}
         <section className="hero-section position-relative overflow-hidden">
           <div className="parallax-bg"></div>
-          <div className="hero-content container position-relative z-1 py-5">
+          <div className="hero-content container position-relative z-1 pb-5 mb-5">
             <div className="row align-items-center min-vh-75">
               <div className="col-lg-6 text-center text-lg-start mb-5 mb-lg-0">
                 <h1 className={`display-4 fw-bold mb-4 text-white hero-title ${isLoaded ? "animate-in" : ""}`}>
@@ -124,7 +123,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-      </main>
-    </>
+      </>
   )
 }
