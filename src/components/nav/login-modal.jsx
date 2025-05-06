@@ -2,71 +2,51 @@
 import Image from "next/image"
 import { useSession, signIn } from "next-auth/react"
 import { useEffect } from "react"
-// No importar bootstrap directamente
 
 export function LoginModal() {
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const showModal = urlParams.get("login");
+
+    if (showModal === "true") {
+      const modalElement = document.getElementById("modalIniciarSesion");
+      if (modalElement && window.bootstrap) {
+        const bsModal = new window.bootstrap.Modal(modalElement);
+        bsModal.show();
+      }
+    }
+  }, []);
+
   const handleGoogleSignIn = async () => {
     try {
-      // Obtener la URL actual completa
-      const currentUrl = typeof window !== "undefined" ? window.location.href : "/"
+      const currentUrl = typeof window !== "undefined" ? window.location.href : "/";
 
-      // No intentamos cerrar el modal manualmente, confiamos en data-bs-dismiss="modal"
-
-      // Iniciar sesión con Google y especificar la URL actual como callbackUrl
       await signIn("google", {
         callbackUrl: currentUrl,
         redirect: false,
-      })
+      });
     } catch (error) {
-      console.error("Error al iniciar sesión:", error)
+      console.error("Error al iniciar sesión:", error);
     }
-  }
-
-  // Modificar la función handleLogin para guardar los datos del usuario en localStorage
-  // y actualizar la UI después del inicio de sesión exitoso
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
-  
+
     const correo_electronico = document.getElementById("floatingInput").value;
     const contrasena = document.getElementById("floatingPassword").value;
-  
+
     const result = await signIn("credentials", {
       correo_electronico,
       contrasena,
     });
-  
+
     if (result.ok) {
-      window.location.reload(); // 🔄 Recarga la página para reflejar el estado de sesión
+      window.location.href = "/"; // Redirige a la página principal
     } else {
       alert("Correo o contraseña incorrectos.");
     }
   };
-  
-
-  useEffect(() => {
-    let timeout
-
-    const resetTimeout = () => {
-      clearTimeout(timeout)
-      timeout = setTimeout(
-        () => {
-          // Este código no se ejecutará si el usuario interactúa con la página
-        },
-        30 * 60 * 1000,
-      ) // 30 minutos en milisegundos
-    }
-
-    const events = ["mousemove", "keydown", "click"]
-    events.forEach((event) => window.addEventListener(event, resetTimeout))
-
-    resetTimeout()
-
-    return () => {
-      clearTimeout(timeout)
-      events.forEach((event) => window.removeEventListener(event, resetTimeout))
-    }
-  }, [])
 
   return (
     <div
@@ -79,7 +59,12 @@ export function LoginModal() {
       <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div className="modal-content">
           <div className="modal-header bg-light">
-            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+            <button
+              type="button"
+              className="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            />
           </div>
           <div className="modal-body p-0">
             <section className="gradient-form rounded-bottom bg-light">
@@ -87,7 +72,12 @@ export function LoginModal() {
                 <div className="row justify-content-center align-items-center">
                   <div className="col-12">
                     <div className="text-center mb-4">
-                      <Image src="/assets/img/Logo2.png" width={160} height={40} alt="logo" />
+                      <Image
+                        src="/assets/img/Logo2.png"
+                        width={160}
+                        height={40}
+                        alt="logo"
+                      />
                     </div>
                     <form onSubmit={handleLogin}>
                       <div className="form-floating mb-3">
@@ -117,7 +107,12 @@ export function LoginModal() {
                           onClick={handleGoogleSignIn}
                           data-bs-dismiss="modal"
                         >
-                          <Image src="/assets/icons/google.svg" alt="Google" width={18} height={18} />
+                          <Image
+                            src="/assets/icons/google.svg"
+                            alt="Google"
+                            width={18}
+                            height={18}
+                          />
                           Iniciar sesión con Google
                         </button>
                       </div>
@@ -153,5 +148,5 @@ export function LoginModal() {
         </div>
       </div>
     </div>
-  )
+  );
 }
