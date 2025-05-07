@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { supabase } from "@/lib/supabase"
-import { getServerSession } from "next-auth"
+import { getServerSession } from "@/server/auth"
 
 // Obtener mensajes
 export async function GET(request) {
