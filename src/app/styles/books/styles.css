@@ -52,8 +52,8 @@ main {
 }
 
 .custom-rectangle {
-  width: 25rem;
-  height: 55rem;
+  width: 32rem;
+  height: 60rem;
   clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 87%, 0% 100%);
   background: linear-gradient(135deg, rgba(240, 255, 240, 0.9) 0%, rgba(220, 240, 220, 0.7) 100%);
   border: 1px solid rgba(144, 238, 144, 0.3);

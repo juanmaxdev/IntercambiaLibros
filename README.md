@@ -1,6 +1,6 @@
-# BookSwap - Plataforma de Intercambio de Libros
+# Plataforma de Intercambio de Libros
 
-BookSwap es una plataforma web que permite a los usuarios intercambiar, donar y descubrir libros. El proyecto está construido con Next.js y utiliza Supabase como base de datos.
+IntercambiaLibros es una plataforma web que permite a los usuarios intercambiar, donar y descubrir libros. El proyecto está construido con Next.js y utiliza Supabase como base de datos.
 
 ## 📚 Características Principales
 
@@ -34,7 +34,7 @@ BookSwap es una plataforma web que permite a los usuarios intercambiar, donar y 
 
 ## 📁 Estructura del Proyecto
 
-\`\`\`
+
 /
 ├── app/                      # Directorio principal de la aplicación Next.js
 │   ├── api/                  # API Routes para el backend
@@ -76,7 +76,7 @@ BookSwap es una plataforma web que permite a los usuarios intercambiar, donar y 
 │   └── auth.js               # Configuración de autenticación
 ├── services/                 # Servicios para interactuar con la API
 └── utils/                    # Utilidades generales
-\`\`\`
+
 
 ## 🔄 Flujos Principales
 
@@ -101,7 +101,7 @@ BookSwap es una plataforma web que permite a los usuarios intercambiar, donar y 
 ## 🔧 Configuración y Despliegue
 
 ### Variables de Entorno
-\`\`\`
+
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
@@ -109,7 +109,7 @@ NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your_nextauth_secret
 SUPABASE_URL=your_supabase_url
 SUPABASE_KEY=your_supabase_key
-\`\`\`
+
 
 ### Instalación
 

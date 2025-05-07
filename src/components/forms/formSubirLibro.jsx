@@ -212,7 +212,7 @@ export default function FormSubirLibro() {
 
     // Validar ISBN
     if (formData.isbn && !/^\d{10}(\d{3})?$/.test(formData.isbn)) {
-      tempErrors.isbn = "El ISBN debe tener 10 o 13 caracteres numéricos";
+      tempErrors.isbn = "El ISBN debe tener de 10 a 13 caracteres numéricos";
       formIsValid = false;
     }
 
@@ -455,8 +455,9 @@ export default function FormSubirLibro() {
                 </option>
                 <option value="Nuevo">Nuevo</option>
                 <option value="Seminuevo">Seminuevo</option>
-                <option value="Aceptable">Aceptable</option>
+                <option value="Usado">Usado</option>
                 <option value="Deteriorado">Deteriorado</option>
+                <option value="Muy Deteriorado">Muy Deteriorado</option>
               </select>
               <label htmlFor="estado_libro">Estado del libro</label>
               {errors.estado_libro && <div className="invalid-feedback">{errors.estado_libro}</div>}
@@ -493,7 +494,6 @@ export default function FormSubirLibro() {
                 </option>
                 <option value="Presencial">Presencial</option>
                 <option value="Envío">Envío</option>
-                <option value="Presencial/Envío">Presencial / Envío</option>
               </select>
               <label htmlFor="metodo_intercambio">Método de intercambio</label>
               {errors.metodo_intercambio && <div className="invalid-feedback">{errors.metodo_intercambio}</div>}
