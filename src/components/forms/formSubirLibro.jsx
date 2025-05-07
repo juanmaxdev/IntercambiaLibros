@@ -212,7 +212,7 @@ export default function FormSubirLibro() {
 
     // Validar ISBN
     if (formData.isbn && !/^\d{10}(\d{3})?$/.test(formData.isbn)) {
-      tempErrors.isbn = "El ISBN debe tener 13 caracteres numéricos";
+      tempErrors.isbn = "El ISBN debe tener de 10 a 13 caracteres numéricos";
       formIsValid = false;
     }
 
