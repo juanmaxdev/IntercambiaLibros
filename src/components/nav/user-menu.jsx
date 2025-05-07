@@ -89,11 +89,6 @@ export function UserMenu({ session, authType = "nextauth" }) {
           </Link>
         </li>
         <li>
-          <Link className="dropdown-item" href="/perfil/transacciones">
-            Transacciones
-          </Link>
-        </li>
-        <li>
           <Link className="dropdown-item" href="/perfil/reportes">
             Reportes
           </Link>
