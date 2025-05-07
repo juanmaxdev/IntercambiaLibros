@@ -5,7 +5,7 @@ import Image from "next/image"
 export function LoginButton() {
   return (
     <Link
-      className="nav-link d-flex align-items-center gap-2 text-nowrap"
+      className="nav-link d-flex align-items-center gap-2 text-nowrap mx-3"
       data-bs-toggle="modal"
       data-bs-target="#modalIniciarSesion"
       href="#"
