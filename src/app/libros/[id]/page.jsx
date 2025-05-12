@@ -4,7 +4,7 @@ import Link from "next/link";
 // Actualizar la función para usar una URL absoluta en el servidor
 async function getBookData(id) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"; // Usar una URL base, cambiar cuando se haga el despliegue
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL; // Usar una URL base, cambiar cuando se haga el despliegue
     const response = await fetch(`${baseUrl}/api/libros`, {
       cache: "no-store",
     });
