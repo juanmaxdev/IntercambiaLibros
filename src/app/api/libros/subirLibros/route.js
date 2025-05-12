@@ -23,7 +23,7 @@ export async function POST(req) {
     }
 
     const usuario_id = await getUsuarioId(emailUsuario);
-    console.log('✅ Usuario ID:', usuario_id);
+    console.log('Usuario ID:', usuario_id);
 
     // Extraer campos
     const titulo = formData.get('titulo');
@@ -38,7 +38,7 @@ export async function POST(req) {
     const editorial = formData.get('editorial') || '';
     const metodo_intercambio = formData.get('metodoIntercambio') || 'Presencial';
 
-    console.log('📝 Campos del libro:', {
+    console.log('Campos del libro:', {
       titulo,
       autor,
       genero_id,
@@ -52,7 +52,7 @@ export async function POST(req) {
       metodo_intercambio,
     });
 
-    // 🧠 Solución al error de duplex: convertir el archivo a buffer
+    //Solución al error de duplex: convertir el archivo a buffer
     const arrayBuffer = await archivo.arrayBuffer();
     const fileBuffer = new Uint8Array(arrayBuffer);
 
@@ -66,7 +66,7 @@ export async function POST(req) {
       });
 
     if (uploadError) {
-      console.error('❌ Error al subir la imagen:', uploadError);
+      console.error('Error al subir la imagen:', uploadError);
       return Response.json({ error: 'Error al subir la imagen a Supabase' }, { status: 500 });
     }
 
@@ -78,11 +78,11 @@ export async function POST(req) {
   const publicURL = publicUrlData?.publicUrl;  
 
     if (urlError) {
-      console.error('❌ Error al obtener URL pública:', urlError);
+      console.error('Error al obtener URL pública:', urlError);
       return Response.json({ error: 'Error al obtener la URL pública del archivo' }, { status: 500 });
     }
 
-    console.log('📤 Imagen subida con URL pública:', publicURL);
+    console.log('Imagen subida con URL pública:', publicURL);
 
     // Insertar el libro en la base de datos
     const libroGuardado = await guardarLibroEnBD({
@@ -101,14 +101,14 @@ export async function POST(req) {
       imagenes: publicURL,
     });
 
-    console.log('✅ Libro guardado:', libroGuardado);
+    console.log('Libro guardado:', libroGuardado);
 
     return Response.json({
       message: 'Libro registrado correctamente',
       libro: libroGuardado,
     }, { status: 201 });
   } catch (err) {
-    console.error('🔥 Error en la API (subirLibros):', err.message, err.stack);
+    console.error('Error en la API (subirLibros):', err.message, err.stack);
     return Response.json({ error: err.message || 'Error interno del servidor' }, { status: 500 });
   }
 }
