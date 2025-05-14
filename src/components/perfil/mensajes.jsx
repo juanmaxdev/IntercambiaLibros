@@ -518,7 +518,7 @@ export default function Mensajes() {
   }
 
   // Función para confirmar la entrega de un intercambio
-  const confirmarEntregaIntercambio = async (intercambioId) => {
+  const confirmarEntregaIntercambio = async (intercambioId, mensajeId) => {
     try {
       // Verificar si el botón ya fue pulsado
       if (enviando) {
@@ -578,6 +578,32 @@ export default function Mensajes() {
 
       // Enviar el mensaje como JSON
       await enviarMensaje(session.user.email, contactoSeleccionado.email, JSON.stringify(mensajeConfirmacion))
+
+      // Marcar el mensaje actual como confirmado
+      // Actualizar el estado local de los mensajes para reflejar la confirmación
+      setMensajes((prevMensajes) =>
+        prevMensajes.map((m) => {
+          if (m.id === mensajeId) {
+            // Si es un mensaje de intercambio, actualizar su estado
+            try {
+              const contenido = JSON.parse(m.contenido)
+              if (contenido.tipo === "solicitud_intercambio") {
+                return {
+                  ...m,
+                  yaConfirmado: true,
+                  contenido: JSON.stringify({
+                    ...contenido,
+                    yaConfirmado: true,
+                  }),
+                }
+              }
+            } catch (e) {
+              // Si no es un JSON válido, no hacer nada
+            }
+          }
+          return m
+        }),
+      )
 
       // Actualizar la interfaz
       await cargarMensajes(contactoSeleccionado.email)
@@ -695,15 +721,15 @@ export default function Mensajes() {
                 </div>
                 <button
                   className="btn btn-primary btn-sm"
-                  onClick={() => confirmarEntregaIntercambio(contenido.intercambio_id)}
-                  disabled={enviando || mensaje.yaConfirmado}
+                  onClick={() => confirmarEntregaIntercambio(contenido.intercambio_id, mensaje.id)}
+                  disabled={enviando || contenido.yaConfirmado}
                 >
                   {enviando ? (
                     <>
                       <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                       Confirmando...
                     </>
-                  ) : mensaje.yaConfirmado ? (
+                  ) : contenido.yaConfirmado ? (
                     <>
                       <i className="bi bi-check-circle me-2"></i>
                       Entrega confirmada
