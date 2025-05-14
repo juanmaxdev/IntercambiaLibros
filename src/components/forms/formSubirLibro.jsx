@@ -12,15 +12,12 @@ export default function FormSubirLibro() {
   const { data: session, status: nextAuthStatus } = useSession()
   const { isLoggedIn, userId, userName, userEmail, loading: authLoading } = useAuth()
 
-  // Redirigir si no está autenticado
   useEffect(() => {
     if (!authLoading && !isLoggedIn) {
-      // Redirigir a la página principal con un parámetro para mostrar el modal de login
       router.push("/?login=true")
     }
   }, [isLoggedIn, authLoading, router])
 
-  // Estado para almacenar los datos del formulario
   const [formData, setFormData] = useState({
     isbn: "",
     titulo: "",
@@ -36,19 +33,17 @@ export default function FormSubirLibro() {
     metodo_intercambio: "",
   })
 
-  // Estado para los errores de validación
   const [errors, setErrors] = useState({})
 
-  // Estado para controlar si el formulario ha sido enviado
   const [isSubmitted, setIsSubmitted] = useState(false)
 
-  // Estado para la vista previa de la imagen
   const [imagePreview, setImagePreview] = useState(null)
 
   const [successMessage, setSuccessMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
-  // Lista de géneros con sus IDs
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+
   const generos = [
     { id: 1, nombre: "Novela" },
     { id: 2, nombre: "Misterio" },
@@ -72,26 +67,20 @@ export default function FormSubirLibro() {
     { id: 20, nombre: "Drama" },
   ]
 
-  // Función para manejar cambios en los inputs
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
 
-    // Para el checkbox de donación
     if (type === "checkbox") {
       setFormData({
         ...formData,
         [name]: checked,
       })
-    }
-    // Para el select de género (convertir a número)
-    else if (name === "genero_id") {
+    } else if (name === "genero_id") {
       setFormData({
         ...formData,
         [name]: Number.parseInt(value, 10),
       })
-    }
-    // Para los demás campos
-    else {
+    } else {
       setFormData({
         ...formData,
         [name]: value,
@@ -99,7 +88,6 @@ export default function FormSubirLibro() {
     }
   }
 
-  // Función para manejar cambios en el archivo
   const handleFileChange = (e) => {
     const file = e.target.files[0]
     if (file) {
@@ -108,47 +96,40 @@ export default function FormSubirLibro() {
         archivo: file,
       })
 
-      // Crear URL para vista previa
       const previewUrl = URL.createObjectURL(file)
       setImagePreview(previewUrl)
     }
   }
 
-  // Función para eliminar la imagen seleccionada
   const handleRemoveImage = () => {
     setFormData({
       ...formData,
       archivo: null,
     })
     setImagePreview(null)
-    // Resetear el input de archivo
     const fileInput = document.getElementById("archivoInput")
     if (fileInput) fileInput.value = ""
   }
 
-  // Limpiar la URL de vista previa al desmontar el componente
-  // Esto es importante para evitar fugas de memoria
-  // y liberar recursos del navegador
+  // Limpiar la URL de vista previa al desmontar el componente , es importante para liberar recursos del nav
   useEffect(() => {
     return () => {
       if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
+        URL.revokeObjectURL(imagePreview)
       }
-    };
-  }, [imagePreview]);
+    }
+  }, [imagePreview])
 
-  // Validar el formulario
+  
   const validateForm = () => {
     const tempErrors = {}
     let formIsValid = true
-
-    // Validar título
+   
     if (!formData.titulo || formData.titulo.length < 3) {
       tempErrors.titulo = "El título es obligatorio y debe tener al menos 3 caracteres"
       formIsValid = false
     }
 
-    // Validar autor
     if (!formData.autor) {
       tempErrors.autor = "El autor es obligatorio"
       formIsValid = false
@@ -157,13 +138,11 @@ export default function FormSubirLibro() {
       formIsValid = false
     }
 
-    // Validar género
     if (!formData.genero_id) {
       tempErrors.genero_id = "Debes seleccionar un género"
       formIsValid = false
     }
 
-    // Validar ubicación
     if (!formData.ubicacion) {
       tempErrors.ubicacion = "La ubicación es obligatoria"
       formIsValid = false
@@ -172,36 +151,32 @@ export default function FormSubirLibro() {
       formIsValid = false
     }
 
-    // Validar estado del libro
     if (!formData.estado_libro) {
       tempErrors.estado_libro = "Debes seleccionar el estado del libro"
       formIsValid = false
     }
 
-    // Validar método de intercambio
     if (!formData.metodo_intercambio) {
       tempErrors.metodo_intercambio = "Debes seleccionar un método de intercambio"
       formIsValid = false
     }
 
-    // Validar archivo
     if (formData.archivo) {
       // Validar que sea una imagen
-      const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+      const validTypes = ["image/jpeg", "image/png", "image/jpg"]
       if (!validTypes.includes(formData.archivo.type)) {
-        tempErrors.archivo = "El archivo debe ser una imagen (JPG, PNG)";
-        formIsValid = false;
+        tempErrors.archivo = "El archivo debe ser una imagen (JPG, PNG)"
+        formIsValid = false
       }
 
       // Validar tamaño (máximo 2MB)
-      const maxSize = 2 * 1024 * 1024; // 2MB en bytes
+      const maxSize = 2 * 1024 * 1024 
       if (formData.archivo.size > maxSize) {
-        tempErrors.archivo = "La imagen no debe superar los 2MB";
-        formIsValid = false;
+        tempErrors.archivo = "La imagen no debe superar los 2MB"
+        formIsValid = false
       }
     }
 
-    // Validar descripción
     if (!formData.descripcion) {
       tempErrors.descripcion = "La descripción es obligatoria"
       formIsValid = false
@@ -210,74 +185,68 @@ export default function FormSubirLibro() {
       formIsValid = false
     }
 
-    // Validar ISBN
-    if (formData.isbn && !/^\d{10}(\d{3})?$/.test(formData.isbn)) {
-      tempErrors.isbn = "El ISBN debe tener de 10 a 13 caracteres numéricos";
-      formIsValid = false;
+    if (formData.isbn && !/^\d{10,13}$/.test(formData.isbn)) {
+      tempErrors.isbn = "El ISBN debe tener de 10 a 13 caracteres numéricos"
+      formIsValid = false
     }
 
     setErrors(tempErrors)
     return formIsValid
   }
 
-  // Función para resetear el input de archivo
   const resetFileInput = () => {
     const fileInput = document.getElementById("archivoInput")
     if (fileInput) fileInput.value = ""
   }
 
-  // Función para manejar el envío del formulario
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitted(true);
-    setSuccessMessage("");
-  
+    e.preventDefault()
+    setIsSubmitted(true)
+    setSuccessMessage("")
+
     if (validateForm()) {
-      setIsLoading(true);
+      setIsLoading(true)
       try {
-        const formDataToSend = new FormData();
-  
-        // Verificar si hay sesión y email
+        const formDataToSend = new FormData()
+
         if (!session?.user?.email) {
-          setErrors({ server: "Debes iniciar sesión para subir un libro." });
-          setIsLoading(false);
-          return;
+          setErrors({ server: "Debes iniciar sesión para subir un libro." })
+          setIsLoading(false)
+          return
         }
-  
-        // 📦 Construir FormData correctamente
-        formDataToSend.append("isbn", formData.isbn || "");
-        formDataToSend.append("titulo", formData.titulo);
-        formDataToSend.append("autor", formData.autor);
-        formDataToSend.append("genero_id", String(formData.genero_id)); // asegurar tipo string
-        formDataToSend.append("estado_libro", formData.estado_libro);
-        formDataToSend.append("descripcion", formData.descripcion);
-        formDataToSend.append("donacion", String(formData.donacion)); // convertir boolean a string
-        formDataToSend.append("ubicacion", formData.ubicacion);
-        formDataToSend.append("tipo_tapa", formData.tipo_tapa || "");
-        formDataToSend.append("editorial", formData.editorial || "");
-        formDataToSend.append("metodoIntercambio", formData.metodo_intercambio || "Presencial");
-  
+
+        formDataToSend.append("isbn", formData.isbn || "")
+        formDataToSend.append("titulo", formData.titulo)
+        formDataToSend.append("autor", formData.autor)
+        formDataToSend.append("genero_id", String(formData.genero_id))
+        formDataToSend.append("estado_libro", formData.estado_libro)
+        formDataToSend.append("descripcion", formData.descripcion)
+        formDataToSend.append("donacion", String(formData.donacion))
+        formDataToSend.append("ubicacion", formData.ubicacion)
+        formDataToSend.append("tipo_tapa", formData.tipo_tapa || "")
+        formDataToSend.append("editorial", formData.editorial || "")
+        formDataToSend.append("metodoIntercambio", formData.metodo_intercambio || "Presencial")
+
         if (formData.archivo) {
-          formDataToSend.append("archivo", formData.archivo);
+          formDataToSend.append("archivo", formData.archivo)
         }
-  
-        // 🚀 Enviar al backend (sin duplex porque es navegador)
+
         const response = await fetch("/api/libros/subirLibros", {
           method: "POST",
           body: formDataToSend,
-          duplex: "half", // Esto es para Next.js 13+
-        });
-  
+          duplex: "half",
+        })
+
         if (!response.ok) {
-          const errorText = await response.text();
-          console.error("Error del servidor:", errorText);
-          setErrors({ server: errorText || "Error al subir el libro." });
-          throw new Error(`Error: ${response.status} - ${errorText}`);
+          const errorText = await response.text()
+          console.error("Error del servidor:", errorText)
+          setErrors({ server: errorText || "Error al subir el libro." })
+          throw new Error(`Error: ${response.status} - ${errorText}`)
         }
-  
-        const result = await response.json();
-        setSuccessMessage("Libro registrado correctamente");
-  
+
+        const result = await response.json()
+        setShowSuccessModal(true)
+
         // Resetear estado
         setFormData({
           isbn: "",
@@ -292,30 +261,27 @@ export default function FormSubirLibro() {
           tipo_tapa: "",
           editorial: "",
           metodo_intercambio: "",
-        });
-        setImagePreview(null);
-        setIsSubmitted(false);
-        resetFileInput();
+        })
+        setImagePreview(null)
+        setIsSubmitted(false)
+        resetFileInput()
       } catch (error) {
-        console.error("Error al enviar el formulario:", error);
-        alert(`Error al enviar el formulario: ${error.message}`);
+        console.error("Error al enviar el formulario:", error)
+        alert(`Error al enviar el formulario: ${error.message}`)
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
     } else {
-      console.log("Formulario con errores");
+      console.log("Formulario con errores")
     }
-  };
-  
+  }
 
-  // Validar cuando cambian los datos y ya se ha intentado enviar
   useEffect(() => {
     if (isSubmitted) {
       validateForm()
     }
   }, [formData, isSubmitted])
 
-  // Si no está autenticado, mostrar mensaje de carga mientras se redirige
   if (authLoading || (!isLoggedIn && nextAuthStatus !== "unauthenticated")) {
     return (
       <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
@@ -335,7 +301,6 @@ export default function FormSubirLibro() {
       <div className="row">
         <div className="col-2 ps-0"></div>
         <div className="col-10 mb-5">
-          {/* FORMULARIO */}
           <h4 className="mb-4">Subir Libro</h4>
           {successMessage && (
             <div className="alert alert-success alert-dismissible fade show" role="alert">
@@ -587,6 +552,36 @@ export default function FormSubirLibro() {
           </form>
         </div>
       </div>
+      {/* Modal de éxito */}
+      {showSuccessModal && (
+        <div className="modal-backdrop" style={{ display: "block" }}>
+          <div className="modal fade show" style={{ display: "block" }} tabIndex="-1">
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">¡Operación exitosa!</h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => setShowSuccessModal(false)}
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div className="modal-body text-center py-4">
+                  <i className="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+                  <h4>El libro se ha subido correctamente</h4>
+                  <p className="mb-0">Tu libro ya está disponible para intercambio.</p>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-primary" onClick={() => setShowSuccessModal(false)}>
+                    Aceptar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
