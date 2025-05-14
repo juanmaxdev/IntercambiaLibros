@@ -98,7 +98,7 @@ export function LoginModal() {
                           placeholder="name@example.com"
                           required
                         />
-                        <label htmlFor="floatingInput">Usuario o email</label>
+                        <label htmlFor="floatingInput">Email</label>
                       </div>
                       <div className="form-floating mb-3">
                         <input
