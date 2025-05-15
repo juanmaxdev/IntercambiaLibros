@@ -13,6 +13,12 @@ export default function PerfilUser() {
   const [userData, setUserData] = useState(null);
   const [editData, setEditData] = useState(null);
 
+  const [estadisticas, setEstadisticas] = useState({
+    librosSubidos: 0,
+    favoritos: 0,
+  });
+  const [cargandoEstadisticas, setCargandoEstadisticas] = useState(true);
+
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/?login=true");
@@ -38,6 +44,43 @@ export default function PerfilUser() {
     }
   }, [status]);
 
+  useEffect(() => {
+    if (!userData?.id || !userData?.correo_electronico) return;
+
+    async function cargarEstadisticas() {
+      let libros = 0, favoritos = 0;
+
+      try {
+        const resLibros = await fetch(
+          `/api/estadisticas/librosSubidoUsuario?userId=${userData.id}`
+        );
+        if (resLibros.ok) {
+          const json = await resLibros.json();
+          libros = json.count ?? 0;
+        }
+      } catch (e) {
+        console.error("Error al cargar libros subidos:", e);
+      }
+
+      try {
+        const resFav = await fetch(
+          `/api/estadisticas/librosFavoritosUsuario?email=${userData.correo_electronico}`
+        );
+        if (resFav.ok) {
+          const json = await resFav.json();
+          favoritos = json.count ?? 0;
+        }
+      } catch (e) {
+        console.error("Error al cargar favoritos:", e);
+      }
+
+      setEstadisticas({ librosSubidos: libros, favoritos });
+      setCargandoEstadisticas(false);
+    }
+
+    cargarEstadisticas();
+  }, [userData]);
+
   const handleEditToggle = async () => {
     if (isEditing) {
       try {
@@ -60,22 +103,6 @@ export default function PerfilUser() {
 
     setIsEditing(!isEditing);
   };
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-  
-    const res = await signIn("credentials", {
-      redirect: false,
-      email: correo, // del input
-      password: contrasena, // del input
-    });
-  
-    if (res.ok) {
-      router.push("/perfil");
-    } else {
-      setError("Correo o contraseña incorrectos");
-    }
-  }; 
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -190,36 +217,26 @@ export default function PerfilUser() {
                     <div className="profile-section">
                       <h3 className="section-title">Estadísticas</h3>
                       <div className="section-content">
-                        <div className="stats-grid">
-                          <div className="stat-item">
-                            <div className="stat-icon"><i className="bi bi-book"></i></div>
-                            <div className="stat-content">
-                              <div className="stat-value">12</div>
-                              <div className="stat-label">Libros subidos</div>
+                        {cargandoEstadisticas ? (
+                          <p>Cargando estadísticas…</p>
+                        ) : (
+                          <div className="stats-grid">
+                            <div className="stat-item">
+                              <div className="stat-icon"><i className="bi bi-book"></i></div>
+                              <div className="stat-content">
+                                <div className="stat-value">{estadisticas.librosSubidos}</div>
+                                <div className="stat-label">Libros subidos</div>
+                              </div>
+                            </div>
+                            <div className="stat-item">
+                              <div className="stat-icon"><i className="bi bi-heart"></i></div>
+                              <div className="stat-content">
+                                <div className="stat-value">{estadisticas.favoritos}</div>
+                                <div className="stat-label">Favoritos</div>
+                              </div>
                             </div>
                           </div>
-                          <div className="stat-item">
-                            <div className="stat-icon"><i className="bi bi-arrow-left-right"></i></div>
-                            <div className="stat-content">
-                              <div className="stat-value">8</div>
-                              <div className="stat-label">Intercambios</div>
-                            </div>
-                          </div>
-                          <div className="stat-item">
-                            <div className="stat-icon"><i className="bi bi-heart"></i></div>
-                            <div className="stat-content">
-                              <div className="stat-value">15</div>
-                              <div className="stat-label">Favoritos</div>
-                            </div>
-                          </div>
-                          <div className="stat-item">
-                            <div className="stat-icon"><i className="bi bi-star"></i></div>
-                            <div className="stat-content">
-                              <div className="stat-value">4.8</div>
-                              <div className="stat-label">Valoración</div>
-                            </div>
-                          </div>
-                        </div>
+                        )}
                       </div>
                     </div>
                   </div>
