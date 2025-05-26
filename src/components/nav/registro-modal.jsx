@@ -71,7 +71,7 @@ export function RegistroModal() {
                 <div className="row justify-content-center align-items-center">
                   <div className="col-12">
                     <div className="text-center mb-4">
-                      <Image src="/assets/img/Logo2.png" width={160} height={40} alt="logo" />
+                      <Image src="/assets/img/logo2.png" width={160} height={40} alt="logo" />
                     </div>
                     <form onSubmit={handleRegister}>
                       <div className="form-floating mb-3">

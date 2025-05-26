@@ -1,6 +1,6 @@
 "use client"
 import Image from "next/image"
-import { useSession, signIn } from "next-auth/react"
+import { signIn } from "next-auth/react"
 import { useEffect } from "react"
 // No importar bootstrap directamente
 
@@ -9,6 +9,7 @@ export function LoginModal() {
     try {
       // Obtener la URL actual completa
       const currentUrl = typeof window !== "undefined" ? window.location.href : "/"
+      console.log("🔐 Login Modal: Iniciando sesión con Google, URL actual:", currentUrl)
 
       // No intentamos cerrar el modal manualmente, confiamos en data-bs-dismiss="modal"
 
@@ -18,7 +19,7 @@ export function LoginModal() {
         redirect: false,
       })
     } catch (error) {
-      console.error("Error al iniciar sesión:", error)
+      console.error("❌ Login Modal: Error al iniciar sesión con Google:", error)
     }
   }
 
@@ -26,23 +27,27 @@ export function LoginModal() {
   // y actualizar la UI después del inicio de sesión exitoso
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-  
-    const correo_electronico = document.getElementById("floatingInput").value;
-    const contrasena = document.getElementById("floatingPassword").value;
-  
+    e.preventDefault()
+
+    const correo_electronico = document.getElementById("floatingInput").value
+    const contrasena = document.getElementById("floatingPassword").value
+
+    console.log("🔐 Login Modal: Iniciando sesión con credenciales para:", correo_electronico)
+
     const result = await signIn("credentials", {
       correo_electronico,
       contrasena,
-    });
-  
+      redirect: false,
+    })
+
+    console.log("🔐 Login Modal: Resultado de inicio de sesión:", result)
+
     if (result.ok) {
-      window.location.reload(); // 🔄 Recarga la página para reflejar el estado de sesión
+      window.location.reload() // 🔄 Recarga la página para reflejar el estado de sesión
     } else {
-      alert("Correo o contraseña incorrectos.");
+      alert("Correo o contraseña incorrectos.")
     }
-  };
-  
+  }
 
   useEffect(() => {
     let timeout
@@ -87,7 +92,7 @@ export function LoginModal() {
                 <div className="row justify-content-center align-items-center">
                   <div className="col-12">
                     <div className="text-center mb-4">
-                      <Image src="/assets/img/Logo2.png" width={160} height={40} alt="logo" />
+                      <Image src="/assets/img/logo2.png" width={160} height={40} alt="logo" />
                     </div>
                     <form onSubmit={handleLogin}>
                       <div className="form-floating mb-3">
@@ -122,11 +127,7 @@ export function LoginModal() {
                         </button>
                       </div>
                       <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-3">
-                        <button
-                          className="btn btn-outline-primary w-100 w-sm-75 mb-2 mb-sm-0"
-                          type="submit"
-                          onClick={handleLogin}
-                        >
+                        <button className="btn btn-outline-primary w-100 w-sm-75 mb-2 mb-sm-0" type="submit">
                           Iniciar Sesión
                         </button>
                         <a className="text-muted ms-sm-3" href="#!">

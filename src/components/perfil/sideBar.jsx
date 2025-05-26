@@ -80,15 +80,6 @@ export default function ModernSidebar() {
             </Link>
           </li>
           <li className="nav-item">
-            <Link
-              href="/perfil/transacciones"
-              className={`nav-link ${isActive("/perfil/transacciones") ? "active" : ""}`}
-            >
-              <i className="bi bi-currency-exchange"></i>
-              {!collapsed && <span>Transacciones</span>}
-            </Link>
-          </li>
-          <li className="nav-item">
             <Link href="/perfil/reportes" className={`nav-link ${isActive("/perfil/reportes") ? "active" : ""}`}>
               <i className="bi bi-flag"></i>
               {!collapsed && <span>Reportes</span>}
