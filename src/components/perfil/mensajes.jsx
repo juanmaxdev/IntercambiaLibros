@@ -615,37 +615,52 @@ export default function Mensajes() {
       if (contenido.tipo === "solicitud_intercambio") {
         return (
           <div className="intercambio-solicitud p-3">
-            <div className="mb-2 fw-bold text-dark">Solicitud de intercambio</div>
-            <div className="mb-2 text-dark">Libros ofrecidos:</div>
-            <div className="libros-ofrecidos mb-3">
-              {contenido.libros_ofrecidos.map((libro) => (
-                <div key={libro.id} className="libro-item d-flex align-items-center mb-2">
-                  <div className="libro-imagen me-2">
-                    {libro.imagen ? (
-                      <img
-                        src={libro.imagen || "/placeholder.svg"}
-                        alt={libro.titulo}
-                        width="40"
-                        height="60"
-                        className="rounded"
-                      />
-                    ) : (
-                      <div className="placeholder-imagen">📚</div>
-                    )}
+            <div className="mb-2 fw-bold text-dark">
+              <i className="bi bi-arrow-left-right me-2"></i>
+              Solicitud de intercambio
+            </div>
+
+            <div className="mb-3">
+              <div className="mb-2 text-dark fw-semibold">Libros ofrecidos:</div>
+              <div className="row g-2">
+                {contenido.libros_ofrecidos.map((libro) => (
+                  <div key={libro.id} className="col-12 col-sm-6">
+                    <div className="libro-item d-flex align-items-center p-2 border rounded">
+                      <div className="libro-imagen me-2 flex-shrink-0">
+                        {libro.imagen ? (
+                          <img
+                            src={libro.imagen || "/placeholder.svg"}
+                            alt={libro.titulo}
+                            width="40"
+                            height="60"
+                            className="rounded"
+                            style={{ objectFit: "cover" }}
+                          />
+                        ) : (
+                          <div className="placeholder-imagen d-flex align-items-center justify-content-center bg-light rounded">
+                            <i className="bi bi-book"></i>
+                          </div>
+                        )}
+                      </div>
+                      <div className="libro-info flex-grow-1 min-width-0">
+                        <div className="libro-titulo fw-semibold text-dark text-truncate" title={libro.titulo}>
+                          {libro.titulo}
+                        </div>
+                        <div className="libro-autor small text-secondary text-truncate" title={libro.autor}>
+                          {libro.autor}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="libro-info">
-                    <div className="libro-titulo fw-semibold text-dark">{libro.titulo}</div>
-                    <div className="libro-autor small text-secondary">{libro.autor}</div>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
             {contenido.libro_solicitado && (
               <div className="mb-3">
-                <div className="mb-2 text-dark">A cambio de:</div>
-                <div className="libro-item d-flex align-items-center">
-                  <div className="libro-imagen me-2">
+                <div className="mb-2 text-dark fw-semibold">A cambio de:</div>
+                <div className="libro-item d-flex align-items-center p-2 border rounded">
+                  <div className="libro-imagen me-2 flex-shrink-0">
                     {contenido.libro_solicitado.imagen ? (
                       <img
                         src={contenido.libro_solicitado.imagen || "/placeholder.svg"}
@@ -653,15 +668,28 @@ export default function Mensajes() {
                         width="40"
                         height="60"
                         className="rounded"
+                        style={{ objectFit: "cover" }}
                       />
                     ) : (
-                      <div className="placeholder-imagen">📚</div>
+                      <div className="placeholder-imagen d-flex align-items-center justify-content-center bg-light rounded">
+                        <i className="bi bi-book"></i>
+                      </div>
                     )}
                   </div>
-                  <div className="libro-info">
-                    <div className="libro-titulo fw-semibold text-dark">{contenido.libro_solicitado.titulo}</div>
+                  <div className="libro-info flex-grow-1 min-width-0">
+                    <div
+                      className="libro-titulo fw-semibold text-dark text-truncate"
+                      title={contenido.libro_solicitado.titulo}
+                    >
+                      {contenido.libro_solicitado.titulo}
+                    </div>
                     {contenido.libro_solicitado.autor && (
-                      <div className="libro-autor small text-secondary">{contenido.libro_solicitado.autor}</div>
+                      <div
+                        className="libro-autor small text-secondary text-truncate"
+                        title={contenido.libro_solicitado.autor}
+                      >
+                        {contenido.libro_solicitado.autor}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -669,19 +697,21 @@ export default function Mensajes() {
             )}
 
             {mensaje.remitente_id !== session?.user?.email && contenido.estado === "pendiente" && (
-              <div className="d-flex gap-2">
+              <div className="d-flex flex-column flex-sm-row gap-2">
                 <button
-                  className="btn btn-success btn-sm"
+                  className="btn btn-success btn-sm flex-fill"
                   onClick={() => responderSolicitudIntercambio(mensaje.id, "aceptada", contenido.intercambio_id)}
                   disabled={enviando || contenido.yaRespondido}
                 >
-                  Aceptar intercambio
+                  <i className="bi bi-check-lg me-1"></i>
+                  Aceptar
                 </button>
                 <button
-                  className="btn btn-danger btn-sm"
+                  className="btn btn-danger btn-sm flex-fill"
                   onClick={() => responderSolicitudIntercambio(mensaje.id, "rechazada", contenido.intercambio_id)}
                   disabled={enviando || contenido.yaRespondido}
                 >
+                  <i className="bi bi-x-lg me-1"></i>
                   Rechazar
                 </button>
               </div>
@@ -691,25 +721,34 @@ export default function Mensajes() {
               <div className="mt-3">
                 <div className="alert alert-info mb-2">
                   <i className="bi bi-info-circle me-2"></i>
-                  Intercambio aceptado. Coordina la entrega con el otro usuario.
+                  <span className="d-none d-sm-inline">
+                    Intercambio aceptado. Coordina la entrega con el otro usuario.
+                  </span>
+                  <span className="d-sm-none">Intercambio aceptado. Coordina la entrega.</span>
                 </div>
                 <button
-                  className="btn btn-primary btn-sm"
+                  className="btn btn-primary btn-sm w-100 w-sm-auto"
                   onClick={() => confirmarEntregaIntercambio(contenido.intercambio_id)}
                   disabled={enviando || mensaje.yaConfirmado}
                 >
                   {enviando ? (
                     <>
                       <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                      Confirmando...
+                      <span className="d-none d-sm-inline">Confirmando...</span>
+                      <span className="d-sm-none">...</span>
                     </>
                   ) : mensaje.yaConfirmado ? (
                     <>
                       <i className="bi bi-check-circle me-2"></i>
-                      Entrega confirmada
+                      <span className="d-none d-sm-inline">Entrega confirmada</span>
+                      <span className="d-sm-none">Confirmada</span>
                     </>
                   ) : (
-                    "Confirmar entrega completada"
+                    <>
+                      <i className="bi bi-check-square me-1"></i>
+                      <span className="d-none d-sm-inline">Confirmar entrega completada</span>
+                      <span className="d-sm-none">Confirmar entrega</span>
+                    </>
                   )}
                 </button>
               </div>
@@ -718,14 +757,16 @@ export default function Mensajes() {
             {contenido.estado === "completado" && (
               <div className="alert alert-success mt-3">
                 <i className="bi bi-check-circle me-2"></i>
-                Intercambio completado exitosamente
+                <span className="d-none d-sm-inline">Intercambio completado exitosamente</span>
+                <span className="d-sm-none">Intercambio completado</span>
               </div>
             )}
 
             {contenido.estado === "rechazado" && (
               <div className="alert alert-danger mt-3">
                 <i className="bi bi-x-circle me-2"></i>
-                Intercambio rechazado
+                <span className="d-none d-sm-inline">Intercambio rechazado</span>
+                <span className="d-sm-none">Rechazado</span>
               </div>
             )}
           </div>
@@ -736,6 +777,7 @@ export default function Mensajes() {
             className={`intercambio-respuesta p-2 ${contenido.respuesta === "aceptada" ? "bg-success-subtle" : "bg-danger-subtle"} rounded`}
           >
             <div className="fw-bold text-dark">
+              <i className={`bi ${contenido.respuesta === "aceptada" ? "bi-check-circle" : "bi-x-circle"} me-2`}></i>
               {contenido.respuesta === "aceptada" ? "¡Intercambio aceptado!" : "Intercambio rechazado"}
             </div>
             <div className="small text-dark">
@@ -818,10 +860,14 @@ export default function Mensajes() {
 
             <div className="row">
               {/* Lista de conversaciones */}
-              <div className="col-md-4 mb-4 mb-md-0">
+              <div className="col-lg-4 mb-4 mb-lg-0">
                 <div className="card shadow-sm h-100">
                   <div className="card-header conversation-header py-3">
-                    <h5 className="mb-0 text-white">Conversaciones</h5>
+                    <h5 className="mb-0 text-white">
+                      <i className="bi bi-chat-dots me-2"></i>
+                      <span className="d-none d-sm-inline">Conversaciones</span>
+                      <span className="d-sm-none">Chats</span>
+                    </h5>
                   </div>
                   <div className="list-group list-group-flush overflow-auto" style={{ maxHeight: "600px" }}>
                     {cargando ? (
@@ -833,8 +879,9 @@ export default function Mensajes() {
                     ) : conversaciones.length === 0 ? (
                       <div className="list-group-item text-center text-muted py-4">
                         <i className="bi bi-chat-left-text fs-1 mb-2"></i>
-                        <p>No tienes conversaciones activas</p>
-                        <small>Cuando contactes con un vendedor, aparecerá aquí</small>
+                        <p className="mb-1">No tienes conversaciones activas</p>
+                        <small className="d-none d-sm-block">Cuando contactes con un vendedor, aparecerá aquí</small>
+                        <small className="d-sm-none">Contacta con vendedores para empezar</small>
                       </div>
                     ) : (
                       conversaciones.map((contacto) => (
@@ -863,7 +910,7 @@ export default function Mensajes() {
                               <div className="d-flex justify-content-between align-items-center">
                                 <p className="text-truncate mb-0 small">
                                   {esMensajeIntercambioTexto(contacto.ultimoMensaje)
-                                    ? "Solicitud de intercambio enviada"
+                                    ? "Solicitud de intercambio"
                                     : contacto.ultimoMensaje}
                                 </p>
                                 {contacto.noLeidos > 0 && (
@@ -890,7 +937,7 @@ export default function Mensajes() {
               </div>
 
               {/* Área de chat */}
-              <div className="col-md-8">
+              <div className="col-lg-8">
                 <div className="card shadow-sm h-100">
                   {cargandoContacto ? (
                     <div className="card-body text-center p-5">
@@ -903,22 +950,30 @@ export default function Mensajes() {
                     <>
                       <div className="card-header bg-light py-3">
                         <div className="d-flex align-items-center justify-content-between w-100">
-                          <div className="d-flex align-items-center">
-                            <div className="avatar-placeholder rounded-circle bg-secondary text-white me-3">
+                          <div className="d-flex align-items-center flex-grow-1 min-width-0">
+                            <div className="avatar-placeholder rounded-circle bg-secondary text-white me-3 flex-shrink-0">
                               {contactoSeleccionado.nombre.charAt(0).toUpperCase()}
                             </div>
-                            <div>
-                              <h5 className="mb-0">{contactoSeleccionado.nombre}</h5>
-                              <small className="text-muted">{contactoSeleccionado.email}</small>
+                            <div className="min-width-0 flex-grow-1">
+                              <h5 className="mb-0 text-truncate">{contactoSeleccionado.nombre}</h5>
+                              <small className="text-muted text-truncate d-block">{contactoSeleccionado.email}</small>
                             </div>
                           </div>
-                          <div className="d-flex align-items-center">
+                          <div className="d-flex align-items-center gap-2 flex-shrink-0">
                             <button
-                              className="btn btn-outline-primary btn-sm me-2"
+                              className="btn btn-outline-primary btn-sm d-none d-md-inline-flex"
                               onClick={() => handleSolicitarIntercambio()}
+                              title="Solicitar intercambio"
                             >
                               <i className="bi bi-arrow-left-right me-1"></i>
-                              Solicitar intercambio
+                              Intercambio
+                            </button>
+                            <button
+                              className="btn btn-outline-primary btn-sm d-md-none"
+                              onClick={() => handleSolicitarIntercambio()}
+                              title="Solicitar intercambio"
+                            >
+                              <i className="bi bi-arrow-left-right"></i>
                             </button>
                             <button
                               className="btn btn-outline-secondary btn-sm"
@@ -940,7 +995,8 @@ export default function Mensajes() {
                           <div className="text-center text-muted my-auto py-5">
                             <i className="bi bi-chat-dots fs-1 mb-3"></i>
                             <h5>No hay mensajes</h5>
-                            <p>Envía un mensaje para iniciar la conversación</p>
+                            <p className="d-none d-sm-block">Envía un mensaje para iniciar la conversación</p>
+                            <p className="d-sm-none">Envía un mensaje para empezar</p>
                           </div>
                         ) : (
                           <div className="d-flex flex-column">
@@ -956,12 +1012,21 @@ export default function Mensajes() {
                                   {esPrimerMensajeDelDia && (
                                     <div className="text-center my-3">
                                       <span className="badge bg-light text-dark px-3 py-2">
-                                        {new Date(mensaje.fecha).toLocaleDateString("es-ES", {
-                                          weekday: "long",
-                                          year: "numeric",
-                                          month: "long",
-                                          day: "numeric",
-                                        })}
+                                        <span className="d-none d-sm-inline">
+                                          {new Date(mensaje.fecha).toLocaleDateString("es-ES", {
+                                            weekday: "long",
+                                            year: "numeric",
+                                            month: "long",
+                                            day: "numeric",
+                                          })}
+                                        </span>
+                                        <span className="d-sm-none">
+                                          {new Date(mensaje.fecha).toLocaleDateString("es-ES", {
+                                            day: "2-digit",
+                                            month: "2-digit",
+                                            year: "numeric",
+                                          })}
+                                        </span>
                                       </span>
                                     </div>
                                   )}
@@ -974,7 +1039,7 @@ export default function Mensajes() {
                                       className={`message-bubble p-3 rounded-3 ${
                                         esRemitente ? "bg-primary text-white" : "bg-light border"
                                       }`}
-                                      style={{ maxWidth: "75%", position: "relative" }}
+                                      style={{ maxWidth: "85%", position: "relative" }}
                                     >
                                       <div className="message-content">
                                         {esMensajeIntercambio(mensaje)
@@ -1004,10 +1069,10 @@ export default function Mensajes() {
                       </div>
 
                       <div className="card-footer bg-white p-3">
-                        <form onSubmit={handleEnviarMensaje} className="d-flex">
+                        <form onSubmit={handleEnviarMensaje} className="d-flex gap-2">
                           <input
                             type="text"
-                            className="form-control me-2"
+                            className="form-control"
                             placeholder="Escribe un mensaje..."
                             value={nuevoMensaje}
                             onChange={(e) => setNuevoMensaje(e.target.value)}
@@ -1015,7 +1080,7 @@ export default function Mensajes() {
                           />
                           <button
                             type="submit"
-                            className="btn btn-primary px-4"
+                            className="btn btn-primary px-3 flex-shrink-0"
                             disabled={enviando || !nuevoMensaje.trim()}
                           >
                             {enviando ? (
@@ -1036,7 +1101,8 @@ export default function Mensajes() {
                       <div className="empty-state">
                         <i className="bi bi-chat-square-text fs-1 text-muted mb-3"></i>
                         <h4 className="text-muted">Selecciona una conversación</h4>
-                        <p className="text-muted">O inicia una nueva desde la sección de libros</p>
+                        <p className="text-muted d-none d-sm-block">O inicia una nueva desde la sección de libros</p>
+                        <p className="text-muted d-sm-none">Inicia una nueva desde libros</p>
                       </div>
                     </div>
                   )}
@@ -1047,14 +1113,18 @@ export default function Mensajes() {
         </div>
       </div>
 
-      {/* Modal de solicitud de intercambio */}
+      {/* Modal de solicitud de intercambio - Responsive */}
       {showIntercambioModal && (
         <div className="modal-backdrop" style={{ display: "block" }}>
           <div className="modal fade show" style={{ display: "block" }} tabIndex="-1">
-            <div className="modal-dialog modal-lg">
+            <div className="modal-dialog modal-lg modal-dialog-scrollable">
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title">Solicitar intercambio</h5>
+                  <h5 className="modal-title">
+                    <i className="bi bi-arrow-left-right me-2"></i>
+                    <span className="d-none d-sm-inline">Solicitar intercambio</span>
+                    <span className="d-sm-none">Intercambio</span>
+                  </h5>
                   <button
                     type="button"
                     className="btn-close"
@@ -1088,9 +1158,13 @@ export default function Mensajes() {
                   ) : (
                     <>
                       <div className="row">
-                        <div className="col-md-6">
-                          <h6 className="mb-3">Selecciona los libros que deseas ofrecer:</h6>
-                          <div className="row row-cols-1 row-cols-md-2 g-3">
+                        <div className="col-12 col-lg-6 mb-4 mb-lg-0">
+                          <h6 className="mb-3">
+                            <i className="bi bi-book me-2"></i>
+                            <span className="d-none d-sm-inline">Selecciona los libros que deseas ofrecer:</span>
+                            <span className="d-sm-none">Tus libros:</span>
+                          </h6>
+                          <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-1 row-cols-xl-2 g-2">
                             {librosUsuario.map((libro) => (
                               <div className="col" key={libro.id}>
                                 <div
@@ -1103,19 +1177,19 @@ export default function Mensajes() {
                                       <img
                                         src={libro.imagenes || "/placeholder.svg"}
                                         alt={libro.titulo}
-                                        style={{ height: "120px", objectFit: "contain" }}
+                                        style={{ height: "100px", objectFit: "contain" }}
                                       />
                                     ) : (
-                                      <div className="placeholder-image" style={{ height: "120px" }}>
+                                      <div className="placeholder-image" style={{ height: "100px" }}>
                                         <i className="bi bi-book fs-1"></i>
                                       </div>
                                     )}
                                   </div>
                                   <div className="card-body py-2">
-                                    <h6 className="card-title text-truncate" title={libro.titulo}>
+                                    <h6 className="card-title text-truncate small" title={libro.titulo}>
                                       {libro.titulo}
                                     </h6>
-                                    <p className="card-text small text-truncate" title={libro.autor}>
+                                    <p className="card-text small text-truncate text-muted" title={libro.autor}>
                                       {libro.autor}
                                     </p>
                                   </div>
@@ -1127,7 +1201,7 @@ export default function Mensajes() {
                                         checked={librosSeleccionados.some((l) => l.id === libro.id)}
                                         onChange={() => handleSeleccionLibro(libro)}
                                       />
-                                      <label className="form-check-label">Seleccionar</label>
+                                      <label className="form-check-label small">Seleccionar</label>
                                     </div>
                                   </div>
                                 </div>
@@ -1136,11 +1210,15 @@ export default function Mensajes() {
                           </div>
                         </div>
 
-                        <div className="col-md-6">
+                        <div className="col-12 col-lg-6">
                           {libroContacto ? (
                             // Si venimos de la página de un libro específico, mostrar solo ese libro
                             <div>
-                              <h6 className="mb-3">Libro que deseas recibir:</h6>
+                              <h6 className="mb-3">
+                                <i className="bi bi-arrow-down-circle me-2"></i>
+                                <span className="d-none d-sm-inline">Libro que deseas recibir:</span>
+                                <span className="d-sm-none">A recibir:</span>
+                              </h6>
                               <div className="card mb-3">
                                 <div className="row g-0">
                                   <div className="col-4">
@@ -1163,7 +1241,10 @@ export default function Mensajes() {
                                       <p className="card-text">{libroContacto.autor}</p>
                                       <p className="card-text">
                                         <small className="text-muted">
-                                          Este es el libro que has seleccionado previamente
+                                          <span className="d-none d-sm-inline">
+                                            Este es el libro que has seleccionado previamente
+                                          </span>
+                                          <span className="d-sm-none">Libro seleccionado</span>
                                         </small>
                                       </p>
                                     </div>
@@ -1174,8 +1255,12 @@ export default function Mensajes() {
                           ) : librosContacto && librosContacto.length > 0 ? (
                             // Si no venimos de un libro específico, mostrar todos los libros del contacto
                             <div>
-                              <h6 className="mb-3">Selecciona el libro que deseas recibir:</h6>
-                              <div className="row row-cols-1 row-cols-md-2 g-3">
+                              <h6 className="mb-3">
+                                <i className="bi bi-arrow-down-circle me-2"></i>
+                                <span className="d-none d-sm-inline">Selecciona el libro que deseas recibir:</span>
+                                <span className="d-sm-none">A recibir:</span>
+                              </h6>
+                              <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-1 row-cols-xl-2 g-2">
                                 {librosContacto.map((libro) => (
                                   <div className="col" key={libro.id}>
                                     <div
@@ -1188,19 +1273,19 @@ export default function Mensajes() {
                                           <img
                                             src={libro.imagenes || "/placeholder.svg"}
                                             alt={libro.titulo}
-                                            style={{ height: "120px", objectFit: "contain" }}
+                                            style={{ height: "100px", objectFit: "contain" }}
                                           />
                                         ) : (
-                                          <div className="placeholder-image" style={{ height: "120px" }}>
+                                          <div className="placeholder-image" style={{ height: "100px" }}>
                                             <i className="bi bi-book fs-1"></i>
                                           </div>
                                         )}
                                       </div>
                                       <div className="card-body py-2">
-                                        <h6 className="card-title text-truncate" title={libro.titulo}>
+                                        <h6 className="card-title text-truncate small" title={libro.titulo}>
                                           {libro.titulo}
                                         </h6>
-                                        <p className="card-text small text-truncate" title={libro.autor}>
+                                        <p className="card-text small text-truncate text-muted" title={libro.autor}>
                                           {libro.autor}
                                         </p>
                                       </div>
@@ -1213,7 +1298,7 @@ export default function Mensajes() {
                                             checked={libroContactoSeleccionado?.id === libro.id}
                                             onChange={() => handleSeleccionLibroContacto(libro)}
                                           />
-                                          <label className="form-check-label">Seleccionar</label>
+                                          <label className="form-check-label small">Seleccionar</label>
                                         </div>
                                       </div>
                                     </div>
@@ -1224,7 +1309,10 @@ export default function Mensajes() {
                           ) : (
                             <div className="alert alert-info">
                               <i className="bi bi-info-circle me-2"></i>
-                              El otro usuario no tiene libros disponibles para intercambio.
+                              <span className="d-none d-sm-inline">
+                                El otro usuario no tiene libros disponibles para intercambio.
+                              </span>
+                              <span className="d-sm-none">Sin libros disponibles para intercambio.</span>
                             </div>
                           )}
                         </div>
@@ -1258,10 +1346,15 @@ export default function Mensajes() {
                     {enviando ? (
                       <>
                         <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        Enviando...
+                        <span className="d-none d-sm-inline">Enviando...</span>
+                        <span className="d-sm-none">...</span>
                       </>
                     ) : (
-                      <>Solicitar intercambio</>
+                      <>
+                        <i className="bi bi-send me-1"></i>
+                        <span className="d-none d-sm-inline">Solicitar intercambio</span>
+                        <span className="d-sm-none">Solicitar</span>
+                      </>
                     )}
                   </button>
                 </div>
