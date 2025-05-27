@@ -896,7 +896,7 @@ export default function Mensajes() {
                             onClick={() => seleccionarContacto(contacto)}
                           >
                             <div className="flex-shrink-0 me-3">
-                              <div className="avatar-placeholder rounded-circle bg-secondary text-white">
+                              <div className="avatar-placeholder rounded-circle bg-secondary text-white" style={{ width: "40px", height: "40px" }}>
                                 {contacto.nombre.charAt(0).toUpperCase()}
                               </div>
                             </div>
@@ -950,11 +950,11 @@ export default function Mensajes() {
                     <>
                       <div className="card-header bg-light py-3">
                         <div className="d-flex align-items-center justify-content-between w-100">
-                          <div className="d-flex align-items-center flex-grow-1 min-width-0">
-                            <div className="avatar-placeholder rounded-circle bg-secondary text-white me-3 flex-shrink-0">
+                          <div className="d-flex align-items-center">
+                            <div className="avatar-placeholder rounded-circle bg-secondary text-white me-3" style={{ width: "40px", height: "40px" }}>
                               {contactoSeleccionado.nombre.charAt(0).toUpperCase()}
                             </div>
-                            <div className="min-width-0 flex-grow-1">
+                            <div className="flex-grow-1">
                               <h5 className="mb-0 text-truncate">{contactoSeleccionado.nombre}</h5>
                               <small className="text-muted text-truncate d-block">{contactoSeleccionado.email}</small>
                             </div>

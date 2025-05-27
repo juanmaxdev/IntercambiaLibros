@@ -13,7 +13,7 @@
 }
 
 @font-face {
-  font-family: 'Baskerville';
+  font-family: 'Baskerville-Italic';
   src: url('/assets/fonts/Libre_Baskerville/LibreBaskerville-italic.ttf') format('truetype');
   font-weight: 400;
   font-style: italic;
@@ -34,7 +34,7 @@
 }
 
 @font-face {
-  font-family: 'Garamond';
+  font-family: 'Garamond-Italic';
   src: url('/assets/fonts/Cormorant_Garamond/static/CormorantGaramond-MediumItalic.ttf') format('truetype');
   font-weight: 500;
   font-style: italic;
@@ -94,7 +94,7 @@ h4,
 h5,
 h6 {
   color: var(--text);
-  font-family: 'Baskerville', 'Garamond', sans-serif;
+  font-family: 'Baskerville-Italic', 'Garamond', sans-serif;
   letter-spacing: 0.5px;
 }
 

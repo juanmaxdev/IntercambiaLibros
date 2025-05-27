@@ -30,7 +30,7 @@ export const obtenerIntercambios = async (userEmail, estado = null) => {
     }
 
     // Ejecutar la consulta
-    const { data, error } = await query.order("created_at", { ascending: false })
+    const { data, error } = await query.order("fecha_intercambio", { ascending: false })
 
     if (error) throw error
 

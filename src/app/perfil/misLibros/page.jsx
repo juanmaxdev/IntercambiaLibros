@@ -1,25 +1,25 @@
-"use client";
-import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
-import ModernSidebar from "@/components/perfil/sideBar";
-import "@/app/styles/books/mis-libros.css";
+"use client"
+import { useState, useEffect } from "react"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import Image from "next/image"
+import Link from "next/link"
+import ModernSidebar from "@/components/perfil/sideBar"
+import "@/app/styles/books/mis-libros.css"
 
 export default function MisLibrosPage() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-  const [libros, setLibros] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("favoritos");
-  const [searchTerm, setSearchTerm] = useState("");
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  const [libros, setLibros] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState("favoritos")
+  const [searchTerm, setSearchTerm] = useState("")
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/?login=true");
+      router.push("/?login=true")
     }
-  }, [status, router]);
+  }, [status, router])
 
   const handleEliminarFavorito = async (libroId) => {
     try {
@@ -27,43 +27,43 @@ export default function MisLibrosPage() {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id_libro: libroId }),
-      });
+      })
 
-      if (!res.ok) throw new Error("Error al eliminar favorito");
+      if (!res.ok) throw new Error("Error al eliminar favorito")
 
-      setLibros((prev) => prev.filter((libro) => libro.id !== libroId));
+      setLibros((prev) => prev.filter((libro) => libro.id !== libroId))
     } catch (err) {
-      console.error("Error al eliminar favorito:", err);
+      console.error("Error al eliminar favorito:", err)
     }
-  };
+  }
 
   const handleEliminarSubido = async (libroId) => {
     try {
       const res = await fetch(`/api/libros/${libroId}`, {
         method: "DELETE",
-      });
+      })
 
-      if (!res.ok) throw new Error("Error al eliminar libro subido");
+      if (!res.ok) throw new Error("Error al eliminar libro subido")
 
-      setLibros((prev) => prev.filter((libro) => libro.id !== libroId));
+      setLibros((prev) => prev.filter((libro) => libro.id !== libroId))
     } catch (err) {
-      console.error("Error al eliminar libro subido:", err);
+      console.error("Error al eliminar libro subido:", err)
     }
-  };
+  }
 
   useEffect(() => {
     const fetchLibros = async () => {
-      setIsLoading(true);
+      setIsLoading(true)
       try {
         if (session?.user?.email) {
-          let endpoint = "";
+          let endpoint = ""
 
           if (activeTab === "favoritos") {
-            endpoint = "/api/libros/favoritos";
+            endpoint = "/api/libros/favoritos"
           } else if (activeTab === "subidos") {
-            endpoint = "/api/libros/usuario";
+            endpoint = "/api/libros/usuario"
           } else if (activeTab === "intercambios") {
-            endpoint = "/api/libros/intercambios";
+            endpoint = "/api/libros/intercambios"
           }
 
           const response = await fetch(endpoint, {
@@ -71,32 +71,32 @@ export default function MisLibrosPage() {
             headers: {
               correo_electronico: session.user.email,
             },
-          });
+          })
 
           if (response.ok) {
-            const data = await response.json();
-            setLibros(data);
+            const data = await response.json()
+            setLibros(data)
           } else {
-            console.error("Error al obtener los libros:", await response.text());
+            console.error("Error al obtener los libros:", await response.text())
           }
         }
       } catch (error) {
-        console.error("Error del servidor:", error);
+        console.error("Error del servidor:", error)
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
     if (status === "authenticated") {
-      fetchLibros();
+      fetchLibros()
     }
-  }, [status, session, activeTab]);
+  }, [status, session, activeTab])
 
   const filteredLibros = libros.filter(
     (libro) =>
-      libro.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      libro.autor.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      (libro.titulo && libro.titulo.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (libro.autor && libro.autor.toLowerCase().includes(searchTerm.toLowerCase())),
+  )
 
   if (status === "loading" || status === "unauthenticated") {
     return (
@@ -109,7 +109,7 @@ export default function MisLibrosPage() {
           <p>Debes iniciar sesión para ver tus libros.</p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -137,13 +137,31 @@ export default function MisLibrosPage() {
               <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
                 <ul className="nav nav-tabs">
                   <li className="nav-item">
-                    <button className={`nav-link ${activeTab === "favoritos" ? "active" : ""}`} onClick={() => setActiveTab("favoritos")}> <i className="bi bi-heart me-2"></i>Favoritos </button>
+                    <button
+                      className={`nav-link ${activeTab === "favoritos" ? "active" : ""}`}
+                      onClick={() => setActiveTab("favoritos")}
+                    >
+                      {" "}
+                      <i className="bi bi-heart me-2"></i>Favoritos{" "}
+                    </button>
                   </li>
                   <li className="nav-item">
-                    <button className={`nav-link ${activeTab === "subidos" ? "active" : ""}`} onClick={() => setActiveTab("subidos")}> <i className="bi bi-upload me-2"></i>Subidos </button>
+                    <button
+                      className={`nav-link ${activeTab === "subidos" ? "active" : ""}`}
+                      onClick={() => setActiveTab("subidos")}
+                    >
+                      {" "}
+                      <i className="bi bi-upload me-2"></i>Subidos{" "}
+                    </button>
                   </li>
                   <li className="nav-item">
-                    <button className={`nav-link ${activeTab === "intercambios" ? "active" : ""}`} onClick={() => setActiveTab("intercambios")}> <i className="bi bi-arrow-left-right me-2"></i>Intercambios </button>
+                    <button
+                      className={`nav-link ${activeTab === "intercambios" ? "active" : ""}`}
+                      onClick={() => setActiveTab("intercambios")}
+                    >
+                      {" "}
+                      <i className="bi bi-arrow-left-right me-2"></i>Intercambios{" "}
+                    </button>
                   </li>
                 </ul>
 
@@ -152,7 +170,13 @@ export default function MisLibrosPage() {
                     <span className="input-group-text bg-white border-end-0">
                       <i className="bi bi-search"></i>
                     </span>
-                    <input type="text" className="form-control border-start-0" placeholder="Buscar en mis libros..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                    <input
+                      type="text"
+                      className="form-control border-start-0"
+                      placeholder="Buscar en mis libros..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                   </div>
                 </div>
               </div>
@@ -171,7 +195,13 @@ export default function MisLibrosPage() {
                   </div>
                   <h3>No se encontraron libros</h3>
                   <p className="text-muted">
-                    {searchTerm ? `No hay resultados para "${searchTerm}". Intenta con otra búsqueda.` : activeTab === "favoritos" ? "Aún no tienes libros marcados como favoritos." : activeTab === "subidos" ? "Aún no has subido ningún libro." : "Aún no has realizado ningún intercambio."}
+                    {searchTerm
+                      ? `No hay resultados para "${searchTerm}". Intenta con otra búsqueda.`
+                      : activeTab === "favoritos"
+                        ? "Aún no tienes libros marcados como favoritos."
+                        : activeTab === "subidos"
+                          ? "Aún no has subido ningún libro."
+                          : "Aún no has realizado ningún intercambio."}
                   </p>
                   {!searchTerm && (
                     <Link href="/libros/generos" className="btn btn-outline-primary mt-3">
@@ -185,15 +215,29 @@ export default function MisLibrosPage() {
                     <div className="col" key={libro.id}>
                       <div className="book-card">
                         <div className="book-card-image">
-                          <Image src={libro.imagenes || "/placeholder.svg?height=300&width=200"} alt={libro.titulo} width={150} height={225} className="img-fluid rounded" />
+                          <Image
+                            src={libro.imagenes || "/placeholder.svg?height=300&width=200"}
+                            alt={libro.titulo}
+                            width={150}
+                            height={225}
+                            className="img-fluid rounded"
+                          />
                           <div className="book-actions">
-                            <button className="action-btn view-btn" title="Ver detalles" onClick={() => router.push(`/libros/${libro.id}`)}>
+                            <button
+                              className="action-btn view-btn"
+                              title="Ver detalles"
+                              onClick={() => router.push(`/libros/${libro.id}`)}
+                            >
                               <i className="bi bi-eye"></i>
                             </button>
                             <button
                               className="action-btn remove-btn"
                               title="Eliminar"
-                              onClick={() => activeTab === "subidos" ? handleEliminarSubido(libro.id) : handleEliminarFavorito(libro.id)}
+                              onClick={() =>
+                                activeTab === "subidos"
+                                  ? handleEliminarSubido(libro.id)
+                                  : handleEliminarFavorito(libro.id)
+                              }
                             >
                               <i className="bi bi-trash"></i>
                             </button>
@@ -204,7 +248,13 @@ export default function MisLibrosPage() {
                           <p className="book-author">{libro.autor}</p>
                           <div className="book-meta">
                             <span className="book-genre">{libro.genero}</span>
-                            <span className="book-date">{new Date(libro.fecha_subida).toLocaleDateString("es-ES", { year: "numeric", month: "short", day: "numeric" })}</span>
+                            <span className="book-date">
+                              {new Date(libro.fecha_subida).toLocaleDateString("es-ES", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              })}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -217,5 +267,5 @@ export default function MisLibrosPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

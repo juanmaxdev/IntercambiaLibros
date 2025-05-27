@@ -8,7 +8,7 @@ export async function obtenerPerfil(email) {
 
   const { data: usuario, error } = await supabase
     .from("usuarios")
-    .select("id, nombre_usuario, correo_electronico, ubicacion, biografia, reputacion")
+    .select("id, nombre_usuario, correo_electronico, ubicacion, biografia, reputacion, fecha_registro")
     .eq("correo_electronico", email)
     .single();
 

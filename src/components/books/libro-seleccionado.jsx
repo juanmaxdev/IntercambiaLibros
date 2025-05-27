@@ -194,7 +194,7 @@ export default function LibroSeleccionado({ book }) {
       </div>
 
       <div className="container-fluid my-5 px-0">
-        <ComentariosLibro titulo={book.titulo || ""} session={session} />
+        <ComentariosLibro libroId={book.id || ""} session={session} />
       </div>
 
       <div className="container mt-4 mb-5 text-center">

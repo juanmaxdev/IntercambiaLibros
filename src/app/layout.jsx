@@ -1,4 +1,3 @@
-import { Geist, Geist_Mono } from 'next/font/google';
 import Script from 'next/script';
 import '/public/assets/bootstrap/css/bootstrap.min.css';
 import Nav from '@/components/nav/navbar';

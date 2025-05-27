@@ -3,7 +3,7 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import "@/app/styles/books/comentarios.css"
 
-export default function ComentariosLibro({ titulo, session }) {
+export default function ComentariosLibro({ libroId, session }) {
   // Estados existentes
   const [comentarios, setComentarios] = useState([])
   const [loading, setLoading] = useState(true)
@@ -45,20 +45,9 @@ export default function ComentariosLibro({ titulo, session }) {
     }, 3000)
   }
 
-  // Normalizar título para comparación
-  const normalizarTexto = (texto) => {
-    if (!texto) return ""
-    return texto
-      .toLowerCase()
-      .trim()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^\w\s]/gi, "")
-  }
-
   useEffect(() => {
     const fetchComentarios = async () => {
-      if (!titulo) {
+      if (!libroId) {
         setLoading(false)
         return
       }
@@ -66,7 +55,7 @@ export default function ComentariosLibro({ titulo, session }) {
       try {
         setLoading(true)
 
-        const response = await fetch(`/api/libros/comentarios?titulo=${encodeURIComponent(titulo)}`)
+        const response = await fetch(`/api/libros/comentarios?libro_id=${encodeURIComponent(libroId)}`)
 
         if (!response.ok) {
           const errorText = await response.text()
@@ -83,32 +72,17 @@ export default function ComentariosLibro({ titulo, session }) {
           throw new Error("Formato de respuesta inesperado")
         }
 
-        const tituloNormalizado = normalizarTexto(titulo)
+        setComentarios(data)
 
-        const comentariosFiltrados = data.filter((comentario) => {
-          const tituloComentario = comentario.titulo_libro || comentario.titulo || ""
-
-          if (!tituloComentario) return false
-
-          const tituloComentarioNormalizado = normalizarTexto(tituloComentario)
-
-          return (
-            tituloComentarioNormalizado.includes(tituloNormalizado) ||
-            tituloNormalizado.includes(tituloComentarioNormalizado)
-          )
-        })
-
-        setComentarios(comentariosFiltrados)
-
-        if (comentariosFiltrados.length > 0) {
+        if (comentarios.length > 0) {
           const conteo = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
-          comentariosFiltrados.forEach((comentario) => {
+          comentarios.forEach((comentario) => {
             if (comentario.valoracion >= 1 && comentario.valoracion <= 5) {
               conteo[comentario.valoracion]++
             }
           })
 
-          const total = comentariosFiltrados.length
+          const total = comentarios.length
           const nuevoPorcentajes = {}
 
           for (let i = 1; i <= 5; i++) {
@@ -126,7 +100,7 @@ export default function ComentariosLibro({ titulo, session }) {
     }
 
     fetchComentarios()
-  }, [titulo])
+  }, [libroId])
 
   // Formatear fecha para mostrar en formato legible
   const formatearFecha = (fechaStr) => {
@@ -176,7 +150,7 @@ export default function ComentariosLibro({ titulo, session }) {
     e.preventDefault()
 
     // Validaciones con mensajes específicos
-    if (!titulo) {
+    if (!libroId) {
       mostrarError("Error interno: No se pudo identificar el libro.", "warning")
       return
     }
@@ -200,7 +174,7 @@ export default function ComentariosLibro({ titulo, session }) {
       setEnviando(true)
 
       const comentarioData = {
-        titulo: titulo,
+        libro_id: libroId,
         usuario_id: session.user.email, // Enviamos el email, la API lo convertirá al ID
         usuario_nombre: session.user.name || "Anónimo",
         imagen_usuario: session.user.image || null,
@@ -210,7 +184,7 @@ export default function ComentariosLibro({ titulo, session }) {
       }
 
       console.log("Enviando comentario:", {
-        titulo: comentarioData.titulo,
+        titulo: comentarioData.libro_id,
         usuario_email: comentarioData.usuario_id,
         valoracion: comentarioData.valoracion,
       })
