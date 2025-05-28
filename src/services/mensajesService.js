@@ -1,9 +1,7 @@
 import { supabase } from "@/lib/supabase"
 
-// Obtener conversaciones de un usuario
 export const obtenerConversaciones = async (userEmail) => {
   try {
-    // Obtener todos los mensajes donde el usuario es remitente o destinatario
     const { data: mensajes, error } = await supabase
       .from("mensajes")
       .select("*")
@@ -12,7 +10,6 @@ export const obtenerConversaciones = async (userEmail) => {
 
     if (error) throw error
 
-    // Obtener IDs únicos de todos los usuarios con los que se ha comunicado
     const contactosIds = new Set()
     mensajes.forEach((mensaje) => {
       if (mensaje.remitente_id === userEmail) {
@@ -22,7 +19,6 @@ export const obtenerConversaciones = async (userEmail) => {
       }
     })
 
-    // Obtener información de todos los usuarios
     const { data: usuarios, error: errorUsuarios } = await supabase
       .from("usuarios")
       .select("id, nombre_usuario, correo_electronico")
@@ -30,7 +26,6 @@ export const obtenerConversaciones = async (userEmail) => {
 
     if (errorUsuarios) throw errorUsuarios
 
-    // Crear un mapa de correo electrónico a información de usuario
     const usuariosMap = {}
     usuarios.forEach((usuario) => {
       usuariosMap[usuario.correo_electronico] = {
@@ -40,7 +35,6 @@ export const obtenerConversaciones = async (userEmail) => {
       }
     })
 
-    // Agrupar mensajes por contacto
     const contactosMap = new Map()
 
     mensajes.forEach((mensaje) => {
@@ -52,10 +46,9 @@ export const obtenerConversaciones = async (userEmail) => {
         email: contactoEmail,
       }
 
-      // Verificar si hay mensajes no leídos
       const noLeido = !mensaje.leido && mensaje.destinatario_id === userEmail
 
-      // Formatear el contenido del mensaje para mensajes de intercambio
+
       let contenidoMostrado = mensaje.contenido
       try {
         const contenidoJson = JSON.parse(mensaje.contenido)
@@ -67,7 +60,6 @@ export const obtenerConversaciones = async (userEmail) => {
           contenidoMostrado = "Entrega confirmada"
         }
       } catch (e) {
-        // No es un JSON, mantener el contenido original
       }
 
       if (!contactosMap.has(contactoEmail)) {
@@ -93,12 +85,9 @@ export const obtenerConversaciones = async (userEmail) => {
 
     return Array.from(contactosMap.values())
   } catch (error) {
-    console.log("Error al obtener conversaciones:", error)
     throw error
   }
 }
-
-// Obtener mensajes entre dos usuarios
 export const obtenerMensajes = async (usuarioEmail, contactoEmail) => {
   try {
     const { data, error } = await supabase
@@ -114,15 +103,12 @@ export const obtenerMensajes = async (usuarioEmail, contactoEmail) => {
 
     return data
   } catch (error) {
-    console.log("Error al obtener mensajes:", error)
     throw error
   }
 }
 
-// Enviar un mensaje
 export const enviarMensaje = async (remitenteEmail, destinatarioEmail, contenido) => {
   try {
-    // Verificar que los emails no sean nulos
     if (!remitenteEmail) {
       throw new Error("Email de remitente no válido")
     }
@@ -146,12 +132,10 @@ export const enviarMensaje = async (remitenteEmail, destinatarioEmail, contenido
 
     return data[0]
   } catch (error) {
-    console.log("Error al enviar mensaje:", error)
     throw error
   }
 }
 
-// Marcar mensajes como leídos
 export const marcarComoLeidos = async (mensajeIds) => {
   try {
     if (!mensajeIds || mensajeIds.length === 0) {
@@ -164,12 +148,10 @@ export const marcarComoLeidos = async (mensajeIds) => {
 
     return data
   } catch (error) {
-    console.log("Error al marcar mensajes como leídos:", error)
     throw error
   }
 }
 
-// Marcar todos los mensajes como leídos para un usuario
 export const marcarTodosComoLeidos = async (userEmail) => {
   try {
     const { data, error } = await supabase
@@ -183,12 +165,10 @@ export const marcarTodosComoLeidos = async (userEmail) => {
 
     return data
   } catch (error) {
-    console.log("Error al marcar todos los mensajes como leídos:", error)
     throw error
   }
 }
 
-// Obtener información de un usuario por email
 export const obtenerUsuarioPorEmail = async (userEmail) => {
   try {
     const { data, error } = await supabase
@@ -205,9 +185,7 @@ export const obtenerUsuarioPorEmail = async (userEmail) => {
       email: data.correo_electronico,
     }
   } catch (error) {
-    console.log("Error al obtener información del usuario:", error)
 
-    // Si no se encuentra el usuario, devolver un objeto con la información básica
     return {
       id: null,
       nombre: userEmail.split("@")[0] || "Usuario",

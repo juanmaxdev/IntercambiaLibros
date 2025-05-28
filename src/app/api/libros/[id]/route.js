@@ -1,17 +1,15 @@
-import { eliminarLibroPorId } from '@/services/librosService';
+import { NextResponse } from "next/server"
+import { obtenerLibroPorId } from "@/services/librosService"
 
-export async function DELETE(_req, { params }) {
-  const { id } = params;
-
-  if (!id) {
-    return Response.json({ error: "ID requerido" }, { status: 400 });
-  }
-
+export async function GET(request, { params }) {
   try {
-    await eliminarLibroPorId(id);
-    return Response.json({ message: "Libro eliminado correctamente" });
-  } catch (err) {
-    console.error("Error al eliminar libro:", err);
-    return Response.json({ error: err.message || "Error interno" }, { status: 500 });
+    const libro = await obtenerLibroPorId(params.id)
+
+    if (!libro) {
+      return NextResponse.json({ error: "Libro no encontrado" }, { status: 404 })
+    }
+    return NextResponse.json(libro)
+  } catch (error) {
+    return NextResponse.json({ error: `Error al obtener libro: ${error.message}` }, { status: 500 })
   }
 }

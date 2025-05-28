@@ -33,7 +33,6 @@ export async function iniciarSesion({ correo_electronico, contrasena }) {
       },
     };
   } catch (err) {
-    console.error('Error en loginService:', err);
     throw err;
   }
 }

@@ -1,0 +1,87 @@
+ .notification-dropdown {
+          position: absolute;
+          top: 100%;
+          right: 0;
+          width: 320px;
+          background-color: white;
+          border-radius: 8px;
+          overflow: hidden;
+          z-index: 1000;
+          border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .notification-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 12px 16px;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+          background-color: #f8f9fa;
+        }
+
+        .notification-body {
+          max-height: 350px;
+          overflow-y: auto;
+        }
+
+        .notification-item {
+          display: flex;
+          padding: 12px 16px;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+          text-decoration: none;
+          color: inherit;
+          transition: background-color 0.2s;
+        }
+
+        .notification-item:hover {
+          background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .notification-avatar {
+          margin-right: 12px;
+          flex-shrink: 0;
+        }
+
+        .avatar-placeholder {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background-color: #6c757d;
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+        }
+
+        .notification-content {
+          flex-grow: 1;
+          min-width: 0;
+        }
+
+        .notification-title {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 4px;
+        }
+
+        .notification-time {
+          font-size: 0.75rem;
+          color: #6c757d;
+        }
+
+        .notification-message {
+          margin: 0;
+          font-size: 0.875rem;
+          color: #495057;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .notification-footer {
+          padding: 8px 16px;
+          border-top: 1px solid rgba(0, 0, 0, 0.05);
+          text-align: center;
+        }

@@ -10,6 +10,7 @@ import { SearchBar } from "./search-bar"
 import { NavLinks } from "./nav-links"
 import { LoginModal } from "./login-modal"
 import { RegistroModal } from "./registro-modal"
+import { SuccessModal } from "./success-modal"
 import { useAuth } from "@/app/hooks/use-auth"
 import NotificationsDropdown from "./notifications-dropdown"
 
@@ -26,11 +27,10 @@ export default function Nav() {
     if (isLoggedIn && localStorage.getItem("sessionStarted")) {
       setToastMessage("Sesión iniciada correctamente")
       setShowToast(true)
-      localStorage.removeItem("sessionStarted") // Eliminar para que no se muestre de nuevo al recargar
+      localStorage.removeItem("sessionStarted") 
     }
   }, [isLoggedIn])
 
-  // Crear un objeto de sesión unificado para pasar a los componentes
   const unifiedSession = {
     user: {
       name: userName || session?.user?.name || "Usuario",
@@ -43,26 +43,23 @@ export default function Nav() {
     const fetchUnreadNotifications = async () => {
       if (isLoggedIn && userEmail) {
         try {
-          // Obtener conversaciones para contar mensajes no leídos
           const response = await fetch(`/api/mensajes/notificaciones?email=${encodeURIComponent(userEmail)}`)
           if (response.ok) {
             const data = await response.json()
             setUnreadNotifications(data.unreadCount || 0)
           }
         } catch (error) {
-          console.error("Error al obtener notificaciones:", error)
+          throw new Error("Error al obtener las notificaciones: " + error.message)
         }
       }
     }
 
     fetchUnreadNotifications()
 
-    // Actualizar cada 30 segundos
     const interval = setInterval(fetchUnreadNotifications, 30000)
     return () => clearInterval(interval)
   }, [isLoggedIn, userEmail])
 
-  // Manejar clic en el icono de notificaciones
   const handleNotificationClick = (e) => {
     e.preventDefault()
     setShowNotifications(!showNotifications)
@@ -80,7 +77,7 @@ export default function Nav() {
                 <li className="nav-item">
                   <Link className="nav-link active p-0" aria-current="page" href="/">
                     <Image
-                      src="/assets/img/logo2.png"
+                      src="/assets/img/logo/logo.png"
                       alt="logo"
                       className="d-none d-md-inline"
                       width={150}
@@ -88,7 +85,7 @@ export default function Nav() {
                       priority
                     />
                     <Image
-                      src="/assets/img/logo/Logo_small_true.jpg"
+                      src="/assets/img/logo/logo_it_responsive.png"
                       alt="logo"
                       className="d-inline d-md-none me-2"
                       width={28}
@@ -98,13 +95,10 @@ export default function Nav() {
                   </Link>
                 </li>
               </ul>
-
-              {/* Barra de búsqueda */}
               <SearchBar />
-
               {/* Menú derecho */}
+
               <ul className="navbar-nav d-flex flex-row align-items-center">
-                {/* Mostrar "Subir Libro" solo si el usuario está autenticado */}
                 {isLoggedIn && (
                   <li className="nav-item ms-3">
                     <Link className="nav-link d-flex align-items-center gap-2 text-nowrap" href="/subirLibro">
@@ -118,7 +112,9 @@ export default function Nav() {
                 <li className="nav-item dropdown" style={{ position: "relative" }}>
                   {isLoggedIn ? <UserMenu session={unifiedSession} authType={authType} /> : <LoginButton />}
                 </li>
+
                 {/* Notificaciones */}
+
                 <li className="nav-item" style={{ position: "relative" }}>
                   <a
                     href="#"
@@ -153,6 +149,7 @@ export default function Nav() {
             <RegistroModal />
           </>
         )}
+        <SuccessModal />
         {/* Mostrar notificación de inicio de sesión */}
         {showToast && <ToastNotification message={toastMessage} onClose={() => setShowToast(false)} />}
       </header>

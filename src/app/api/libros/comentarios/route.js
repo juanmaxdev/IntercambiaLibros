@@ -1,126 +1,139 @@
 import { supabase } from "@/lib/supabase"
-import { NextResponse } from "next/server"
 
-export async function GET(request) {
+export async function GET(req) {
   try {
-    // Obtener el título del libro desde los parámetros de consulta
-    const searchParams = request.nextUrl.searchParams
-    const titulo = searchParams.get("titulo")
+    const { searchParams } = new URL(req.url)
+    const usuario = searchParams.get("usuario")
+    if (usuario) {
+      const { data: usuarioData, error: usuarioError } = await supabase
+        .from("usuarios")
+        .select("id")
+        .eq("correo_electronico", usuario)
+        .single()
 
-    if (!titulo) {
-      return NextResponse.json({ error: "Se requiere el título del libro" }, { status: 400 })
+      if (usuarioError || !usuarioData) {
+        return new Response(JSON.stringify([]), { status: 200 })
+      }
+
+      const { data: comentarios, error } = await supabase
+        .from("valoraciones_libros")
+        .select("*")
+        .eq("usuario_id", usuarioData.id)
+
+      if (error) {
+        return new Response(JSON.stringify({ error: "Error al obtener comentarios" }), { status: 500 })
+      }
+
+      return new Response(JSON.stringify(comentarios || []), { status: 200 })
     }
 
-    // Función para normalizar texto
-    const normalizarTexto = (texto) => {
-      if (!texto) return ""
-      return texto
-        .toLowerCase()
-        .trim()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "") // Eliminar acentos
-        .replace(/[^\w\s]/gi, "") // Eliminar caracteres especiales
+    // Si no se especifica usuario, obtener todos los comentarios (lógica existente)
+    const libroId = searchParams.get("libro_id")
+
+    if (!libroId) {
+      return new Response(JSON.stringify({ error: "libro_id es requerido" }), { status: 400 })
     }
 
-    const tituloNormalizado = normalizarTexto(titulo)
 
-    // Consulta a Supabase para obtener todas las valoraciones
-    // Cambiamos el nombre de la tabla a valoraciones_libros
-    const { data, error } = await supabase.from("valoraciones_libros").select(`
-        id,
-        usuario_id,
-        valoracion,
-        comentario,
-        fecha_valoracion,
-        titulo,
-        usuarios:usuario_id (
+    const { data: comentarios, error } = await supabase
+      .from("valoraciones_libros")
+      .select(`
+        *,
+        usuarios (
           nombre_usuario,
           correo_electronico
         )
       `)
+      .eq("libro_id", libroId)
+      .order("fecha_valoracion", { ascending: false })
 
     if (error) {
-      console.error("Error al obtener valoraciones:", error)
-      return NextResponse.json({ error: `Error al obtener valoraciones: ${error.message}` }, { status: 500 })
+      return new Response(JSON.stringify({ error: "Error al obtener comentarios" }), { status: 500 })
     }
 
-    // Verificar que data sea un array
-    if (!Array.isArray(data)) {
-      console.error("La respuesta de Supabase no es un array:", data)
-      return NextResponse.json({ error: "Formato de respuesta inesperado" }, { status: 500 })
-    }
-
-    // Aplanar los resultados para facilitar el acceso a los datos
-    const comentariosAplanados = data.map(({ usuarios, ...rest }) => ({
-      ...rest,
-      nombre_usuario: usuarios?.nombre_usuario || "",
-      correo_electronico: usuarios?.correo_electronico || "",
-    }))
-
-    // Filtrar los comentarios según el título normalizado
-    const comentariosFiltrados = comentariosAplanados.filter((comentario) => {
-      // Obtener el título del comentario
-      const tituloComentario = comentario.titulo || ""
-
-      if (!tituloComentario) return false
-
-      const tituloComentarioNormalizado = normalizarTexto(tituloComentario)
-
-      // Comparación más flexible: verificar si uno contiene al otro
-      return (
-        tituloComentarioNormalizado.includes(tituloNormalizado) ||
-        tituloNormalizado.includes(tituloComentarioNormalizado)
-      )
-    })
-
-    return NextResponse.json(comentariosFiltrados)
+    return new Response(JSON.stringify(comentarios || []), { status: 200 })
   } catch (error) {
-    console.error("Error al obtener comentarios:", error)
-    return NextResponse.json({ error: `Error al obtener los comentarios: ${error.message}` }, { status: 500 })
+    return new Response(JSON.stringify({ error: "Error interno del servidor" }), { status: 500 })
   }
 }
 
-export async function POST(request) {
+export async function POST(req) {
   try {
-    const comentarioData = await request.json()
+    const body = await req.json()
 
-    // Validar datos requeridos
-    if (!comentarioData.titulo || !comentarioData.comentario || !comentarioData.valoracion) {
-      return NextResponse.json({ error: "Faltan datos requeridos (título, comentario o valoración)" }, { status: 400 })
+    const { libro_id, usuario_id, valoracion, comentario } = body
+
+    if (!libro_id || !usuario_id || !valoracion) {
+      return new Response(JSON.stringify({ error: "Faltan datos requeridos" }), { status: 400 })
     }
 
-    // Si no se recibe fecha, la generamos desde backend
-    if (!comentarioData.fecha_valoracion) {
-      const fecha = new Date()
-      comentarioData.fecha_valoracion = fecha.toISOString().slice(0, 16) // yyyy-mm-ddTHH:MM
+
+    const valoracionNum = Number.parseInt(valoracion)
+    if (isNaN(valoracionNum) || valoracionNum < 1 || valoracionNum > 5) {
+      return new Response(JSON.stringify({ error: "La valoración debe ser un número entre 1 y 5" }), { status: 400 })
     }
 
-    // Preparar los datos para insertar
-    const datosParaInsertar = {
-      usuario_id: comentarioData.usuario_id,
-      valoracion: comentarioData.valoracion,
-      comentario: comentarioData.comentario,
-      fecha_valoracion: comentarioData.fecha_valoracion,
-      titulo: comentarioData.titulo,
+    // Si usuario_id es un email, obtener el ID numérico
+    let usuarioIdFinal = usuario_id
+    if (typeof usuario_id === "string" && usuario_id.includes("@")) {
+
+      const { data: usuario, error: usuarioError } = await supabase
+        .from("usuarios")
+        .select("id")
+        .eq("correo_electronico", usuario_id)
+        .single()
+
+      if (usuarioError || !usuario) {
+        return new Response(JSON.stringify({ error: "Usuario no encontrado" }), { status: 404 })
+      }
+
+      usuarioIdFinal = usuario.id
     }
 
-    // Insertar el comentario en la base de datos
-    const { data, error } = await supabase.from("valoraciones_libros").insert([datosParaInsertar]).select()
+    // Verificar si ya existe una valoración de este usuario para este libro
+    const { data: existingRating, error: checkError } = await supabase
+      .from("valoraciones_libros")
+      .select("id")
+      .eq("libro_id", libro_id)
+      .eq("usuario_id", usuarioIdFinal)
+      .single()
 
-    if (error) {
-      console.error("Error al insertar valoración:", error)
-      return NextResponse.json({ error: `Error al insertar valoración: ${error.message}` }, { status: 500 })
+    if (checkError && checkError.code !== "PGRST116") {
+      return new Response(JSON.stringify({ error: "Error al verificar valoración existente" }), { status: 500 })
     }
 
-    return NextResponse.json(
-      {
-        message: "Comentario enviado correctamente",
-        data: data[0],
-      },
-      { status: 200 },
-    )
+    if (existingRating) {
+      const { error: updateError } = await supabase
+        .from("valoraciones_libros")
+        .update({
+          valoracion: valoracionNum,
+          comentario: comentario || null,
+          fecha_valoracion: new Date().toISOString(),
+        })
+        .eq("id", existingRating.id)
+
+      if (updateError) {
+        return new Response(JSON.stringify({ error: "Error al actualizar valoración" }), { status: 500 })
+      }
+
+      return new Response(JSON.stringify({ message: "Valoración actualizada correctamente" }), { status: 200 })
+    } else {
+      
+      const { error: insertError } = await supabase.from("valoraciones_libros").insert({
+        libro_id: Number.parseInt(libro_id),
+        usuario_id: usuarioIdFinal,
+        valoracion: valoracionNum,
+        comentario: comentario || null,
+        fecha_valoracion: new Date().toISOString(),
+      })
+
+      if (insertError) {
+        return new Response(JSON.stringify({ error: "Error al insertar valoración" }), { status: 500 })
+      }
+
+      return new Response(JSON.stringify({ message: "Comentario enviado correctamente" }), { status: 201 })
+    }
   } catch (error) {
-    console.error("Error al guardar el comentario:", error)
-    return NextResponse.json({ error: `Error al guardar el comentario: ${error.message}` }, { status: 500 })
+    return new Response(JSON.stringify({ error: "Error interno del servidor" }), { status: 500 })
   }
 }

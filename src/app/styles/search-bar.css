@@ -129,7 +129,6 @@
   font-size: 0.9rem;
 }
 
-/* Notificación de búsqueda sin resultados */
 .search-notification {
   position: fixed;
   top: 80px;
@@ -179,7 +178,6 @@
   }
 }
 
-/* Añadir estilos para mantener consistencia en la barra de búsqueda */
 .search-container-nav {
   position: relative;
   width: 100%;

@@ -11,12 +11,10 @@ export default function ModernSidebar() {
   const pathname = usePathname()
   const { data: session } = useSession()
 
-  // Función para determinar si un enlace está activo
   const isActive = (path) => {
     return pathname === path || pathname.startsWith(path + "/")
   }
 
-  // Función para alternar el estado del sidebar
   const toggleSidebar = () => {
     setCollapsed(!collapsed)
   }
@@ -77,15 +75,6 @@ export default function ModernSidebar() {
             <Link href="/perfil/mensajes" className={`nav-link ${isActive("/perfil/mensajes") ? "active" : ""}`}>
               <i className="bi bi-chat"></i>
               {!collapsed && <span>Mensajes</span>}
-            </Link>
-          </li>
-          <li className="nav-item">
-            <Link
-              href="/perfil/transacciones"
-              className={`nav-link ${isActive("/perfil/transacciones") ? "active" : ""}`}
-            >
-              <i className="bi bi-currency-exchange"></i>
-              {!collapsed && <span>Transacciones</span>}
             </Link>
           </li>
           <li className="nav-item">

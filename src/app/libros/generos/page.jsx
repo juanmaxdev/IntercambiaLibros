@@ -13,7 +13,6 @@ export default function BookListPage() {
         const data = await response.json();
         setBooks(data);
       } catch (error) {
-        console.error('Error fetching books:', error);
       } finally {
         setIsLoading(false);
       }
@@ -23,8 +22,8 @@ export default function BookListPage() {
   }, []);
 
   return (
-    <main className="container py-4">
+    <div className="container py-4">
       <BookList books={books} isLoading={isLoading} />
-    </main>
+    </div>
   );
 }

@@ -41,7 +41,7 @@ export default function Opiniones() {
                           />
                           <div>
                             <p className="mb-0 fw-medium">Saul</p>
-                            <p className="mb-0 text-muted small">Happy</p>
+                            <p className="mb-0 text-muted small">Feliz</p>
                           </div>
                         </div>
                       </div>
@@ -63,7 +63,7 @@ export default function Opiniones() {
                           />
                           <div>
                             <p className="mb-0 fw-medium">Ana</p>
-                            <p className="mb-0 text-muted small">Satisfied</p>
+                            <p className="mb-0 text-muted small">Satisfecha</p>
                           </div>
                         </div>
                       </div>
@@ -85,7 +85,7 @@ export default function Opiniones() {
                           />
                           <div>
                             <p className="mb-0 fw-medium">Carlos</p>
-                            <p className="mb-0 text-muted small">Excited</p>
+                            <p className="mb-0 text-muted small">Increible iniciativa</p>
                           </div>
                         </div>
                       </div>
@@ -107,7 +107,7 @@ export default function Opiniones() {
                           />
                           <div>
                             <p className="mb-0 fw-medium">Laura</p>
-                            <p className="mb-0 text-muted small">Impressed</p>
+                            <p className="mb-0 text-muted small">Me encanta</p>
                           </div>
                         </div>
                       </div>

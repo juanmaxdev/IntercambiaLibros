@@ -14,14 +14,13 @@
 /* Sidebar colapsado */
 .modern-sidebar.collapsed {
   width: 80px;
-  padding: 20px 10px; /* Removed in update, but kept for backward compatibility if needed */
+  padding: 20px 10px; 
 }
 
 .modern-sidebar.collapsed {
   width: 80px;
 }
 
-/* Botón de colapso */
 .collapse-btn {
   position: absolute;
   top: 20px;
@@ -44,7 +43,6 @@
   background-color: #f8f9fa;
 }
 
-/* Cabecera del sidebar */
 .sidebar-header {
   padding: 0 20px 20px;
   border-bottom: 1px solid #f0f0f0;
@@ -102,7 +100,6 @@
   word-break: break-all;
 }
 
-/* Navegación */
 .sidebar-nav {
   padding: 0 10px;
 }
@@ -144,7 +141,6 @@
   text-overflow: ellipsis;
 }
 
-/* Botón de cerrar sesión */
 .logout-item {
   margin-top: 20px;
 }
@@ -161,7 +157,7 @@
   background-color: #fff5f5;
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .modern-sidebar {
     width: 100%;
@@ -169,7 +165,7 @@
   }
 
   .modern-sidebar.collapsed {
-    width: 80px; /* Modified to keep the original behavior on small screens */
+    width: 80px;
   }
 
   .collapse-btn {

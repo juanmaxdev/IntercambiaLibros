@@ -1,13 +1,14 @@
-import NextAuth from "next-auth"
-import Credentials from "next-auth/providers/credentials";
-import Google from "next-auth/providers/google"
-import { createClient } from "@supabase/supabase-js"
-import bcrypt from "bcrypt";
+import NextAuth from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
+import Google from 'next-auth/providers/google';
+import { createClient } from '@supabase/supabase-js';
+import bcrypt from 'bcrypt';
 
 // Cliente Supabase para servidor (permite escritura con service role)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL, 
-  process.env.SUPABASE_SERVICE_ROLE_KEY)
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -16,105 +17,101 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
     Credentials({
-      name: "Credenciales",
+      name: 'Credenciales',
       credentials: {
-        correo_electronico: { label: "Correo", type: "text" },
-        contrasena: { label: "Contraseña", type: "password" },
-      },      
+        correo_electronico: { label: 'Correo', type: 'text' },
+        contrasena: { label: 'Contraseña', type: 'password' },
+      },
       async authorize(credentials) {
-        const { correo_electronico, contrasena } = credentials;
+        try {
+          const { correo_electronico, contrasena } = credentials;
 
-        console.log("Intentando iniciar sesión con:", correo_electronico);
+          if (!correo_electronico || !contrasena) {
+            return null;
+          }
 
-        const { data: user, error } = await supabase
-          .from("usuarios")
-          .select("*")
-          .eq("correo_electronico", correo_electronico)
-          .single();
+          const { data: user, error } = await supabase
+            .from('usuarios')
+            .select('*')
+            .eq('correo_electronico', correo_electronico)
+            .single();
 
-        if (error) {
-          console.error("Error al consultar la base de datos:", error);
-          return null; // Devuelve null en lugar de lanzar un error
+          if (error || !user) {
+            return null;
+          }
+
+          // Si no hay contraseña en la BD (usuario de Google), no permitir login con credenciales
+          if (!user.contrasena) {
+            return null;
+          }
+
+          const passwordCorrecta = await bcrypt.compare(contrasena, user.contrasena);
+          if (!passwordCorrecta) {
+            return null;
+          }
+
+          return {
+            id: user.id,
+            email: user.correo_electronico,
+            name: user.nombre_usuario,
+          };
+        } catch (error) {
+          console.error('Error en authorize:', error);
+          return null;
         }
-
-        if (!user) {
-          console.error("Usuario no encontrado con el correo:", correo_electronico);
-          return null; // Devuelve null si el usuario no existe
-        }
-
-        const passwordCorrecta = await bcrypt.compare(contrasena, user.contrasena);
-        if (!passwordCorrecta) {
-          console.error("Contraseña incorrecta para el usuario:", correo_electronico);
-          return null; // Devuelve null si la contraseña no coincide
-        }
-
-        console.log("Inicio de sesión exitoso para:", correo_electronico);
-
-        return {
-          email: user.correo_electronico,
-          name: user.nombre_usuario,
-        };
       },
     }),
   ],
   pages: {
-    signIn: "/login",
-    error: "/error",
+    signIn: '/',
+    error: '/',
   },
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
     maxAge: 30 * 60,
   },
   callbacks: {
-    async signIn({ user }) {
+    async signIn({ user, account, profile }) {
       const { email, name } = user;
 
       try {
         if (!email || !name) {
-          console.error("❌ Datos incompletos para crear el usuario:", { email, name });
-          throw new Error("Datos incompletos para crear el usuario.");
+          throw new Error('Datos incompletos para crear el usuario.');
         }
 
-        // Buscar si ya existe el usuario en Supabase
-        const { data: existingUser } = await supabase
-          .from("usuarios")
-          .select("id")
-          .eq("correo_electronico", email)
+        const { data: existingUser, error: queryError } = await supabase
+          .from('usuarios')
+          .select('id')
+          .eq('correo_electronico', email)
           .maybeSingle();
 
-        // Si no existe, insertarlo
         if (!existingUser) {
-          const { error: insertError } = await supabase.from("usuarios").insert([
+          const { error: insertError } = await supabase.from('usuarios').insert([
             {
               correo_electronico: email,
               nombre_usuario: name,
               fecha_registro: new Date().toISOString(),
               reputacion: 0,
-              ubicacion: "No especificada",
-              biografia: "Nuevo usuario",
+              ubicacion: 'No especificada',
+              biografia: 'Nuevo usuario',
               contrasena: null,
             },
           ]);
 
           if (insertError) {
-            console.error("❌ Error creando usuario con Google:", insertError.message);
-            throw new Error("Error al crear el usuario. Inténtalo de nuevo.");
+            throw new Error('Error al crear el usuario. Inténtalo de nuevo.');
           }
-
-          console.log("✅ Usuario creado correctamente:", email);
-        } else {
-          console.log("ℹ️ Usuario ya registrado:", email);
         }
 
         return true;
       } catch (err) {
-        console.error("❌ Error en signIn callback:", err);
+        console.error('Error en signIn callback:', err);
         return false;
       }
     },
 
     async redirect({ url, baseUrl }) {
-      return "/";
+      return baseUrl;
     },
 
     async jwt({ token, user }) {
@@ -127,5 +124,4 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
 });
 
-// Exportamos getServerSession para uso en rutas API
-export const getServerSession = auth
+export const getServerSession = auth;

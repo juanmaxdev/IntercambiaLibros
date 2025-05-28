@@ -15,7 +15,6 @@ export async function POST(request) {
       return NextResponse.json({ error: "ID de intercambio requerido" }, { status: 400 })
     }
 
-    // Obtener el ID del usuario
     const { data: usuario, error: errorUsuario } = await supabase
       .from("usuarios")
       .select("id")
@@ -26,7 +25,6 @@ export async function POST(request) {
       return NextResponse.json({ error: errorUsuario.message }, { status: 500 })
     }
 
-    // Obtener el intercambio
     const { data: intercambio, error: errorIntercambio } = await supabase
       .from("intercambios")
       .select("*")
@@ -41,12 +39,10 @@ export async function POST(request) {
       return NextResponse.json({ error: "Intercambio no encontrado" }, { status: 404 })
     }
 
-    // Verificar que el usuario sea parte del intercambio
     if (intercambio.usuario_id_ofrece !== usuario.id && intercambio.usuario_id_recibe !== usuario.id) {
       return NextResponse.json({ error: "No autorizado para confirmar este intercambio" }, { status: 403 })
     }
 
-    // Actualizar el campo de confirmación correspondiente
     const updateData = {}
     if (intercambio.usuario_id_ofrece === usuario.id) {
       updateData.confirmado_ofrece = true
@@ -54,7 +50,6 @@ export async function POST(request) {
       updateData.confirmado_recibe = true
     }
 
-    // Si ambos confirman, cambiar el estado a completado
     if (
       (intercambio.usuario_id_ofrece === usuario.id && intercambio.confirmado_recibe) ||
       (intercambio.usuario_id_recibe === usuario.id && intercambio.confirmado_ofrece)
@@ -62,7 +57,6 @@ export async function POST(request) {
       updateData.estado = "completado"
     }
 
-    // Actualizar el intercambio
     const { data, error } = await supabase.from("intercambios").update(updateData).eq("id", intercambio_id).select()
 
     if (error) {

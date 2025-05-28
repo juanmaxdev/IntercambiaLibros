@@ -12,7 +12,6 @@ export function UserMenu({ session, authType = "nextauth" }) {
     setIsOpen(!isOpen)
   }
 
-  // Cerrar el menú cuando se hace clic fuera de él
   useEffect(() => {
     function handleClickOutside(event) {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -26,10 +25,8 @@ export function UserMenu({ session, authType = "nextauth" }) {
     }
   }, [])
 
-  // Función para cerrar sesión según el tipo de autenticación
   const handleSignOut = async () => {
     if (authType === "credentials") {
-      // Limpiar localStorage para cerrar sesión con credenciales
       localStorage.removeItem("authToken")
       localStorage.removeItem("userId")
       localStorage.removeItem("userName")
@@ -37,10 +34,8 @@ export function UserMenu({ session, authType = "nextauth" }) {
       localStorage.removeItem("authType")
       localStorage.removeItem("sessionStarted")
 
-      // Recargar la página para actualizar la UI
       window.location.href = "/"
     } else {
-      // Cerrar sesión con NextAuth
       localStorage.removeItem("sessionStarted")
       await signOut({ callbackUrl: "/" })
     }

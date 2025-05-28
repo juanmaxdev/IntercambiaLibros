@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export function RegistroModal() {
   const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState(""); // Estado para el mensaje de éxito
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -37,23 +37,19 @@ export function RegistroModal() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Registro exitoso:", data);
 
-        // Mostrar mensaje de éxito
         setSuccessMessage("Cuenta creada exitosamente. Ya puedes iniciar sesión.");
-        setErrorMessage(""); // Limpiar mensajes de error
-
-        // Ocultar el mensaje después de 3 segundos
+        setErrorMessage(""); 
+        
         setTimeout(() => {
           setSuccessMessage("");
-          document.getElementById("modalRegistro").click(); // Cerrar el modal
+          document.getElementById("modalRegistro").click(); 
         }, 3000);
       } else {
         const error = await response.json();
         setErrorMessage(error.message || "Error al registrar el usuario");
       }
     } catch (err) {
-      console.error("Error del servidor:", err);
       setErrorMessage("Error del servidor. Inténtalo más tarde.");
     }
   };
@@ -71,7 +67,7 @@ export function RegistroModal() {
                 <div className="row justify-content-center align-items-center">
                   <div className="col-12">
                     <div className="text-center mb-4">
-                      <Image src="/assets/img/Logo2.png" width={160} height={40} alt="logo" />
+                      <Image src="/assets/img/logo/logo.png" width={160} height={40} alt="logo" />
                     </div>
                     <form onSubmit={handleRegister}>
                       <div className="form-floating mb-3">

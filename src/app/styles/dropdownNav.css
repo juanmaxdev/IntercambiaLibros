@@ -7,8 +7,8 @@
   left: auto ;
   right: 0 ;
   will-change: transform ;
-  max-width: 100vw; /* Asegurar que no exceda el ancho de la ventana */
-  overflow-x: hidden; /* Evitar scroll horizontal */
+  max-width: 100vw; 
+  overflow-x: hidden; 
   margin-top: 0.5rem ;
 }
 
@@ -16,13 +16,13 @@
   position: relative ;
 }
 
-/* Asegura que el dropdown no afecte el layout */
+
 .dropdown-menu.show {
   display: block;
   margin-top: 0.5rem;
 }
 
-/* Ajusta la posición para dispositivos móviles */
+
 @media (max-width: 768px) {
   .dropdown-menu {
     position: absolute ;
@@ -30,10 +30,9 @@
     right: 0 ;
     width: auto ;
     min-width: 10rem ;
-    max-width: 90vw ; /* Limitar el ancho en dispositivos móviles */
+    max-width: 90vw ; 
   }
 
-  /* Asegurar que el menú de usuario se mantenga dentro de la pantalla */
   .nav-item.dropdown .dropdown-menu {
     right: 0 ;
     left: auto 

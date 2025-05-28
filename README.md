@@ -1,164 +1,327 @@
-# Plataforma de Intercambio de Libros
+# IntercambiaLibros - Plataforma de Intercambio de Libros
 
-IntercambiaLibros es una plataforma web que permite a los usuarios intercambiar, donar y descubrir libros. El proyecto está construido con Next.js y utiliza Supabase como base de datos.
+## Índice
+- [Introducción](#introducción)
+- [Tecnologías](#tecnologías)
+- [Estructura del Proyecto](#estructura-del-proyecto)
+- [Funcionalidades](#funcionalidades)
+- [API Endpoints](#api-endpoints)
+- [Autenticación](#autenticación)
+- [Instalación](#instalación)
+- [Configuración](#configuración)
+- [Uso](#uso)
+- [Contribución](#contribución)
 
-## 📚 Características Principales
+## Introducción
 
-- **Intercambio de Libros**: Los usuarios pueden publicar libros para intercambio y contactar a otros usuarios para realizar intercambios.
-- **Donaciones**: Sistema de donación de libros para quienes desean regalar sus libros a otros usuarios.
-- **Catálogo de Libros**: Exploración de libros por géneros, novedades y búsqueda.
-- **Sistema de Usuarios**: Registro, inicio de sesión y perfiles de usuario.
-- **Mensajería**: Sistema de mensajes entre usuarios para coordinar intercambios.
-- **Notificaciones**: Alertas sobre nuevos mensajes, solicitudes de intercambio y más.
-- **Favoritos**: Los usuarios pueden marcar libros como favoritos para acceder a ellos fácilmente.
-- **Comentarios**: Sistema de comentarios en los libros para compartir opiniones.
+IntercambiaLibros es una plataforma web que permite a los usuarios intercambiar libros entre sí. Los usuarios pueden registrarse, subir sus libros disponibles para intercambio, buscar libros de otros usuarios, iniciar conversaciones, proponer intercambios y gestionar sus donaciones.
 
-## 🛠️ Tecnologías Utilizadas
+La aplicación está diseñada para fomentar la lectura y crear una comunidad de lectores que puedan compartir sus libros de manera sencilla y eficiente.
+
+## Tecnologías
+
+El proyecto utiliza las siguientes tecnologías:
 
 - **Frontend**:
   - Next.js (App Router)
   - React
-  - Bootstrap
-  - CSS personalizado
+  - Bootstrap 5
+  - CSS
+  - JavaScript/JSX
 
 - **Backend**:
   - Next.js API Routes
+  - NextAuth.js para autenticación
+
+- **Base de Datos**:
   - Supabase (PostgreSQL)
 
-- **Autenticación**:
-  - NextAuth.js
-  - Google OAuth
-
 - **Almacenamiento**:
-  - Supabase Storage para imágenes de libros y perfiles
+  - Supabase Storage para imágenes de portadas de libros
 
-## 📁 Estructura del Proyecto
-
+## Estructura del Proyecto
 
 /
-├── app/                      # Directorio principal de la aplicación Next.js
-│   ├── api/                  # API Routes para el backend
-│   │   ├── auth/             # Endpoints de autenticación
-│   │   ├── chat/             # Endpoints para el sistema de chat
-│   │   ├── contacto/         # Endpoints para el formulario de contacto
-│   │   ├── generos/          # Endpoints para gestionar géneros literarios
-│   │   ├── intercambios/     # Endpoints para gestionar intercambios
-│   │   ├── libros/           # Endpoints para gestionar libros
-│   │   ├── mensajes/         # Endpoints para el sistema de mensajería
-│   │   ├── notificaciones/   # Endpoints para notificaciones
-│   │   ├── perfil/           # Endpoints para gestionar perfiles
-│   │   └── reportes/         # Endpoints para sistema de reportes
-│   ├── footer/               # Páginas relacionadas con el footer
-│   ├── hooks/                # Custom hooks de React
-│   ├── layout.jsx            # Layout principal de la aplicación
-│   ├── libros/               # Páginas relacionadas con libros
-│   │   ├── donaciones/       # Página de donaciones
-│   │   ├── generos/          # Página de géneros
-│   │   ├── novedades/        # Página de novedades
-│   │   ├── search/           # Página de búsqueda
-│   │   └── [id]/             # Página de detalle de libro
-│   ├── page.jsx              # Página principal (Home)
-│   ├── perfil/               # Páginas relacionadas con el perfil
-│   ├── styles/               # Estilos CSS
-│   └── subirLibro/           # Página para subir libros
-├── components/               # Componentes reutilizables
-│   ├── books/                # Componentes relacionados con libros
-│   ├── carousel/             # Componentes de carrusel
-│   ├── footer/               # Componentes del footer
-│   ├── forms/                # Componentes de formularios
-│   ├── home/                 # Componentes de la página principal
-│   ├── nav/                  # Componentes de navegación
-│   ├── opiniones/            # Componentes de opiniones/comentarios
-│   └── perfil/               # Componentes del perfil
-├── lib/                      # Bibliotecas y utilidades
-│   └── supabase.js           # Configuración de Supabase
-├── server/                   # Código del servidor
-│   └── auth.js               # Configuración de autenticación
-├── services/                 # Servicios para interactuar con la API
-└── utils/                    # Utilidades generales
+├── app/                    # Directorio principal de Next.js App Router
+│   ├── api/                # API Routes
+│   │   ├── auth/           # Endpoints de autenticación
+│   │   ├── chat/           # Endpoints de mensajería
+│   │   ├── contacto/       # Endpoints de formulario de contacto
+│   │   ├── generos/        # Endpoints de géneros literarios
+│   │   ├── intercambios/   # Endpoints de gestión de intercambios
+│   │   ├── libros/         # Endpoints de gestión de libros
+│   │   ├── mensajes/       # Endpoints de notificaciones y mensajes
+│   │   ├── perfil/         # Endpoints de gestión de perfil
+│   │   └── reportes/       # Endpoints de reportes
+│   ├── footer/             # Páginas de información legal y sobre el proyecto
+│   ├── hooks/              # Custom hooks
+│   ├── libros/             # Páginas relacionadas con libros
+│   ├── perfil/             # Páginas de perfil de usuario
+│   ├── styles/             # Estilos CSS
+│   └── subirLibro/         # Página para subir nuevos libros
+├── components/             # Componentes React reutilizables
+│   ├── books/              # Componentes relacionados con libros
+│   ├── carousel/           # Componentes de carruseles
+│   ├── footer/             # Componentes del pie de página
+│   ├── forms/              # Componentes de formularios
+│   ├── home/               # Componentes de la página principal
+│   ├── nav/                # Componentes de navegación
+│   ├── opiniones/          # Componentes de reseñas y opiniones
+│   └── perfil/             # Componentes del perfil de usuario
+├── lib/                    # Bibliotecas y utilidades
+│   └── supabase.js         # Configuración de Supabase
+├── server/                 # Lógica del servidor
+│   └── auth.js             # Configuración de autenticación
+├── services/               # Servicios para interactuar con la API
+└── utils/                  # Utilidades generales
 
 
-## 🔄 Flujos Principales
+## Funcionalidades
 
-### Intercambio de Libros
-1. El usuario sube un libro para intercambio
-2. Otro usuario ve el libro y solicita un intercambio
-3. El propietario recibe una notificación y acepta/rechaza
-4. Los usuarios coordinan el intercambio a través del sistema de mensajes
+### Gestión de Usuarios
+- **Registro de usuarios**: Los usuarios pueden registrarse con correo electrónico y contraseña o con Google.
+- **Inicio de sesión**: Sistema de autenticación seguro con NextAuth.js.
+- **Perfil de usuario**: Cada usuario tiene un perfil personalizable con información básica.
+- **Edición de perfil**: Los usuarios pueden actualizar su información personal, ubicación y biografía.
 
-### Donación de Libros
-1. El usuario sube un libro marcándolo como donación
-2. Otros usuarios pueden ver los libros disponibles para donación
-3. Un usuario interesado solicita la donación
-4. El donante y el receptor coordinan la entrega
+### Gestión de Libros
+- **Subir libros**: Los usuarios pueden subir libros para intercambio con detalles como título, autor, género, estado, etc.
+- **Buscar libros**: Búsqueda avanzada por título, autor, género o ubicación.
+- **Ver detalles**: Página detallada para cada libro con toda su información.
+- **Favoritos**: Los usuarios pueden marcar libros como favoritos para acceder rápidamente.
+- **Comentarios y valoraciones**: Sistema de comentarios y valoraciones para libros.
 
-### Exploración de Libros
-1. Los usuarios pueden explorar libros por géneros
-2. Ver las últimas novedades añadidas
-3. Buscar libros por título, autor o descripción
-4. Filtrar resultados por diferentes criterios
+### Intercambios
+- **Proponer intercambios**: Los usuarios pueden proponer intercambios de libros a otros usuarios.
+- **Gestionar propuestas**: Aceptar, rechazar o negociar propuestas de intercambio.
+- **Confirmar intercambios**: Sistema de confirmación mutua para completar intercambios.
+- **Historial**: Registro completo de intercambios realizados.
 
-## 🔧 Configuración y Despliegue
+### Donaciones
+- **Marcar libros para donación**: Opción para marcar libros como donación sin esperar intercambio.
+- **Explorar donaciones**: Sección específica para ver libros disponibles para donación.
 
-### Variables de Entorno
+### Mensajería
+- **Chat entre usuarios**: Sistema de mensajería privada entre usuarios.
+- **Notificaciones**: Alertas de nuevos mensajes y actualizaciones de intercambios.
+- **Historial de conversaciones**: Acceso al historial completo de conversaciones.
 
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your_nextauth_secret
-SUPABASE_URL=your_supabase_url
-SUPABASE_KEY=your_supabase_key
+### Reportes
+- **Sistema de reportes**: Los usuarios pueden reportar contenido inapropiado o problemas.
+- **Formulario de contacto**: Canal directo para comunicarse con los administradores.
+
+## API Endpoints
+
+### Autenticación
+- `POST /api/auth/[...nextauth]` - Endpoints de NextAuth.js para autenticación
+
+### Libros
+- `GET /api/libros` - Obtener todos los libros disponibles
+- `GET /api/libros/[id]` - Obtener información detallada de un libro específico
+- `GET /api/libros/usuario` - Obtener libros subidos por un usuario específico
+- `POST /api/libros/subirLibros` - Subir un nuevo libro al sistema
+- `GET /api/libros/favoritos` - Obtener lista de libros favoritos del usuario
+- `POST /api/libros/favoritos` - Añadir un libro a favoritos
+- `DELETE /api/libros/favoritos` - Eliminar un libro de favoritos
+- `GET /api/libros/favoritos/verificar` - Verificar si un libro está en favoritos
+- `GET /api/libros/comentarios` - Obtener comentarios de un libro específico
+- `POST /api/libros/comentarios` - Añadir un comentario a un libro
+- `GET /api/libros/donaciones` - Obtener libros disponibles para donación
+- `GET /api/libros/intercambios` - Obtener libros disponibles para intercambio
+
+### Géneros
+- `GET /api/generos` - Obtener lista de todos los géneros literarios
+
+### Intercambios
+- `GET /api/intercambios` - Obtener intercambios del usuario actual
+- `POST /api/intercambios` - Crear una nueva propuesta de intercambio
+- `PATCH /api/intercambios` - Actualizar el estado de un intercambio (aceptar/rechazar)
+- `POST /api/intercambios/confirmar` - Confirmar la entrega de un intercambio
+
+### Mensajes
+- `GET /api/mensajes` - Obtener mensajes de una conversación específica
+- `POST /api/mensajes` - Enviar un nuevo mensaje a otro usuario
+- `GET /api/mensajes/notificaciones` - Obtener notificaciones de mensajes no leídos
+
+### Perfil
+- `GET /api/perfil` - Obtener información del perfil del usuario actual
+- `PUT /api/perfil` - Actualizar información del perfil
+- `POST /api/perfil/registro` - Registrar un nuevo usuario
+- `POST /api/perfil/login` - Iniciar sesión con credenciales
+
+### Contacto y Reportes
+- `POST /api/contacto` - Enviar un mensaje de contacto o reporte
+- `POST /api/reportes` - Enviar un reporte sobre contenido o usuario
+
+## Autenticación
+
+El proyecto utiliza NextAuth.js para la autenticación, con soporte para:
+
+1. **Autenticación con credenciales**: Email y contraseña
+2. **Autenticación con proveedores externos**: Google
 
 
-### Instalación
+La configuración de autenticación se encuentra en `server/auth.js` y los endpoints en `app/api/auth/[...nextauth]/route.js`.
 
-1. Clonar el repositorio:
-\`\`\`bash
+### Flujo de autenticación:
+
+1. El usuario introduce sus credenciales en el modal de login
+2. Las credenciales se envían a NextAuth.js
+3. NextAuth.js verifica las credenciales contra la base de datos Supabase
+4. Si son correctas, se crea una sesión JWT para el usuario
+5. El usuario es redirigido a la página principal o a la página solicitada
+
+
+### Seguridad
+
+- Las contraseñas se almacenan hasheadas con bcrypt
+- Las sesiones utilizan JWT con una duración configurable
+- Se implementa protección CSRF
+- Los usuarios de Google se registran automáticamente en la base de datos
+  
+## Instalación
+
+
+1. Clona el repositorio:
+
 git clone https://github.com/tu-usuario/bookswap.git
-cd bookswap
-\`\`\`
 
-2. Instalar dependencias:
-\`\`\`bash
+2. Instala las dependencias:
+
 npm install
-\`\`\`
 
-3. Configurar variables de entorno:
-Crea un archivo `.env.local` en la raíz del proyecto y añade las variables mencionadas anteriormente.
+3. Crea un archivo `.env.local` en la raíz del proyecto con las siguientes variables:
 
-4. Iniciar el servidor de desarrollo:
-\`\`\`bash
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=tu_secreto_seguro
+
+# Supabase
+
+NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
+NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_anonima_de_supabase
+SUPABASE_SERVICE_ROLE_KEY=tu_clave_de_servicio_de_supabase
+
+# Google (opcional)
+
+GOOGLE_CLIENT_ID=tu_client_id_de_google
+GOOGLE_CLIENT_SECRET=tu_client_secret_de_google
+
+## Configuración
+
+### Supabase
+
+1. Crea una cuenta en [Supabase](https://supabase.com/)
+2. Crea un nuevo proyecto
+3. Ejecuta los scripts SQL para crear las tablas necesarias
+4. Configura las políticas de seguridad para las tablas
+5. Configura el almacenamiento para las imágenes de portadas de libros
+6. Copia las credenciales a tu archivo `.env.local`
+
+
+### NextAuth.js
+
+1. Genera una clave secreta segura para NEXTAUTH_SECRET:
+2. Configura los proveedores de autenticación en `server/auth.js`
+3. Si utilizas Google, crea un proyecto en [Google Cloud Console](https://console.cloud.google.com/) y configura las credenciales OAuth
+
+
+### Bootstrap
+
+El proyecto utiliza Bootstrap 5 para los estilos. Los archivos CSS y JS de Bootstrap deben estar disponibles en:
+
+- `/assets/bootstrap/css/bootstrap.min.css`
+- `/assets/bootstrap/js/bootstrap.bundle.min.js`
+
+
+## Uso
+
+1. Inicia el servidor de desarrollo:
+
 npm run dev
-\`\`\`
 
-5. Abrir [http://localhost:3000](http://localhost:3000) en el navegador.
+1. Abre [http://localhost:3000](http://localhost:3000) en tu navegador
 
-## 📊 Estructura de la Base de Datos
 
-### Tablas Principales
+### Funcionalidades principales:
 
-- **usuarios**: Información de los usuarios registrados
-- **libros**: Catálogo de libros disponibles
-- **generos**: Géneros literarios
-- **intercambios**: Registro de intercambios entre usuarios
-- **donaciones**: Registro de donaciones
-- **mensajes**: Sistema de mensajería
-- **notificaciones**: Sistema de notificaciones
-- **favoritos**: Libros marcados como favoritos
-- **comentarios**: Comentarios en los libros
+#### Registro e inicio de sesión
 
-## 🤝 Contribución
+- Haz clic en "Iniciar sesión" en la barra de navegación
+- Completa el formulario con tus datos o utiliza Google
+- Para registrarte, haz clic en "Regístrate" en el modal de inicio de sesión
 
-1. Haz un fork del proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/amazing-feature`)
-3. Haz commit de tus cambios (`git commit -m 'Add some amazing feature'`)
-4. Push a la rama (`git push origin feature/amazing-feature`)
-5. Abre un Pull Request
 
-## 📄 Licencia
+#### Explorar libros
 
-Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para más información.
+- Navega por la página principal para ver los libros destacados
+- Utiliza la barra de búsqueda para encontrar libros específicos
+- Filtra por géneros en la sección correspondiente
+
+
+#### Subir un libro
+
+- Accede a la página "Subir Libro" desde el menú de usuario
+- Completa el formulario con los detalles del libro
+- Sube una imagen de la portada (opcional)
+- Indica si es para intercambio o donación
+
+
+#### Gestionar perfil
+
+- Accede a tu perfil desde el menú de usuario
+- Edita tu información personal, ubicación y biografía
+- Visualiza estadísticas de tus libros, favoritos y comentarios
+
+
+#### Proponer intercambios
+
+- Visita la página de detalles de un libro
+- Haz clic en "Proponer intercambio"
+- Selecciona uno de tus libros para ofrecer
+- Envía la propuesta al propietario
+
+
+#### Gestionar intercambios
+
+- Accede a la sección de mensajes desde tu perfil
+- Revisa las propuestas de intercambio recibidas
+- Acepta, rechaza o negocia las propuestas
+- Confirma cuando el intercambio se ha completado
+
+
+#### Enviar mensajes
+
+- Visita el perfil de otro usuario
+- Utiliza la opción de contacto en la página de detalles de un libro
+- Accede a tu bandeja de mensajes para ver conversaciones anteriores
+
+
+## Contribución
+
+1. Haz un fork del repositorio
+2. Crea una rama para tu funcionalidad (`git checkout -b feature/nueva-funcionalidad`)
+3. Haz commit de tus cambios (`git commit -am 'Añadir nueva funcionalidad'`)
+4. Haz push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Crea un nuevo Pull Request
+
+
+### Guía de estilo
+
+- Utiliza ESLint y Prettier para mantener un código limpio y consistente
+- Sigue las convenciones de nomenclatura existentes
+- Escribe pruebas para las nuevas funcionalidades
+- Documenta las nuevas funcionalidades y cambios importantes
+
+
+### Reportar problemas
+
+Si encuentras algún problema o tienes alguna sugerencia, por favor crea un issue en el repositorio con la siguiente información:
+
+- Descripción detallada del problema
+- Pasos para reproducirlo
+- Comportamiento esperado
+- Capturas de pantalla (si aplica)
+- Entorno (navegador, sistema operativo, etc.)
 
 ## 📞 Contacto
 
@@ -166,4 +329,4 @@ Para cualquier consulta o sugerencia, por favor contacta a través de [correo el
 
 ---
 
-Desarrollado con ❤️.
+Desarrollado con ❤️ por @juanmaxdev @tomcat7733.

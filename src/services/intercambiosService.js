@@ -1,9 +1,7 @@
 import { supabase } from "@/lib/supabase"
 
-// Obtener intercambios de un usuario
 export const obtenerIntercambios = async (userEmail, estado = null) => {
   try {
-    // Primero obtenemos el ID del usuario a partir de su correo
     const { data: usuario, error: errorUsuario } = await supabase
       .from("usuarios")
       .select("id")
@@ -12,7 +10,6 @@ export const obtenerIntercambios = async (userEmail, estado = null) => {
 
     if (errorUsuario) throw errorUsuario
 
-    // Construir la consulta base
     let query = supabase
       .from("intercambios")
       .select(`
@@ -24,24 +21,20 @@ export const obtenerIntercambios = async (userEmail, estado = null) => {
       `)
       .or(`usuario_id_ofrece.eq.${usuario.id},usuario_id_recibe.eq.${usuario.id}`)
 
-    // Filtrar por estado si se proporciona
     if (estado) {
       query = query.eq("estado", estado)
     }
 
-    // Ejecutar la consulta
-    const { data, error } = await query.order("created_at", { ascending: false })
+    const { data, error } = await query.order("fecha_intercambio", { ascending: false })
 
     if (error) throw error
 
     return data
   } catch (error) {
-    console.error("Error al obtener intercambios:", error)
     throw error
   }
 }
 
-// Crear una solicitud de intercambio
 export const crearSolicitudIntercambio = async (
   remitenteEmail,
   destinatarioEmail,
@@ -50,7 +43,6 @@ export const crearSolicitudIntercambio = async (
   mensaje = "",
 ) => {
   try {
-    // Obtener IDs de usuarios
     const { data: remitente, error: errorRemitente } = await supabase
       .from("usuarios")
       .select("id")
@@ -73,7 +65,7 @@ export const crearSolicitudIntercambio = async (
       .insert({
         usuario_id_ofrece: remitente.id,
         usuario_id_recibe: destinatario.id,
-        usuario_ofrece_id_libro: librosOfrecidos[0], // Por ahora solo usamos el primer libro
+        usuario_ofrece_id_libro: librosOfrecidos[0], 
         usuario_recibe_id_libro: libroSolicitado,
         estado: "pendiente",
         comentario: mensaje,
@@ -86,12 +78,10 @@ export const crearSolicitudIntercambio = async (
 
     return data[0]
   } catch (error) {
-    console.error("Error al crear solicitud de intercambio:", error)
     throw error
   }
 }
 
-// Responder a una solicitud de intercambio
 export const responderSolicitudIntercambio = async (intercambioId, respuesta, comentario = "") => {
   try {
     const { data, error } = await supabase
@@ -107,15 +97,12 @@ export const responderSolicitudIntercambio = async (intercambioId, respuesta, co
 
     return data[0]
   } catch (error) {
-    console.error("Error al responder a la solicitud:", error)
     throw error
   }
 }
 
-// Confirmar entrega de un intercambio
 export const confirmarEntregaIntercambio = async (intercambioId, usuarioEmail) => {
   try {
-    // Obtener el ID del usuario
     const { data: usuario, error: errorUsuario } = await supabase
       .from("usuarios")
       .select("id")
@@ -124,7 +111,6 @@ export const confirmarEntregaIntercambio = async (intercambioId, usuarioEmail) =
 
     if (errorUsuario) throw errorUsuario
 
-    // Obtener el intercambio actual
     const { data: intercambio, error: errorIntercambio } = await supabase
       .from("intercambios")
       .select("*")
@@ -133,7 +119,6 @@ export const confirmarEntregaIntercambio = async (intercambioId, usuarioEmail) =
 
     if (errorIntercambio) throw errorIntercambio
 
-    // Determinar qué campo actualizar
     const updateData = {}
     let nuevoEstado = "pendiente_confirmacion"
 
@@ -143,7 +128,6 @@ export const confirmarEntregaIntercambio = async (intercambioId, usuarioEmail) =
       updateData.confirmado_recibe = true
     }
 
-    // Si ambos usuarios han confirmado, marcar como completado
     if (
       (intercambio.confirmado_ofrece && updateData.confirmado_recibe) ||
       (updateData.confirmado_ofrece && intercambio.confirmado_recibe)
@@ -179,7 +163,6 @@ export const confirmarEntregaIntercambio = async (intercambioId, usuarioEmail) =
   }
 }
 
-// Obtener detalles de un intercambio específico
 export const obtenerDetallesIntercambio = async (intercambioId) => {
   try {
     const { data, error } = await supabase
@@ -198,7 +181,6 @@ export const obtenerDetallesIntercambio = async (intercambioId) => {
 
     return data
   } catch (error) {
-    console.error("Error al obtener detalles del intercambio:", error)
     throw error
   }
 }

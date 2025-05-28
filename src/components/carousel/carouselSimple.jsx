@@ -14,7 +14,6 @@ export default function CarouselSimple() {
     const fetchGeneros = async () => {
       try {
         setLoading(true)
-        // Consumir la API de géneros
         const response = await fetch("/api/generos", {
           cache: "no-store",
           headers: {
@@ -30,14 +29,12 @@ export default function CarouselSimple() {
 
         setGeneros(data)
 
-        // Agrupar los géneros en grupos de 5 para el carrusel
         const groups = []
         for (let i = 0; i < data.length; i += 5) {
           groups.push(data.slice(i, i + 5))
         }
         setGroupedGeneros(groups)
       } catch (err) {
-        console.error("Error fetching genres:", err)
         setError(err.message)
       } finally {
         setLoading(false)
@@ -47,7 +44,6 @@ export default function CarouselSimple() {
     fetchGeneros()
   }, [])
 
-  // Aplicar estilos de hover usando un estilo en línea
   useEffect(() => {
     const styleElement = document.createElement("style")
     styleElement.textContent = `
@@ -125,7 +121,7 @@ export default function CarouselSimple() {
                 className={`carousel-item ${groupIndex === 0 ? "active" : ""}`}
                 data-bs-interval="7000"
               >
-                <div className="row justify-content-center p-3">
+                <div className="row justify-content-center px-5 p-md-3">
                   {group.map((genero) => (
                     <div key={`genero-${genero.id}`} className="col-lg-2 col-md-4 col-sm-6 col-12 mb-3">
                       <Link
@@ -133,7 +129,7 @@ export default function CarouselSimple() {
                         className="text-decoration-none"
                       >
                         <div className="card h-100 genre-card">
-                          <div className="position-relative overflow-hidden" style={{ height: "400px" }}>
+                          <div className="position-relative overflow-hidden" style={{ height: "380px" }}>
                             <Image
                               src={genero.imagen || "/placeholder.svg?height=300&width=200"}
                               className="card-img-top genre-image"
@@ -159,7 +155,7 @@ export default function CarouselSimple() {
             ))
           ) : (
             <div className="carousel-item active">
-              <div className="row justify-content-center p-3">
+              <div className="row justify-content-center px-5 p-md-3">
                 <div className="col-12 text-center py-5">
                   <p>No hay géneros disponibles</p>
                 </div>
@@ -225,23 +221,20 @@ export function CarouselNuevosLibros() {
 
         const data = await response.json()
 
-        // Ordenar los libros por fecha de subida (más recientes primero)
         const sortedBooks = data.sort((a, b) => {
           const dateA = new Date(a.fecha_subida)
           const dateB = new Date(b.fecha_subida)
-          return dateB - dateA // Orden descendente (más reciente primero)
+          return dateB - dateA 
         })
 
         setBooks(sortedBooks)
 
-        // Agrupar los libros en grupos de 5 para el carrusel
         const groups = []
         for (let i = 0; i < Math.min(sortedBooks.length, 15); i += 5) {
           groups.push(sortedBooks.slice(i, i + 5))
         }
         setGroupedBooks(groups)
       } catch (err) {
-        console.error("Error fetching books:", err)
         setError(err.message)
       } finally {
         setLoading(false)
@@ -306,7 +299,7 @@ export function CarouselNuevosLibros() {
                 className={`carousel-item ${groupIndex === 0 ? "active" : ""}`}
                 data-bs-interval="7000"
               >
-                <div className="row justify-content-center p-3">
+                <div className="row justify-content-center px-5 p-md-3">
                   {group.map((book, bookIndex) => (
                     <div key={`book-${book.id || bookIndex}`} className="col-lg-2 col-md-4 col-sm-6 col-12 mb-3">
                       <BookCard book={book} />
@@ -317,7 +310,7 @@ export function CarouselNuevosLibros() {
             ))
           ) : (
             <div className="carousel-item active">
-              <div className="row justify-content-center p-3">
+              <div className="row justify-content-center px-5 p-md-3">
                 <div className="col-12 text-center py-5">
                   <p>No hay libros disponibles</p>
                 </div>

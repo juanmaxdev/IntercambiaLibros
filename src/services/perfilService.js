@@ -1,6 +1,5 @@
 import { supabase } from "@/lib/supabase";
 
-// Obtener los datos del usuario
 export async function obtenerPerfil(email) {
   if (!email) {
     throw new Error("El email es obligatorio");
@@ -8,7 +7,7 @@ export async function obtenerPerfil(email) {
 
   const { data: usuario, error } = await supabase
     .from("usuarios")
-    .select("id, nombre_usuario, correo_electronico, ubicacion, biografia, reputacion")
+    .select("id, nombre_usuario, correo_electronico, ubicacion, biografia, reputacion, fecha_registro")
     .eq("correo_electronico", email)
     .single();
 
@@ -19,7 +18,6 @@ export async function obtenerPerfil(email) {
   return usuario;
 }
 
-// Actualizar los datos del usuario
 export async function actualizarPerfil(email, updatedData) {
   if (!email) {
     throw new Error("El email es obligatorio");

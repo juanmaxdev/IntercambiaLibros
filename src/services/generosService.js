@@ -1,14 +1,15 @@
-import { supabase } from '@/lib/supabase';
+import { supabase } from "@/lib/supabase"
 
 export async function obtenerGeneros() {
-  const { data, error } = await supabase
-    .from('generos')
-    .select('id, nombre, imagen');
+  try {
+    const { data, error } = await supabase.from("generos").select("*").order("nombre", { ascending: true })
 
-  if (error) {
-    console.error('❌ Error al obtener géneros:', error.message);
-    throw new Error('Error al obtener géneros');
+    if (error) {
+      throw new Error(`Error al obtener géneros: ${error.message}`)
+    }
+
+    return data || []
+  } catch (error) {
+    throw error
   }
-
-  return data;
 }
