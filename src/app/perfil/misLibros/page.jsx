@@ -135,8 +135,8 @@ export default function MisLibrosPage() {
                     </li>
                   ))}
                 </ul>
-                <div className="search-container--inside">
-                  <div className="input-group">
+                <div className="search-container--inside ">
+                  <div className="input-group ps-3 ps-md-0">
                     <span className="input-group-text bg-white border-end-0">
                       <i className="bi bi-search" />
                     </span>
@@ -253,7 +253,7 @@ export default function MisLibrosPage() {
               ) : (
                 <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 g-4">
                   {filteredLibros.map((libro) => (
-                    <div className="col" key={libro.id}>
+                    <div className="col d-flex justify-content-center" key={libro.id}>
                       <div className="book-card" style={{ width: 280 }}>
                         <div className="book-card-image position-relative overflow-hidden" style={{ height: 300 }}>
                           <Image

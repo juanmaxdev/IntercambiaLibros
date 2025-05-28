@@ -40,9 +40,6 @@ export default function FormSubirLibro() {
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-
-  const [showSuccessModal, setShowSuccessModal] = useState(false)
-
   const generos = [
     { id: 1, nombre: 'Novela' },
     { id: 2, nombre: 'Misterio' },
