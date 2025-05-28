@@ -24,18 +24,15 @@ export default function ComentariosLibro({ libroId, session }) {
   const [mensajeExito, setMensajeExito] = useState("")
   const [hoverRating, setHoverRating] = useState(0)
 
-
   const [mostrarModalError, setMostrarModalError] = useState(false)
   const [mensajeError, setMensajeError] = useState("")
-  const [tipoError, setTipoError] = useState("error") 
-
+  const [tipoError, setTipoError] = useState("error")
 
   const mostrarError = (mensaje, tipo = "error") => {
     setMensajeError(mensaje)
     setTipoError(tipo)
     setMostrarModalError(true)
   }
-
 
   const mostrarExito = (mensaje) => {
     setMensajeExito(mensaje)
@@ -69,15 +66,15 @@ export default function ComentariosLibro({ libroId, session }) {
 
         setComentarios(data)
 
-        if (comentarios.length > 0) {
+        if (data.length > 0) {
           const conteo = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
-          comentarios.forEach((comentario) => {
+          data.forEach((comentario) => {
             if (comentario.valoracion >= 1 && comentario.valoracion <= 5) {
               conteo[comentario.valoracion]++
             }
           })
 
-          const total = comentarios.length
+          const total = data.length
           const nuevoPorcentajes = {}
 
           for (let i = 1; i <= 5; i++) {
@@ -162,7 +159,7 @@ export default function ComentariosLibro({ libroId, session }) {
 
       const comentarioData = {
         libro_id: libroId,
-        usuario_id: session.user.email, 
+        usuario_id: session.user.email,
         usuario_nombre: session.user.name || "Anónimo",
         imagen_usuario: session.user.image || null,
         comentario: nuevoComentario.comentario.trim(),
@@ -185,8 +182,16 @@ export default function ComentariosLibro({ libroId, session }) {
         throw new Error(mensajeUsuario)
       }
 
-      setComentarios([comentarioData, ...comentarios])
+      // Crear el objeto comentario con la estructura correcta
+      const nuevoComentarioObj = {
+        ...comentarioData,
+        usuarios: {
+          nombre_usuario: session.user.name || "Anónimo",
+          correo_electronico: session.user.email,
+        },
+      }
 
+      setComentarios([nuevoComentarioObj, ...comentarios])
 
       const nuevoConteo = { ...porcentajes }
       const total = comentarios.length + 1
@@ -371,16 +376,16 @@ export default function ComentariosLibro({ libroId, session }) {
                                   />
                                 ) : (
                                   <div className="avatar-placeholder rounded-circle">
-                                    {(comentario.nombre_usuario || "U")[0].toUpperCase()}
+                                    {(comentario.usuarios?.nombre_usuario || "U")[0].toUpperCase()}
                                   </div>
                                 )}
                               </div>
                               <div>
                                 <p className="fw-bold mb-0">
-                                  {comentario.nombre_usuario ||
+                                  {comentario.usuarios?.nombre_usuario ||
                                     (comentario.usuario_id === session?.user?.email
                                       ? session.user.name
-                                      : `${(comentario.usuario_id?.toString() || "").substring(0, 5) || "Anónimo"}`)}
+                                      : "Usuario desconocido")}
                                 </p>
                                 <p className="text-muted small mb-0">
                                   {comentario.fecha_valoracion

@@ -39,7 +39,7 @@ export async function GET(req) {
       .from("valoraciones_libros")
       .select(`
         *,
-        usuarios (
+        usuarios!valoraciones_libros_usuario_id_fkey (
           nombre_usuario,
           correo_electronico
         )
