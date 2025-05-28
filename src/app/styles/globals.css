@@ -14,7 +14,7 @@
 
 @font-face {
   font-family: 'Baskerville-Italic';
-  src: url('/assets/fonts/Libre_Baskerville/LibreBaskerville-italic.ttf') format('truetype');
+  src: url('/assets/fonts/Libre_Baskerville/LibreBaskerville-Italic.ttf') format('truetype');
   font-weight: 400;
   font-style: italic;
 }
@@ -76,7 +76,6 @@ body {
   font-family: 'Roboto', 'Montserrat', sans-serif;
   max-width: 100vw;
   overflow-x: hidden;
-  margin-top: 50px;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -100,6 +99,7 @@ h6 {
 
 span,
 p {
+  font-family: 'Roboto', 'Montserrat', sans-serif;
   color: var(--text);
 }
 

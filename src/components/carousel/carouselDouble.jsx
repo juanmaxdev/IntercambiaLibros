@@ -14,7 +14,6 @@ export default function CarouselDoble() {
     const fetchDonaciones = async () => {
       try {
         setLoading(true)
-        // Usar el endpoint de proxy para donaciones
         const response = await fetch("/api/libros/donaciones", {
           cache: "no-store",
           headers: {
@@ -32,10 +31,10 @@ export default function CarouselDoble() {
         const sortedDonaciones = data.sort((a, b) => {
           const dateA = new Date(a.fecha_subida || a.fecha_donacion || "")
           const dateB = new Date(b.fecha_subida || b.fecha_donacion || "")
-          return dateB - dateA // Orden descendente (más reciente primero)
+          return dateB - dateA 
         })
 
-        // Filtrar donaciones duplicadas basadas en libro_id
+   
         const uniqueDonaciones = []
         const seenIds = new Set()
 
@@ -45,21 +44,19 @@ export default function CarouselDoble() {
             seenIds.add(idToCheck)
             uniqueDonaciones.push({
               ...donacion,
-              id: idToCheck, // Asegurar que el campo 'id' exista y sea igual a 'libro_id' o 'id'
+              id: idToCheck, 
             })
           }
         })
 
         setDonaciones(uniqueDonaciones)
 
-        // Agrupar las donaciones en grupos de 10 (5 por fila, 2 filas) para el carrusel
         const groups = []
         for (let i = 0; i < Math.min(uniqueDonaciones.length, 30); i += 10) {
           groups.push(uniqueDonaciones.slice(i, i + 10))
         }
         setGroupedDonaciones(groups)
       } catch (err) {
-        console.error("Error fetching donaciones:", err)
         setError(err.message)
       } finally {
         setLoading(false)
@@ -121,7 +118,7 @@ export default function CarouselDoble() {
                 data-bs-interval="7000"
               >
                 {/* Primera fila de 5 libros */}
-                <div className="row justify-content-center p-3">
+                <div className="row justify-content-center px-5 p-md-3">
                   {group.slice(0, 5).map((book, bookIndex) => (
                     <div
                       key={`book-row1-${groupIndex}-${bookIndex}`}
@@ -134,7 +131,7 @@ export default function CarouselDoble() {
 
                 {/* Segunda fila de 5 libros (si hay suficientes) */}
                 {group.length > 5 && (
-                  <div className="row justify-content-center p-3 mt-2">
+                  <div className="row justify-content-center px-5 p-md-3 mt-md-2">
                     {group.slice(5, 10).map((book, bookIndex) => (
                       <div
                         key={`book-row2-${groupIndex}-${bookIndex}`}

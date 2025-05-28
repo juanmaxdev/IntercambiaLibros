@@ -14,7 +14,6 @@ export default function BookCard({ book }) {
   }
 
   const handleMoreInfo = () => {
-    // Usar libro_id si está disponible, de lo contrario usar id
     const bookId = book.libro_id || book.id
 
     if (bookId) {
@@ -23,16 +22,14 @@ export default function BookCard({ book }) {
       alert("No se puede mostrar la información del libro porque no tiene un ID válido.")
     }
   }
-
-  // Verificar si el libro es una donación
   const isDonation = book.donacion === true || book.tipoIntercambio === "2"
 
   return (
     <div
-      className="card h-100 shadow-sm position-relative"
+      className="card shadow-sm position-relative"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      style={{ borderRadius: "8px", overflow: "hidden" }}
+      style={{ borderRadius: "8px", overflow: "hidden", height: "90%" }}
     >
       {/* Etiqueta de donación */}
       {isDonation && (

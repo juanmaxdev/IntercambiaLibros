@@ -1,6 +1,5 @@
 import { supabase } from "@/lib/supabase";
 
-// Obtener los datos del usuario
 export async function obtenerPerfil(email) {
   if (!email) {
     throw new Error("El email es obligatorio");
@@ -19,7 +18,6 @@ export async function obtenerPerfil(email) {
   return usuario;
 }
 
-// Actualizar los datos del usuario
 export async function actualizarPerfil(email, updatedData) {
   if (!email) {
     throw new Error("El email es obligatorio");

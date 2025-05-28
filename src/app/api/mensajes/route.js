@@ -2,7 +2,6 @@ import { NextResponse } from "next/server"
 import { supabase } from "@/lib/supabase"
 import { getServerSession } from "next-auth"
 
-// Obtener mensajes
 export async function GET(request) {
   try {
     const session = await getServerSession()
@@ -36,7 +35,7 @@ export async function GET(request) {
   }
 }
 
-// Enviar mensaje
+
 export async function POST(request) {
   try {
     const session = await getServerSession()

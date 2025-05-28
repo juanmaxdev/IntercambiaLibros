@@ -1,130 +1,113 @@
-"use client"
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { useSession } from "next-auth/react"
-import { useAuth } from "@/app/hooks/use-auth"
-import Link from "next/link"
-import Image from "next/image"
-import "@/app/styles/stylesFormSubirLibro.css"
+'use client';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import { useAuth } from '@/app/hooks/use-auth';
+import Link from 'next/link';
+import Image from 'next/image';
+import '@/app/styles/stylesFormSubirLibro.css';
 
 export default function FormSubirLibro() {
-  const router = useRouter()
-  const { data: session, status: nextAuthStatus } = useSession()
-  const { isLoggedIn, userId, userName, userEmail, loading: authLoading } = useAuth()
+  const router = useRouter();
+  const { data: session, status: nextAuthStatus } = useSession();
+  const { isLoggedIn, userId, userName, userEmail, loading: authLoading } = useAuth();
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // Redirigir si no está autenticado
   useEffect(() => {
     if (!authLoading && !isLoggedIn) {
-      // Redirigir a la página principal con un parámetro para mostrar el modal de login
-      router.push("/?login=true")
+      router.push('/?login=true');
     }
-  }, [isLoggedIn, authLoading, router])
+  }, [isLoggedIn, authLoading, router]);
 
-  // Estado para almacenar los datos del formulario
   const [formData, setFormData] = useState({
-    isbn: "",
-    titulo: "",
-    autor: "",
-    genero_id: "",
-    estado_libro: "",
-    descripcion: "",
+    isbn: '',
+    titulo: '',
+    autor: '',
+    genero_id: '',
+    estado_libro: '',
+    descripcion: '',
     donacion: false,
-    ubicacion: "",
+    ubicacion: '',
     archivo: null,
-    tipo_tapa: "",
-    editorial: "",
-    metodo_intercambio: "",
-  })
+    tipo_tapa: '',
+    editorial: '',
+    metodo_intercambio: '',
+  });
 
-  // Estado para los errores de validación
-  const [errors, setErrors] = useState({})
-
-  // Estado para controlar si el formulario ha sido enviado
-  const [isSubmitted, setIsSubmitted] = useState(false)
-
-  // Estado para la vista previa de la imagen
-  const [imagePreview, setImagePreview] = useState(null)
-
-  const [successMessage, setSuccessMessage] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [errors, setErrors] = useState({});
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   // Lista de géneros con sus IDs
   const generos = [
-    { id: 1, nombre: "Novela" },
-    { id: 2, nombre: "Misterio" },
-    { id: 3, nombre: "Ciencia Ficción" },
-    { id: 4, nombre: "Fantasía" },
-    { id: 5, nombre: "Histórico" },
-    { id: 6, nombre: "Fábula" },
-    { id: 7, nombre: "Romántica" },
-    { id: 8, nombre: "Filosofía" },
-    { id: 9, nombre: "Clásico" },
-    { id: 10, nombre: "Finanzas" },
-    { id: 11, nombre: "Autoayuda" },
-    { id: 12, nombre: "Cocina" },
-    { id: 13, nombre: "Terror" },
-    { id: 14, nombre: "Aventura" },
-    { id: 15, nombre: "Biografía" },
-    { id: 16, nombre: "Poesía" },
-    { id: 17, nombre: "Juvenil" },
-    { id: 18, nombre: "Infantil" },
-    { id: 19, nombre: "Aprendizaje" },
-    { id: 20, nombre: "Drama" },
-  ]
+    { id: 1, nombre: 'Novela' },
+    { id: 2, nombre: 'Misterio' },
+    { id: 3, nombre: 'Ciencia Ficción' },
+    { id: 4, nombre: 'Fantasía' },
+    { id: 5, nombre: 'Histórico' },
+    { id: 6, nombre: 'Fábula' },
+    { id: 7, nombre: 'Romántica' },
+    { id: 8, nombre: 'Filosofía' },
+    { id: 9, nombre: 'Clásico' },
+    { id: 10, nombre: 'Finanzas' },
+    { id: 11, nombre: 'Autoayuda' },
+    { id: 12, nombre: 'Cocina' },
+    { id: 13, nombre: 'Terror' },
+    { id: 14, nombre: 'Aventura' },
+    { id: 15, nombre: 'Biografía' },
+    { id: 16, nombre: 'Poesía' },
+    { id: 17, nombre: 'Juvenil' },
+    { id: 18, nombre: 'Infantil' },
+    { id: 19, nombre: 'Aprendizaje' },
+    { id: 20, nombre: 'Drama' },
+  ];
 
-  // Función para manejar cambios en los inputs
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target
+    const { name, value, type, checked } = e.target;
 
-    // Para el checkbox de donación
-    if (type === "checkbox") {
+    if (type === 'checkbox') {
       setFormData({
         ...formData,
         [name]: checked,
-      })
-    }
-    // Para el select de género (convertir a número)
-    else if (name === "genero_id") {
+      });
+    } else if (name === 'genero_id') {
       setFormData({
         ...formData,
         [name]: Number.parseInt(value, 10),
-      })
-    }
-    // Para los demás campos
-    else {
+      });
+    } else {
       setFormData({
         ...formData,
         [name]: value,
-      })
+      });
     }
-  }
+  };
 
-  // Función para manejar cambios en el archivo
   const handleFileChange = (e) => {
-    const file = e.target.files[0]
+    const file = e.target.files[0];
     if (file) {
       setFormData({
         ...formData,
         archivo: file,
-      })
+      });
 
-      // Crear URL para vista previa
-      const previewUrl = URL.createObjectURL(file)
-      setImagePreview(previewUrl)
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
     }
-  }
+  };
 
-  // Función para eliminar la imagen seleccionada
   const handleRemoveImage = () => {
     setFormData({
       ...formData,
       archivo: null,
-    })
-    setImagePreview(null)
+    });
+    setImagePreview(null);
     // Resetear el input de archivo
-    const fileInput = document.getElementById("archivoInput")
-    if (fileInput) fileInput.value = ""
-  }
+    const fileInput = document.getElementById('archivoInput');
+    if (fileInput) fileInput.value = '';
+  };
 
   // Limpiar la URL de vista previa al desmontar el componente
   // Esto es importante para evitar fugas de memoria
@@ -137,188 +120,166 @@ export default function FormSubirLibro() {
     };
   }, [imagePreview]);
 
-  // Validar el formulario
   const validateForm = () => {
-    const tempErrors = {}
-    let formIsValid = true
+    const tempErrors = {};
+    let formIsValid = true;
 
-    // Validar título
     if (!formData.titulo || formData.titulo.length < 3) {
-      tempErrors.titulo = "El título es obligatorio y debe tener al menos 3 caracteres"
-      formIsValid = false
-    }
-
-    // Validar autor
-    if (!formData.autor) {
-      tempErrors.autor = "El autor es obligatorio"
-      formIsValid = false
-    } else if (formData.autor.length < 3) {
-      tempErrors.autor = "El autor debe tener al menos 3 caracteres"
-      formIsValid = false
-    }
-
-    // Validar género
-    if (!formData.genero_id) {
-      tempErrors.genero_id = "Debes seleccionar un género"
-      formIsValid = false
-    }
-
-    // Validar ubicación
-    if (!formData.ubicacion) {
-      tempErrors.ubicacion = "La ubicación es obligatoria"
-      formIsValid = false
-    } else if (formData.ubicacion.length < 5) {
-      tempErrors.ubicacion = "La ubicación debe tener al menos 5 caracteres"
-      formIsValid = false
-    }
-
-    // Validar estado del libro
-    if (!formData.estado_libro) {
-      tempErrors.estado_libro = "Debes seleccionar el estado del libro"
-      formIsValid = false
-    }
-
-    // Validar método de intercambio
-    if (!formData.metodo_intercambio) {
-      tempErrors.metodo_intercambio = "Debes seleccionar un método de intercambio"
-      formIsValid = false
-    }
-
-    // Validar archivo
-    if (formData.archivo) {
-      // Validar que sea una imagen
-      const validTypes = ["image/jpeg", "image/png", "image/jpg"];
-      if (!validTypes.includes(formData.archivo.type)) {
-        tempErrors.archivo = "El archivo debe ser una imagen (JPG, PNG)";
-        formIsValid = false;
-      }
-
-      // Validar tamaño (máximo 2MB)
-      const maxSize = 2 * 1024 * 1024; // 2MB en bytes
-      if (formData.archivo.size > maxSize) {
-        tempErrors.archivo = "La imagen no debe superar los 2MB";
-        formIsValid = false;
-      }
-    }
-
-    // Validar descripción
-    if (!formData.descripcion) {
-      tempErrors.descripcion = "La descripción es obligatoria"
-      formIsValid = false
-    } else if (formData.descripcion.length < 20) {
-      tempErrors.descripcion = "La descripción debe tener al menos 20 caracteres"
-      formIsValid = false
-    }
-
-    // Validar ISBN
-    if (formData.isbn && !/^\d{10}(\d{3})?$/.test(formData.isbn)) {
-      tempErrors.isbn = "El ISBN debe tener 10 o 13 caracteres numéricos";
+      tempErrors.titulo = 'El título es obligatorio y debe tener al menos 3 caracteres';
       formIsValid = false;
     }
 
-    setErrors(tempErrors)
-    return formIsValid
-  }
+    if (!formData.autor) {
+      tempErrors.autor = 'El autor es obligatorio';
+      formIsValid = false;
+    } else if (formData.autor.length < 3) {
+      tempErrors.autor = 'El autor debe tener al menos 3 caracteres';
+      formIsValid = false;
+    }
 
-  // Función para resetear el input de archivo
+    if (!formData.genero_id) {
+      tempErrors.genero_id = 'Debes seleccionar un género';
+      formIsValid = false;
+    }
+
+    if (!formData.ubicacion) {
+      tempErrors.ubicacion = 'La ubicación es obligatoria';
+      formIsValid = false;
+    } else if (formData.ubicacion.length < 5) {
+      tempErrors.ubicacion = 'La ubicación debe tener al menos 5 caracteres';
+      formIsValid = false;
+    }
+
+    if (!formData.estado_libro) {
+      tempErrors.estado_libro = 'Debes seleccionar el estado del libro';
+      formIsValid = false;
+    }
+
+    if (!formData.metodo_intercambio) {
+      tempErrors.metodo_intercambio = 'Debes seleccionar un método de intercambio';
+      formIsValid = false;
+    }
+
+    if (formData.archivo) {
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+      if (!validTypes.includes(formData.archivo.type)) {
+        tempErrors.archivo = 'El archivo debe ser una imagen (JPG, PNG)';
+        formIsValid = false;
+      }
+
+      const maxSize = 2 * 1024 * 1024; // 2MB en bytes
+      if (formData.archivo.size > maxSize) {
+        tempErrors.archivo = 'La imagen no debe superar los 2MB';
+        formIsValid = false;
+      }
+    }
+
+    if (!formData.descripcion) {
+      tempErrors.descripcion = 'La descripción es obligatoria';
+      formIsValid = false;
+    } else if (formData.descripcion.length < 20) {
+      tempErrors.descripcion = 'La descripción debe tener al menos 20 caracteres';
+      formIsValid = false;
+    }
+
+    if (formData.isbn && !/^\d{10}(\d{3})?$/.test(formData.isbn)) {
+      tempErrors.isbn = 'El ISBN debe tener 10 o 13 caracteres numéricos';
+      formIsValid = false;
+    }
+
+    setErrors(tempErrors);
+    return formIsValid;
+  };
+
   const resetFileInput = () => {
-    const fileInput = document.getElementById("archivoInput")
-    if (fileInput) fileInput.value = ""
-  }
+    const fileInput = document.getElementById('archivoInput');
+    if (fileInput) fileInput.value = '';
+  };
 
-  // Función para manejar el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitted(true);
-    setSuccessMessage("");
-  
+
     if (validateForm()) {
       setIsLoading(true);
       try {
         const formDataToSend = new FormData();
-  
-        // Verificar si hay sesión y email
+
         if (!session?.user?.email) {
-          setErrors({ server: "Debes iniciar sesión para subir un libro." });
+          setErrors({ server: 'Debes iniciar sesión para subir un libro.' });
           setIsLoading(false);
           return;
         }
-  
-        // 📦 Construir FormData correctamente
-        formDataToSend.append("isbn", formData.isbn || "");
-        formDataToSend.append("titulo", formData.titulo);
-        formDataToSend.append("autor", formData.autor);
-        formDataToSend.append("genero_id", String(formData.genero_id)); // asegurar tipo string
-        formDataToSend.append("estado_libro", formData.estado_libro);
-        formDataToSend.append("descripcion", formData.descripcion);
-        formDataToSend.append("donacion", String(formData.donacion)); // convertir boolean a string
-        formDataToSend.append("ubicacion", formData.ubicacion);
-        formDataToSend.append("tipo_tapa", formData.tipo_tapa || "");
-        formDataToSend.append("editorial", formData.editorial || "");
-        formDataToSend.append("metodoIntercambio", formData.metodo_intercambio || "Presencial");
-  
+
+        formDataToSend.append('isbn', formData.isbn || '');
+        formDataToSend.append('titulo', formData.titulo);
+        formDataToSend.append('autor', formData.autor);
+        formDataToSend.append('genero_id', String(formData.genero_id));
+        formDataToSend.append('estado_libro', formData.estado_libro);
+        formDataToSend.append('descripcion', formData.descripcion);
+        formDataToSend.append('donacion', String(formData.donacion));
+        formDataToSend.append('ubicacion', formData.ubicacion);
+        formDataToSend.append('tipo_tapa', formData.tipo_tapa || '');
+        formDataToSend.append('editorial', formData.editorial || '');
+        formDataToSend.append('metodoIntercambio', formData.metodo_intercambio || 'Presencial');
+
         if (formData.archivo) {
-          formDataToSend.append("archivo", formData.archivo);
+          formDataToSend.append('archivo', formData.archivo);
         }
-  
-        // 🚀 Enviar al backend (sin duplex porque es navegador)
-        const response = await fetch("/api/libros/subirLibros", {
-          method: "POST",
+
+        const response = await fetch('/api/libros/subirLibros', {
+          method: 'POST',
           body: formDataToSend,
-          duplex: "half", // Esto es para Next.js 13+
+          duplex: 'half',
         });
-  
+
         if (!response.ok) {
           const errorText = await response.text();
-          console.error("Error del servidor:", errorText);
-          setErrors({ server: errorText || "Error al subir el libro." });
+          setErrors({ server: errorText || 'Error al subir el libro.' });
           throw new Error(`Error: ${response.status} - ${errorText}`);
         }
-  
+
         const result = await response.json();
-        setSuccessMessage("Libro registrado correctamente");
-  
-        // Resetear estado
+        setSuccessMessage('Libro registrado correctamente');
+        setShowSuccessModal(true);
+        setTimeout(() => setShowSuccessModal(false), 3000);
+
         setFormData({
-          isbn: "",
-          titulo: "",
-          autor: "",
-          genero_id: "",
-          estado_libro: "",
-          descripcion: "",
+          isbn: '',
+          titulo: '',
+          autor: '',
+          genero_id: '',
+          estado_libro: '',
+          descripcion: '',
           donacion: false,
-          ubicacion: "",
+          ubicacion: '',
           archivo: null,
-          tipo_tapa: "",
-          editorial: "",
-          metodo_intercambio: "",
+          tipo_tapa: '',
+          editorial: '',
+          metodo_intercambio: '',
         });
+
         setImagePreview(null);
         setIsSubmitted(false);
         resetFileInput();
       } catch (error) {
-        console.error("Error al enviar el formulario:", error);
         alert(`Error al enviar el formulario: ${error.message}`);
       } finally {
         setIsLoading(false);
       }
     } else {
-      console.log("Formulario con errores");
     }
   };
-  
 
-  // Validar cuando cambian los datos y ya se ha intentado enviar
   useEffect(() => {
     if (isSubmitted) {
-      validateForm()
+      validateForm();
     }
-  }, [formData, isSubmitted])
+  }, [formData, isSubmitted]);
 
-  // Si no está autenticado, mostrar mensaje de carga mientras se redirige
-  if (authLoading || (!isLoggedIn && nextAuthStatus !== "unauthenticated")) {
+  if (authLoading || (!isLoggedIn && nextAuthStatus !== 'unauthenticated')) {
     return (
-      <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
+      <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
         <div className="text-center">
           <div className="spinner-border text-primary mb-3" role="status">
             <span className="visually-hidden">Cargando...</span>
@@ -327,7 +288,7 @@ export default function FormSubirLibro() {
           <p>Debes iniciar sesión para subir un libro.</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -337,22 +298,29 @@ export default function FormSubirLibro() {
         <div className="col-10 mb-5">
           {/* FORMULARIO */}
           <h4 className="mb-4">Subir Libro</h4>
-          {successMessage && (
-            <div className="alert alert-success alert-dismissible fade show" role="alert">
-              <strong>{successMessage}</strong>
-              <button
-                type="button"
-                className="btn-close"
-                onClick={() => setSuccessMessage("")}
-                aria-label="Close"
-              ></button>
+          {showSuccessModal && (
+            <div
+              className="modal fade show"
+              style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}
+              role="dialog"
+            >
+              <div className="modal-dialog modal-dialog-centered" role="document">
+                <div className="modal-content">
+                  <div className="modal-header border-0">
+                    <h5 className="modal-title text-center text-success">¡Felicidades!</h5>
+                  </div>
+                  <div className="modal-body text-center">
+                    <p>Libro subido correctamente</p>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
-          <form style={{ maxWidth: "80%" }} onSubmit={handleSubmit}>
+          <form style={{ maxWidth: '80%' }} onSubmit={handleSubmit}>
             <div className="form-floating my-3">
               <input
                 type="text"
-                className={`form-control ${errors.titulo ? "is-invalid" : ""}`}
+                className={`form-control ${errors.titulo ? 'is-invalid' : ''}`}
                 id="floatingInputTitle"
                 placeholder="Titulo"
                 name="titulo"
@@ -367,7 +335,7 @@ export default function FormSubirLibro() {
             <div className="form-floating my-3">
               <input
                 type="text"
-                className={`form-control ${errors.autor ? "is-invalid" : ""}`}
+                className={`form-control ${errors.autor ? 'is-invalid' : ''}`}
                 id="floatingAutor"
                 placeholder="Autor"
                 name="autor"
@@ -381,7 +349,7 @@ export default function FormSubirLibro() {
 
             <div className="form-floating my-3">
               <select
-                className={`form-select py-0 ${errors.genero_id ? "is-invalid" : ""}`}
+                className={`form-select py-0 ${errors.genero_id ? 'is-invalid' : ''}`}
                 aria-label="Género del libro"
                 name="genero_id"
                 value={formData.genero_id}
@@ -415,7 +383,7 @@ export default function FormSubirLibro() {
             <div className="form-floating my-3">
               <input
                 type="text"
-                className={`form-control ${errors.isbn ? "is-invalid" : ""}`}
+                className={`form-control ${errors.isbn ? 'is-invalid' : ''}`}
                 id="floatingisbn"
                 placeholder="ISBN"
                 name="isbn"
@@ -429,7 +397,7 @@ export default function FormSubirLibro() {
             <div className="form-floating my-3">
               <input
                 type="text"
-                className={`form-control ${errors.ubicacion ? "is-invalid" : ""}`}
+                className={`form-control ${errors.ubicacion ? 'is-invalid' : ''}`}
                 id="floatingUbi"
                 placeholder="Ubicación"
                 name="ubicacion"
@@ -443,7 +411,7 @@ export default function FormSubirLibro() {
 
             <div className="form-floating my-3">
               <select
-                className={`form-select py-0 ${errors.estado_libro ? "is-invalid" : ""}`}
+                className={`form-select py-0 ${errors.estado_libro ? 'is-invalid' : ''}`}
                 aria-label="Estado del libro"
                 name="estado_libro"
                 value={formData.estado_libro}
@@ -481,7 +449,7 @@ export default function FormSubirLibro() {
 
             <div className="form-floating my-3">
               <select
-                className={`form-select py-0 ${errors.metodo_intercambio ? "is-invalid" : ""}`}
+                className={`form-select py-0 ${errors.metodo_intercambio ? 'is-invalid' : ''}`}
                 aria-label="Método de intercambio"
                 name="metodo_intercambio"
                 value={formData.metodo_intercambio}
@@ -504,11 +472,11 @@ export default function FormSubirLibro() {
                 className="form-select py-0"
                 id="donacionSelect"
                 name="donacion"
-                value={formData.donacion ? "true" : "false"}
+                value={formData.donacion ? 'true' : 'false'}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    donacion: e.target.value === "true",
+                    donacion: e.target.value === 'true',
                   })
                 }
               >
@@ -524,7 +492,7 @@ export default function FormSubirLibro() {
               </label>
               <input
                 type="file"
-                className={`form-control ${errors.archivo ? "is-invalid" : ""}`}
+                className={`form-control ${errors.archivo ? 'is-invalid' : ''}`}
                 id="archivoInput"
                 accept=".jpg,.jpeg,.png"
                 onChange={handleFileChange}
@@ -535,12 +503,12 @@ export default function FormSubirLibro() {
               {imagePreview && (
                 <div className="mt-3 position-relative">
                   <Image
-                    src={imagePreview || "/placeholder.svg"}
+                    src={imagePreview || '/placeholder.svg'}
                     alt="Vista previa"
                     className="img-thumbnail"
                     width={200}
                     height={300}
-                    style={{ objectFit: "contain" }}
+                    style={{ objectFit: 'contain' }}
                   />
                   <button
                     type="button"
@@ -555,13 +523,13 @@ export default function FormSubirLibro() {
 
             <div className="form-floating my-3">
               <textarea
-                className={`form-control ${errors.descripcion ? "is-invalid" : ""}`}
+                className={`form-control ${errors.descripcion ? 'is-invalid' : ''}`}
                 id="floatingInputDescripcion"
                 placeholder="Descripción"
                 name="descripcion"
                 value={formData.descripcion}
                 onChange={handleChange}
-                style={{ height: "100px" }}
+                style={{ height: '100px' }}
                 required
               ></textarea>
               <label htmlFor="floatingInputDescripcion">Descripción del libro</label>
@@ -569,18 +537,18 @@ export default function FormSubirLibro() {
             </div>
 
             <div className="d-flex justify-content-between gap-3 mt-3">
-              <Link href="/" className="btn btn-outline-secondary" style={{ minWidth: "45%" }}>
+              <Link href="/" className="btn btn-outline-secondary" style={{ minWidth: '45%' }}>
                 Cancelar
               </Link>
 
-              <button className="btn btn-primary" type="submit" style={{ minWidth: "45%" }} disabled={isLoading}>
+              <button className="btn btn-primary" type="submit" style={{ minWidth: '45%' }} disabled={isLoading}>
                 {isLoading ? (
                   <>
                     <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                     Enviando...
                   </>
                 ) : (
-                  "Enviar"
+                  'Enviar'
                 )}
               </button>
             </div>
@@ -588,5 +556,5 @@ export default function FormSubirLibro() {
         </div>
       </div>
     </div>
-  )
+  );
 }

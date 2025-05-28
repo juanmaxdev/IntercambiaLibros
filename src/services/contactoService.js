@@ -9,7 +9,6 @@ export async function obtenerMensajes() {
   return data;
 }
 
-// Función para guardar un mensaje
 export async function guardarMensaje({ nombre, apellidos, email, titulo, mensaje }) {
   const { data, error } = await supabase.from('contacto').insert([
     {

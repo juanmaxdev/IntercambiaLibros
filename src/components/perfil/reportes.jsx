@@ -6,7 +6,6 @@ import { useSession } from "next-auth/react"
 
 export default function Reportes() {
   const { data: session } = useSession()
-  // Estado para almacenar los datos del formulario y errores
   const [formValues, setFormValues] = useState({
     nombre: "",
     apellidos: "",
@@ -17,7 +16,6 @@ export default function Reportes() {
   })
   const [errors, setErrors] = useState({})
 
-  // Maneja cambios en el formulario
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -27,7 +25,6 @@ export default function Reportes() {
     }))
   }
 
-  // Función de validación
   const validate = () => {
     const newErrors = {}
     const msg = "Este campo es obligatorio."
@@ -65,11 +62,9 @@ export default function Reportes() {
     if (!formValues.acepto) {
       newErrors.acepto = "Debes aceptar los términos y condiciones."
     }
-    // Se devuelven los errores
     return newErrors
   }
 
-  // Manejar el envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault()
     const validationErrors = validate()
@@ -77,7 +72,6 @@ export default function Reportes() {
       setErrors(validationErrors)
       return
     }
-    // Si no hay errores, puedes proceder a enviar los datos al servidor
     setErrors({})
 
     const dataForm = {
@@ -272,7 +266,6 @@ export default function Reportes() {
                     />
                     <label className="form-check-label" htmlFor="gridCheck">
                       Acepto los términos y condiciones{" "}
-                      {/* PONER UN Link con el import hacia los terminos y condiciones cuando esten READY */}
                     </label>
                   </div>
                   {errors.acepto && <small className="text-danger">{errors.acepto}</small>}

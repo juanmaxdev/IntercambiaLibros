@@ -46,7 +46,6 @@ export default function LibroSeleccionado({ book }) {
       setMensajeFavorito("Libro añadido a favoritos")
       setTimeout(() => setMensajeFavorito(""), 3000)
     } catch (err) {
-      console.error("Error al añadir a favoritos:", err)
       alert("No se pudo añadir a favoritos")
     }
   }
@@ -193,7 +192,7 @@ export default function LibroSeleccionado({ book }) {
         </div>
       </div>
 
-      <div className="container-fluid my-5 px-0">
+      <div className="container-fluid d-flex justify-content-center my-5 px-0">
         <ComentariosLibro libroId={book.id || ""} session={session} />
       </div>
 

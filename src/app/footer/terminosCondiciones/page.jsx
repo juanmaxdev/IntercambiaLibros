@@ -1,12 +1,11 @@
 export default function TerminosCondiciones() {
   return (
-    <main className="container my-5">
+    <div className="container my-5">
       <header className="mb-4 text-center">
         <h1 className="mb-3">Términos y Condiciones de IntercambiaLibros</h1>
         <p className="text-muted">Última actualización: Marzo 2025</p>
       </header>
 
-      {/* 1. Introducción */}
       <section className="mb-4">
         <h2 className="h4">1. Introducción</h2>
         <p>
@@ -16,7 +15,6 @@ export default function TerminosCondiciones() {
         </p>
       </section>
 
-      {/* 2. Aceptación de los Términos */}
       <section className="mb-4">
         <h2 className="h4">2. Aceptación de los Términos</h2>
         <p>
@@ -25,7 +23,6 @@ export default function TerminosCondiciones() {
         </p>
       </section>
 
-      {/* 3. Registro de Usuario */}
       <section className="mb-4">
         <h2 className="h4">3. Registro de Usuario</h2>
         <p>
@@ -34,7 +31,6 @@ export default function TerminosCondiciones() {
         </p>
       </section>
 
-      {/* 4. Responsabilidad del Intercambio y Envíos */}
       <section className="mb-4">
         <h2 className="h4">4. Responsabilidad del Intercambio y Envíos</h2>
         <ul>
@@ -56,7 +52,6 @@ export default function TerminosCondiciones() {
         </ul>
       </section>
 
-      {/* 5. Conducta del Usuario */}
       <section className="mb-4">
         <h2 className="h4">5. Conducta del Usuario</h2>
         <p>Al utilizar esta plataforma, te comprometes a:</p>
@@ -82,7 +77,6 @@ export default function TerminosCondiciones() {
         </ul>
       </section>
 
-      {/* 7. Privacidad y Protección de Datos */}
       <section className="mb-4">
         <h2 className="h4">7. Privacidad y Protección de Datos</h2>
         <p>
@@ -92,7 +86,6 @@ export default function TerminosCondiciones() {
         </p>
       </section>
 
-      {/* 8. Modificaciones a los Términos */}
       <section className="mb-4">
         <h2 className="h4">8. Modificaciones a los Términos</h2>
         <p>
@@ -102,7 +95,6 @@ export default function TerminosCondiciones() {
         </p>
       </section>
 
-      {/* 9. Ley Aplicable y Jurisdicción */}
       <section className="mb-4">
         <h2 className="h4">9. Ley Aplicable y Jurisdicción</h2>
         <p>
@@ -115,7 +107,6 @@ export default function TerminosCondiciones() {
         </p>
       </section>
 
-      {/* 10. Contacto */}
       <section>
         <h2 className="h4">10. Contacto</h2>
         <p>
@@ -123,6 +114,6 @@ export default function TerminosCondiciones() {
           <a href="mailto:info@intercambialibros.com">info@intercambialibros.com</a>.
         </p>
       </section>
-    </main>
+    </div>
   );
 }

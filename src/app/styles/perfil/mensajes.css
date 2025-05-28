@@ -1,10 +1,9 @@
 .avatar-placeholder {
-  width: 40px;
-  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
+  background: linear-gradient(135deg, #5a8c5a 0%, #3a6d7c 100%);
 }
 
 .message-bubble {

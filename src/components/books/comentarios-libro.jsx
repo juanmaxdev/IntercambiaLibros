@@ -24,20 +24,19 @@ export default function ComentariosLibro({ libroId, session }) {
   const [mensajeExito, setMensajeExito] = useState("")
   const [hoverRating, setHoverRating] = useState(0)
 
-  // Nuevos estados para el modal de error
+
   const [mostrarModalError, setMostrarModalError] = useState(false)
   const [mensajeError, setMensajeError] = useState("")
-  const [tipoError, setTipoError] = useState("error") // "error", "warning", "info"
+  const [tipoError, setTipoError] = useState("error") 
 
-  // Función para mostrar errores en modal
+
   const mostrarError = (mensaje, tipo = "error") => {
-    console.error("Error en comentarios:", mensaje)
     setMensajeError(mensaje)
     setTipoError(tipo)
     setMostrarModalError(true)
   }
 
-  // Función para mostrar éxito
+
   const mostrarExito = (mensaje) => {
     setMensajeExito(mensaje)
     setTimeout(() => {
@@ -59,16 +58,12 @@ export default function ComentariosLibro({ libroId, session }) {
 
         if (!response.ok) {
           const errorText = await response.text()
-          console.error("Respuesta de error:", errorText)
-          console.error("Status code:", response.status)
-          console.error("Status text:", response.statusText)
           throw new Error(`Error al cargar los comentarios: ${response.status}`)
         }
 
         const data = await response.json()
 
         if (!Array.isArray(data)) {
-          console.error("La respuesta de la API no es un array:", data)
           throw new Error("Formato de respuesta inesperado")
         }
 
@@ -92,7 +87,6 @@ export default function ComentariosLibro({ libroId, session }) {
           setPorcentajes(nuevoPorcentajes)
         }
       } catch (err) {
-        console.error("Error al cargar comentarios:", err)
         setError("No se pudieron cargar los comentarios")
       } finally {
         setLoading(false)
@@ -102,7 +96,6 @@ export default function ComentariosLibro({ libroId, session }) {
     fetchComentarios()
   }, [libroId])
 
-  // Formatear fecha para mostrar en formato legible
   const formatearFecha = (fechaStr) => {
     const fecha = new Date(fechaStr)
     return fecha.toLocaleDateString("es-ES", {
@@ -114,7 +107,6 @@ export default function ComentariosLibro({ libroId, session }) {
 
   const isLoggedIn = !!session
 
-  // Manejar cambios en el formulario
   const handleInputChange = (e) => {
     const { name, value } = e.target
     if (name === "comentario" && value.length > 300) {
@@ -127,7 +119,6 @@ export default function ComentariosLibro({ libroId, session }) {
     })
   }
 
-  // Manejar cambio de valoración
   const handleRatingChange = (rating) => {
     setNuevoComentario({
       ...nuevoComentario,
@@ -135,21 +126,17 @@ export default function ComentariosLibro({ libroId, session }) {
     })
   }
 
-  // Manejar hover en las estrellas
   const handleRatingHover = (rating) => {
     setHoverRating(rating)
   }
 
-  // Resetear hover al salir del área de estrellas
   const handleRatingLeave = () => {
     setHoverRating(0)
   }
 
-  // Enviar nuevo comentario
   const handleSubmitComentario = async (e) => {
     e.preventDefault()
 
-    // Validaciones con mensajes específicos
     if (!libroId) {
       mostrarError("Error interno: No se pudo identificar el libro.", "warning")
       return
@@ -175,19 +162,13 @@ export default function ComentariosLibro({ libroId, session }) {
 
       const comentarioData = {
         libro_id: libroId,
-        usuario_id: session.user.email, // Enviamos el email, la API lo convertirá al ID
+        usuario_id: session.user.email, 
         usuario_nombre: session.user.name || "Anónimo",
         imagen_usuario: session.user.image || null,
         comentario: nuevoComentario.comentario.trim(),
         valoracion: nuevoComentario.valoracion,
         fecha_valoracion: new Date().toISOString(),
       }
-
-      console.log("Enviando comentario:", {
-        titulo: comentarioData.libro_id,
-        usuario_email: comentarioData.usuario_id,
-        valoracion: comentarioData.valoracion,
-      })
 
       const response = await fetch("/api/libros/comentarios", {
         method: "POST",
@@ -200,17 +181,13 @@ export default function ComentariosLibro({ libroId, session }) {
       const resultado = await response.json()
 
       if (!response.ok) {
-        // Usar el mensaje amigable del servidor si está disponible
         const mensajeUsuario = resultado.userMessage || resultado.error || "Error desconocido al enviar el comentario"
         throw new Error(mensajeUsuario)
       }
 
-      console.log("Comentario enviado exitosamente:", resultado)
-
-      // Actualizar la lista de comentarios
       setComentarios([comentarioData, ...comentarios])
 
-      // Actualizar porcentajes
+
       const nuevoConteo = { ...porcentajes }
       const total = comentarios.length + 1
 
@@ -222,14 +199,10 @@ export default function ComentariosLibro({ libroId, session }) {
 
       setPorcentajes(nuevoConteo)
 
-      // Limpiar formulario y mostrar mensaje de éxito
       setNuevoComentario({ comentario: "", valoracion: 5 })
       setMostrarFormulario(false)
       mostrarExito(resultado.userMessage || "¡Tu comentario se ha publicado exitosamente!")
     } catch (error) {
-      console.error("Error al enviar comentario:", error)
-
-      // Mostrar el mensaje de error directamente (ya viene procesado del servidor)
       mostrarError(error.message)
     } finally {
       setEnviando(false)
@@ -240,7 +213,6 @@ export default function ComentariosLibro({ libroId, session }) {
     <>
       <div className="custom-container-comment mx-auto mx-md-5 rounded">
         <div className="row g-0">
-          {/* Sección de comentarios - Ocupa toda la pantalla en móviles, 8 columnas en tablets/desktop */}
           <div className="col-12 col-lg-8">
             <h3 className="fw-semibold pt-4 ps-3 ps-md-5 text-dark">Opiniones del libro</h3>
             <div className="container mt-3 pt-2 ps-3 ps-md-4 comentarios-container">

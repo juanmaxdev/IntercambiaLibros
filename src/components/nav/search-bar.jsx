@@ -15,7 +15,6 @@ export function SearchBar() {
   const searchContainerRef = useRef(null)
   const router = useRouter()
 
-  // Manejar cambios en el término de búsqueda
   const handleSearchChange = (e) => {
     const value = e.target.value
     setSearchTerm(value)
@@ -34,7 +33,6 @@ export function SearchBar() {
   // Realizar la búsqueda
   const performSearch = async (term) => {
     try {
-      // Obtener todos los libros
       const response = await fetch("/api/libros", {
         cache: "no-store",
       })
@@ -45,7 +43,6 @@ export function SearchBar() {
 
       const books = await response.json()
 
-      // Filtrar los libros según el término de búsqueda
       const searchLower = term.toLowerCase()
       const filteredBooks = books.filter((book) => {
         return (
@@ -57,19 +54,16 @@ export function SearchBar() {
         )
       })
 
-      // Limitar a 5 resultados para la vista previa
       setSearchResults(filteredBooks.slice(0, 5))
       setShowResults(filteredBooks.length > 0)
       setNoResults(filteredBooks.length === 0 && term.length > 2)
       setIsSearching(false)
     } catch (error) {
-      console.error("Error al buscar:", error)
       setIsSearching(false)
       setNoResults(true)
     }
   }
 
-  // Modificar la función handleSubmit para asegurar que la redirección sea correcta
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -77,7 +71,7 @@ export function SearchBar() {
       setIsSearching(true)
 
       try {
-        // Realizar búsqueda para verificar si hay resultados
+
         const response = await fetch("/api/libros", {
           cache: "no-store",
         })
@@ -99,11 +93,9 @@ export function SearchBar() {
           )
         })
 
-        // Siempre redirigir a la página de resultados, incluso si no hay coincidencias
+
         router.push(`libros/search?term=${encodeURIComponent(searchTerm)}`)
       } catch (error) {
-        console.error("Error al buscar:", error)
-        // Aún así, redirigir a la página de resultados
         router.push(`libros/search?term=${encodeURIComponent(searchTerm)}`)
       } finally {
         setIsSearching(false)
@@ -112,7 +104,7 @@ export function SearchBar() {
     }
   }
 
-  // Cerrar los resultados al hacer clic fuera
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {

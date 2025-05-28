@@ -2,7 +2,6 @@ import { NextResponse } from "next/server"
 import { supabase } from "@/lib/supabase"
 import { getServerSession } from "@/server/auth"
 
-// Crear una nueva solicitud de intercambio
 export async function POST(request) {
   try {
     const session = await getServerSession()
@@ -16,7 +15,6 @@ export async function POST(request) {
       return NextResponse.json({ error: "Faltan campos obligatorios" }, { status: 400 })
     }
 
-    // Obtener el ID del usuario remitente
     const { data: remitente, error: errorRemitente } = await supabase
       .from("usuarios")
       .select("id")
@@ -27,7 +25,6 @@ export async function POST(request) {
       return NextResponse.json({ error: errorRemitente.message }, { status: 500 })
     }
 
-    // Obtener el ID del usuario destinatario
     const { data: destinatario, error: errorDestinatario } = await supabase
       .from("usuarios")
       .select("id")
@@ -38,13 +35,12 @@ export async function POST(request) {
       return NextResponse.json({ error: errorDestinatario.message }, { status: 500 })
     }
 
-    // Crear el intercambio en la base de datos
     const { data, error } = await supabase
       .from("intercambios")
       .insert({
         usuario_id_ofrece: remitente.id,
         usuario_id_recibe: destinatario.id,
-        usuario_ofrece_id_libro: libros_ofrecidos[0], // Por ahora solo usamos el primer libro
+        usuario_ofrece_id_libro: libros_ofrecidos[0], 
         usuario_recibe_id_libro: libro_solicitado || null,
         estado: "pendiente",
         comentario: mensaje || "Solicitud de intercambio",
@@ -64,7 +60,6 @@ export async function POST(request) {
   }
 }
 
-// Obtener intercambios del usuario
 export async function GET(request) {
   try {
     const session = await getServerSession()
@@ -72,7 +67,6 @@ export async function GET(request) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
 
-    // Obtener el ID del usuario
     const { data: usuario, error: errorUsuario } = await supabase
       .from("usuarios")
       .select("id")
@@ -114,7 +108,6 @@ export async function GET(request) {
   }
 }
 
-// Actualizar el estado de un intercambio
 export async function PATCH(request) {
   try {
     const session = await getServerSession()
@@ -128,7 +121,6 @@ export async function PATCH(request) {
       return NextResponse.json({ error: "Faltan campos obligatorios" }, { status: 400 })
     }
 
-    // Obtener el ID del usuario
     const { data: usuario, error: errorUsuario } = await supabase
       .from("usuarios")
       .select("id")
@@ -139,7 +131,6 @@ export async function PATCH(request) {
       return NextResponse.json({ error: errorUsuario.message }, { status: 500 })
     }
 
-    // Verificar que el usuario sea parte del intercambio
     const { data: intercambio, error: errorConsulta } = await supabase
       .from("intercambios")
       .select("*")
@@ -158,7 +149,6 @@ export async function PATCH(request) {
       return NextResponse.json({ error: "No autorizado para actualizar este intercambio" }, { status: 403 })
     }
 
-    // Verificar que el intercambio esté en estado pendiente para poder cambiarlo
     if (intercambio.estado !== "pendiente" && estado !== "completado") {
       return NextResponse.json(
         {
@@ -169,7 +159,6 @@ export async function PATCH(request) {
       )
     }
 
-    // Actualizar el estado del intercambio
     const { data, error } = await supabase
       .from("intercambios")
       .update({
@@ -183,7 +172,6 @@ export async function PATCH(request) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    // Si se rechaza, no hacemos nada más
     if (estado === "rechazado") {
       return NextResponse.json(data[0])
     }

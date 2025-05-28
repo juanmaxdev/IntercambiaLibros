@@ -7,24 +7,15 @@ import { useEffect } from "react"
 export function LoginModal() {
   const handleGoogleSignIn = async () => {
     try {
-      // Obtener la URL actual completa
       const currentUrl = typeof window !== "undefined" ? window.location.href : "/"
-      console.log("🔐 Login Modal: Iniciando sesión con Google, URL actual:", currentUrl)
-
-      // No intentamos cerrar el modal manualmente, confiamos en data-bs-dismiss="modal"
-
-      // Iniciar sesión con Google y especificar la URL actual como callbackUrl
       await signIn("google", {
         callbackUrl: currentUrl,
         redirect: false,
       })
     } catch (error) {
-      console.error("❌ Login Modal: Error al iniciar sesión con Google:", error)
     }
   }
 
-  // Modificar la función handleLogin para guardar los datos del usuario en localStorage
-  // y actualizar la UI después del inicio de sesión exitoso
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -32,18 +23,15 @@ export function LoginModal() {
     const correo_electronico = document.getElementById("floatingInput").value
     const contrasena = document.getElementById("floatingPassword").value
 
-    console.log("🔐 Login Modal: Iniciando sesión con credenciales para:", correo_electronico)
-
     const result = await signIn("credentials", {
       correo_electronico,
       contrasena,
       redirect: false,
     })
 
-    console.log("🔐 Login Modal: Resultado de inicio de sesión:", result)
 
     if (result.ok) {
-      window.location.reload() // 🔄 Recarga la página para reflejar el estado de sesión
+      window.location.reload()
     } else {
       alert("Correo o contraseña incorrectos.")
     }
@@ -56,10 +44,9 @@ export function LoginModal() {
       clearTimeout(timeout)
       timeout = setTimeout(
         () => {
-          // Este código no se ejecutará si el usuario interactúa con la página
         },
         30 * 60 * 1000,
-      ) // 30 minutos en milisegundos
+      )
     }
 
     const events = ["mousemove", "keydown", "click"]
@@ -92,7 +79,7 @@ export function LoginModal() {
                 <div className="row justify-content-center align-items-center">
                   <div className="col-12">
                     <div className="text-center mb-4">
-                      <Image src="/assets/img/logo2.png" width={160} height={40} alt="logo" />
+                      <Image src="/assets/img/logo/logo.png" width={160} height={40} alt="logo" />
                     </div>
                     <form onSubmit={handleLogin}>
                       <div className="form-floating mb-3">
@@ -130,9 +117,6 @@ export function LoginModal() {
                         <button className="btn btn-outline-primary w-100 w-sm-75 mb-2 mb-sm-0" type="submit">
                           Iniciar Sesión
                         </button>
-                        <a className="text-muted ms-sm-3" href="#!">
-                          ¿Olvidaste la contraseña?
-                        </a>
                       </div>
                       <div className="text-center">
                         <p className="mb-2">¿No tienes una cuenta?</p>

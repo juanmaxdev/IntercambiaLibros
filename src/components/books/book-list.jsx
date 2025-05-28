@@ -13,15 +13,12 @@ export default function BookList({ books = [], isLoading }) {
   const filteredBooksRef = useRef([])
   const [genres, setGenres] = useState(["All"])
 
-  // Extraer géneros únicos de los libros - Modificar para usar categoría o nombre_genero
   useEffect(() => {
     const uniqueGenres = ["All", ...new Set(books.map((book) => book.categoria || book.nombre_genero).filter(Boolean))]
     setGenres(uniqueGenres)
   }, [books])
 
-  // Añadir useEffect para manejar el parámetro de género en la URL
   useEffect(() => {
-    // Verificar si hay un parámetro de género en la URL
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search)
       const genreParam = params.get("genre")
@@ -30,34 +27,26 @@ export default function BookList({ books = [], isLoading }) {
         setSelectedGenre(genreParam)
       }
     }
-  }, [genres]) // Dependencia de genres para asegurar que se ejecute después de cargar los géneros
+  }, [genres]) 
 
-  // Filtrar libros por género - Modificar para usar categoría o nombre_genero
   const filteredBooks =
     selectedGenre === "All"
       ? books
       : books.filter((book) => {
-          // Usar categoría o nombre_genero, lo que esté disponible
           const bookGenre = book.categoria || book.nombre_genero || ""
           return bookGenre === selectedGenre
         })
 
-  // Actualizar la referencia para evitar bucles infinitos
   filteredBooksRef.current = filteredBooks
 
-  // Este useEffect se ejecuta solo cuando cambia selectedGenre o books
   useEffect(() => {
-    // Resetear cuando cambia el filtro de género o los libros
     setPage(1)
     setVisibleBooks(filteredBooksRef.current.slice(0, booksPerPage))
-  }, [selectedGenre, books, booksPerPage]) // No incluir filteredBooks aquí
+  }, [selectedGenre, books, booksPerPage])
 
-  // Este useEffect maneja la carga infinita
   useEffect(() => {
-    // Obtener los libros filtrados de la referencia para evitar dependencias cíclicas
+  
     const currentFilteredBooks = filteredBooksRef.current
-
-    // Solo crear el observer si hay más libros para cargar
     if (visibleBooks.length >= currentFilteredBooks.length) {
       return
     }
@@ -66,7 +55,6 @@ export default function BookList({ books = [], isLoading }) {
       (entries) => {
         const target = entries[0]
         if (target.isIntersecting) {
-          // Cargar más libros cuando el loader esté visible
           const startIndex = page * booksPerPage
           const endIndex = startIndex + booksPerPage
 
@@ -80,7 +68,7 @@ export default function BookList({ books = [], isLoading }) {
       },
       {
         threshold: 0.1,
-        rootMargin: "100px", // Añadir margen para detectar antes de llegar al final
+        rootMargin: "100px", 
       },
     )
 
@@ -93,9 +81,7 @@ export default function BookList({ books = [], isLoading }) {
         observer.unobserve(loaderRef.current)
       }
     }
-  }, [page, visibleBooks.length, booksPerPage]) // Eliminamos filteredBooks de las dependencias
-
-  // Extraer géneros únicos de los libros - Modificar para usar categoría o nombre_genero
+  }, [page, visibleBooks.length, booksPerPage]) 
 
   return (
     <div className="book-list">
@@ -113,7 +99,7 @@ export default function BookList({ books = [], isLoading }) {
         </div>
       ) : (
         <>
-          <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">
+          <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4 px-4 p-md-0">
             {visibleBooks.map((book, index) => (
               <div className="col" key={`${book.id}-${index}`}>
                 <BookCard book={book} />

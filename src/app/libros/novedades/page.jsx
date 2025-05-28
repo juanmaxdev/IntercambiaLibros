@@ -14,7 +14,6 @@ export default function NewBooksPage() {
   const booksPerPage = 10
   const filteredBooksRef = useRef([])
 
-  // Cargar libros desde la API
   useEffect(() => {
     async function fetchBooks() {
       try {
@@ -27,16 +26,14 @@ export default function NewBooksPage() {
 
         const data = await response.json()
 
-        // Ordenar los libros por fecha de subida (más recientes primero)
         const sortedBooks = data.sort((a, b) => {
           const dateA = new Date(a.fecha_subida || "")
           const dateB = new Date(b.fecha_subida || "")
-          return dateB - dateA // Orden descendente (más reciente primero)
+          return dateB - dateA 
         })
 
         setBooks(sortedBooks)
       } catch (err) {
-        console.error("Error al cargar los libros:", err)
         setError(err.message)
       } finally {
         setIsLoading(false)
@@ -46,33 +43,24 @@ export default function NewBooksPage() {
     fetchBooks()
   }, [])
 
-  // Filtrar libros por género
-  // Modificar para usar categoría o nombre_genero según lo que esté disponible
   const filteredBooks =
     selectedGenre === "All"
       ? books
       : books.filter((book) => {
-          // Usar categoría o nombre_genero, lo que esté disponible
           const bookGenre = book.categoria || book.nombre_genero || ""
           return bookGenre === selectedGenre
         })
 
-  // Actualizar la referencia para evitar bucles infinitos
   filteredBooksRef.current = filteredBooks
 
-  // Este useEffect se ejecuta solo cuando cambia selectedGenre o books
   useEffect(() => {
-    // Resetear cuando cambia el filtro de género o los libros
     setPage(1)
     setVisibleBooks(filteredBooksRef.current.slice(0, booksPerPage))
   }, [selectedGenre, books, booksPerPage])
 
-  // Este useEffect maneja la carga infinita
   useEffect(() => {
-    // Obtener los libros filtrados de la referencia para evitar dependencias cíclicas
     const currentFilteredBooks = filteredBooksRef.current
 
-    // Solo crear el observer si hay más libros para cargar
     if (visibleBooks.length >= currentFilteredBooks.length) {
       return
     }
@@ -81,7 +69,6 @@ export default function NewBooksPage() {
       (entries) => {
         const target = entries[0]
         if (target.isIntersecting) {
-          // Cargar más libros cuando el loader esté visible
           const startIndex = page * booksPerPage
           const endIndex = startIndex + booksPerPage
 
@@ -95,7 +82,7 @@ export default function NewBooksPage() {
       },
       {
         threshold: 0.1,
-        rootMargin: "100px", // Añadir margen para detectar antes de llegar al final
+        rootMargin: "100px",
       },
     )
 
@@ -110,7 +97,6 @@ export default function NewBooksPage() {
     }
   }, [page, visibleBooks.length, booksPerPage])
 
-  // Extraer géneros únicos de los libros - Modificar para usar categoría o nombre_genero
   const genres = ["All", ...new Set(books.map((book) => book.categoria || book.nombre_genero).filter(Boolean))]
 
   return (

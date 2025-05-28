@@ -13,7 +13,6 @@ export async function GET() {
     return NextResponse.json({ message: 'Error al obtener donaciones', error: error.message }, { status: 500 });
   }
 
-  // Aplanar resultados
   const donaciones = data.map(({ usuarios, libros, ...rest }) => ({
     ...rest,
     usuario_id: rest.usuario_id,

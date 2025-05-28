@@ -4,18 +4,15 @@ import { obtenerPerfil, actualizarPerfil } from "@/services/perfilService";
 export async function GET() {
   try {
     const session = await auth();
-    console.log("🧪 Sesión devuelta por auth():", session);
 
     const email = session?.user?.email;
     if (!email) {
-      console.warn("⚠️ No autorizado: falta email en session:", session);
       return new Response(JSON.stringify({ error: "No autorizado" }), { status: 401 });
     }
 
     const usuario = await obtenerPerfil(email);
     return new Response(JSON.stringify(usuario), { status: 200 });
   } catch (error) {
-    console.error("❌ Error al obtener el perfil:", error);
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 }
@@ -34,7 +31,6 @@ export async function PUT(req) {
 
     return new Response(JSON.stringify(result), { status: 200 });
   } catch (error) {
-    console.error("Error al actualizar el perfil:", error);
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 }

@@ -24,13 +24,11 @@ export default function DonationsPage() {
   const isAuthenticated = status === "authenticated"
   const router = useRouter()
 
-  // Cargar géneros y donaciones
   useEffect(() => {
     async function fetchData() {
       try {
         setIsLoading(true)
 
-        // 1. Primero cargar los géneros para tener el mapeo de ID a nombre
         const generosResponse = await fetch("/api/generos")
         if (!generosResponse.ok) {
           throw new Error(`Error al obtener los géneros: ${generosResponse.status}`)
@@ -38,18 +36,15 @@ export default function DonationsPage() {
 
         const generosData = await generosResponse.json()
 
-        // Crear un mapa de ID a nombre de género
         const genreMapping = {}
         generosData.forEach((genero) => {
           genreMapping[genero.id] = genero.nombre
         })
         setGenreMap(genreMapping)
 
-        // Crear lista de géneros con "All" al principio
         const allGenres = ["All", ...generosData.map((genero) => genero.nombre)]
         setGenres(allGenres)
 
-        // 2. Luego cargar las donaciones
         const donationsResponse = await fetch("/api/libros/donaciones")
         if (!donationsResponse.ok) {
           throw new Error(`Error al obtener las donaciones: ${donationsResponse.status}`)
@@ -57,7 +52,6 @@ export default function DonationsPage() {
 
         const data = await donationsResponse.json()
 
-        // Filtrar donaciones duplicadas basadas en libro_id
         const uniqueDonations = []
         const seenIds = new Set()
 
@@ -66,14 +60,12 @@ export default function DonationsPage() {
           if (idToCheck && !seenIds.has(idToCheck)) {
             seenIds.add(idToCheck)
 
-            // Añadir el nombre del género basado en el ID si está disponible
             const donationWithGenre = {
               ...donation,
               id: idToCheck,
               donacion: true,
             }
 
-            // Si tenemos un genero_id, añadir el nombre del género
             if (donation.genero_id && genreMapping[donation.genero_id]) {
               donationWithGenre.nombre_genero = genreMapping[donation.genero_id]
             }
@@ -84,7 +76,6 @@ export default function DonationsPage() {
 
         setBooks(uniqueDonations)
       } catch (err) {
-        console.error("Error al cargar datos:", err)
         setError(err.message)
       } finally {
         setIsLoading(false)
@@ -182,11 +173,9 @@ export default function DonationsPage() {
     }
   }, [page, visibleBooks.length, booksPerPage])
 
-  // Función para manejar el clic en el botón de donar
   const handleDonateClick = (e) => {
     if (!isAuthenticated) {
       e.preventDefault()
-      // Redirigir a la página principal y mostrar el modal desde allí
       router.push("/?login=true")
     }
   }

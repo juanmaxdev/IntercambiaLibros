@@ -11,7 +11,6 @@
   overflow: hidden;
 }
 
-/* Cabecera del perfil */
 .profile-header {
   position: relative;
   padding-bottom: 1.5rem;
@@ -34,7 +33,6 @@
   opacity: 0.1;
 }
 
-/* Corregir la posición del avatar en el perfil */
 .profile-avatar {
   position: absolute;
   bottom: 5px;
@@ -95,7 +93,6 @@
   margin-bottom: 0.5rem;
 }
 
-/* Cuerpo del perfil */
 .profile-body {
   padding: 2rem;
 }
@@ -121,7 +118,6 @@
   padding: 1.5rem;
 }
 
-/* Información personal */
 .info-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -166,7 +162,6 @@
   font-style: italic;
 }
 
-/* Estadísticas mejoradas */
 .stat-card {
   transition: all 0.3s ease;
   cursor: default;
@@ -365,7 +360,6 @@
   }
 }
 
-/* Estados de carga */
 .loading-skeleton {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
@@ -381,14 +375,12 @@
   }
 }
 
-/* Mejoras de accesibilidad */
 .btn:focus,
 .form-control:focus {
   box-shadow: 0 0 0 0.2rem rgba(90, 140, 90, 0.25);
   border-color: #5a8c5a;
 }
 
-/* Efectos hover mejorados */
 .btn-outline-primary:hover {
   background-color: #5a8c5a;
   border-color: #5a8c5a;

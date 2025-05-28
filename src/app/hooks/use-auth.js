@@ -61,7 +61,6 @@ export function useAuth() {
           })
         }
       } catch (error) {
-        console.error("Error al verificar autenticación:", error)
         setAuthState({
           isLoggedIn: false,
           userId: null,

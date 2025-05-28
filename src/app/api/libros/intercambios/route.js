@@ -13,7 +13,6 @@ export async function GET() {
     const intercambios = await obtenerIntercambios(email)
     return new Response(JSON.stringify(intercambios), { status: 200 })
   } catch (error) {
-    console.error("Error al obtener intercambios:", error)
     return new Response(JSON.stringify({ error: error.message }), { status: 500 })
   }
 }

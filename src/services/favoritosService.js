@@ -27,7 +27,6 @@ export async function librosFavoritos() {
     return [];
   }
 
-  // Obtener los datos de los libros
   const { data: libros, error: libroError } = await supabase
     .from("libros")
     .select("*")

@@ -48,44 +48,38 @@ export default function Mensajes() {
         try {
           await cargarConversaciones()
 
-          // Si hay un parámetro de contacto, cargar ese contacto
           if (contactoParam) {
             await cargarContacto(contactoParam)
           }
         } catch (err) {
           setError("Error al cargar las conversaciones. Por favor, intenta de nuevo más tarde.")
-          console.error("Error al inicializar:", err)
         }
       }
     }
 
     inicializar()
 
-    // Actualizar mensajes cada minuto si hay un contacto seleccionado
     const intervalo = setInterval(() => {
       if (session?.user?.email && contactoSeleccionado) {
         cargarMensajes(contactoSeleccionado.email)
       }
-    }, 60000) // Cambiado de 10000 a 60000 (1 minuto)
+    }, 60000) 
 
     return () => clearInterval(intervalo)
   }, [session, status, contactoParam])
 
-  // Cargar mensajes cuando se selecciona un contacto
   useEffect(() => {
     if (session?.user?.email && contactoSeleccionado) {
       cargarMensajes(contactoSeleccionado.email)
     }
   }, [contactoSeleccionado, session])
 
-  // Desplazar al último mensaje cuando se cargan nuevos mensajes
   useEffect(() => {
     if (mensajesFinRef.current) {
       mensajesFinRef.current.scrollIntoView({ behavior: "smooth" })
     }
   }, [mensajes])
 
-  // Cargar contacto por email
   const cargarContacto = async (contactoEmail) => {
     if (!contactoEmail) return
 
@@ -100,12 +94,10 @@ export default function Mensajes() {
           email: usuario.email || contactoEmail,
         })
       } else {
-        // Si no se encuentra el usuario, buscar en las conversaciones existentes
         const contactoEncontrado = conversaciones.find((c) => c.email === contactoEmail)
         if (contactoEncontrado) {
           setContactoSeleccionado(contactoEncontrado)
         } else {
-          // Si no se encuentra en las conversaciones, crear un contacto básico
           setContactoSeleccionado({
             id: null,
             nombre: contactoEmail.split("@")[0] || "Usuario",
@@ -114,19 +106,16 @@ export default function Mensajes() {
         }
       }
 
-      // Si hay un parámetro de libro, configurar mensaje inicial
       if (libroParam) {
         setNuevoMensaje(`Hola, estoy interesado en tu libro "${libroParam}". ¿Podríamos hablar sobre él?`)
       }
     } catch (error) {
-      console.error("Error al cargar contacto:", error)
       setError("Error al cargar el contacto. Por favor, intenta de nuevo.")
     } finally {
       setCargandoContacto(false)
     }
   }
 
-  // Cargar conversaciones
   const cargarConversaciones = async () => {
     if (!session?.user?.email) return
 
@@ -134,12 +123,10 @@ export default function Mensajes() {
       setCargando(true)
       const conversacionesData = await obtenerConversaciones(session.user.email)
 
-      // Ordenar por fecha más reciente
       const conversacionesOrdenadas = conversacionesData.sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
 
       setConversaciones(conversacionesOrdenadas)
     } catch (error) {
-      console.error("Error al cargar conversaciones:", error)
       setError("Error al cargar las conversaciones. Por favor, intenta de nuevo.")
     } finally {
       setCargando(false)
@@ -160,13 +147,11 @@ export default function Mensajes() {
       if (mensajesNoLeidos.length > 0) {
         await marcarComoLeidos(mensajesNoLeidos)
 
-        // Actualizar el contador de no leídos en las conversaciones
         setConversaciones((prevConversaciones) =>
           prevConversaciones.map((conv) => (conv.email === contactoEmail ? { ...conv, noLeidos: 0 } : conv)),
         )
       }
     } catch (error) {
-      console.error("Error al cargar mensajes:", error)
       setError("Error al cargar los mensajes. Por favor, intenta de nuevo.")
     }
   }
@@ -182,41 +167,34 @@ export default function Mensajes() {
       await enviarMensaje(session.user.email, contactoSeleccionado.email, nuevoMensaje)
       setNuevoMensaje("")
       await cargarMensajes(contactoSeleccionado.email)
-      await cargarConversaciones() // Actualizar la lista de conversaciones
+      await cargarConversaciones() 
     } catch (error) {
-      console.error("Error al enviar mensaje:", error)
       setError("Error al enviar el mensaje. Por favor, inténtalo de nuevo.")
     } finally {
       setEnviando(false)
     }
   }
 
-  // Seleccionar un contacto
   const seleccionarContacto = (contacto) => {
     setContactoSeleccionado(contacto)
-    setError(null) // Limpiar errores al cambiar de contacto
+    setError(null) 
   }
 
-  // Cerrar la conversación actual
   const cerrarConversacion = () => {
     setContactoSeleccionado(null)
     setMensajes([])
     setError(null)
   }
 
-  // Cerrar una conversación específica
   const cerrarConversacionEspecifica = (email) => {
-    // Si es la conversación actualmente seleccionada, la cerramos
     if (contactoSeleccionado?.email === email) {
       setContactoSeleccionado(null)
       setMensajes([])
     }
 
-    // Actualizamos la lista de conversaciones
     setConversaciones((prevConversaciones) => prevConversaciones.filter((conv) => conv.email !== email))
   }
 
-  // Formatear fecha
   const formatearFecha = (fecha) => {
     return new Date(fecha).toLocaleString("es-ES", {
       day: "2-digit",
@@ -226,13 +204,11 @@ export default function Mensajes() {
       minute: "2-digit",
     })
   }
-
-  // Formatear fecha corta (solo hora si es hoy, o fecha)
   const formatearFechaCorta = (fecha) => {
     const fechaMensaje = new Date(fecha)
     const hoy = new Date()
 
-    // Si es hoy, mostrar solo la hora
+
     if (fechaMensaje.toDateString() === hoy.toDateString()) {
       return fechaMensaje.toLocaleTimeString("es-ES", {
         hour: "2-digit",
@@ -240,7 +216,7 @@ export default function Mensajes() {
       })
     }
 
-    // Si es este año pero no hoy, mostrar día y mes
+
     if (fechaMensaje.getFullYear() === hoy.getFullYear()) {
       return fechaMensaje.toLocaleDateString("es-ES", {
         day: "2-digit",
@@ -248,7 +224,6 @@ export default function Mensajes() {
       })
     }
 
-    // Si es otro año, mostrar fecha completa
     return fechaMensaje.toLocaleDateString("es-ES", {
       day: "2-digit",
       month: "2-digit",
@@ -256,13 +231,11 @@ export default function Mensajes() {
     })
   }
 
-  // Función para abrir el modal de solicitud de intercambio
   const handleSolicitarIntercambio = async () => {
     if (!session?.user?.email) return
 
     try {
       setCargandoLibros(true)
-      // Obtener los libros del usuario actual
       const response = await fetch("/api/libros/usuario", {
         method: "GET",
         headers: {
@@ -270,7 +243,6 @@ export default function Mensajes() {
         },
       })
 
-      // Obtener los libros del contacto
       const responseContacto = await fetch("/api/libros/usuario", {
         method: "GET",
         headers: {
@@ -282,7 +254,6 @@ export default function Mensajes() {
         const librosUsuarioData = await response.json()
         const librosContactoData = await responseContacto.json()
 
-        // Filtrar libros que ya han sido intercambiados (si tienen esa propiedad)
         const librosUsuarioFiltrados = librosUsuarioData.filter(
           (libro) => !libro.estado_intercambio || libro.estado_intercambio !== "intercambiado",
         )
@@ -293,7 +264,6 @@ export default function Mensajes() {
 
         setLibrosUsuario(librosUsuarioFiltrados)
 
-        // Si venimos de la página de un libro específico, buscar ese libro en los libros del contacto
         if (libroParam) {
           const libroEncontrado = librosContactoFiltrados.find((libro) => libro.titulo === libroParam)
           if (libroEncontrado) {
@@ -301,23 +271,19 @@ export default function Mensajes() {
           }
         }
 
-        // Guardar los libros del contacto para mostrarlos en el modal
         setLibrosContacto(librosContactoFiltrados)
 
-        // Si no tiene libros, mostrar el modal con mensaje
         setShowIntercambioModal(true)
       } else {
         setError("Error al obtener los libros. Por favor, intenta de nuevo.")
       }
     } catch (error) {
-      console.error("Error al cargar libros:", error)
       setError("Error al cargar los libros. Por favor, intenta de nuevo.")
     } finally {
       setCargandoLibros(false)
     }
   }
 
-  // Función para manejar la selección de libros
   const handleSeleccionLibro = (libro) => {
     setLibrosSeleccionados((prevSelected) => {
       const isSelected = prevSelected.some((item) => item.id === libro.id)
@@ -330,7 +296,6 @@ export default function Mensajes() {
     })
   }
 
-  // Función para verificar si un texto es un mensaje de intercambio en formato JSON
   const esMensajeIntercambioTexto = (texto) => {
     try {
       const contenido = JSON.parse(texto)
@@ -344,12 +309,10 @@ export default function Mensajes() {
     }
   }
 
-  // Función para manejar la selección del libro del contacto
   const handleSeleccionLibroContacto = (libro) => {
     setLibroContactoSeleccionado(libro)
   }
 
-  // Función para enviar la solicitud de intercambio
   const enviarSolicitudIntercambio = async () => {
     if (librosSeleccionados.length === 0) {
       setError("Debes seleccionar al menos un libro para el intercambio")
@@ -359,12 +322,10 @@ export default function Mensajes() {
     try {
       setEnviando(true)
 
-      // Determinar qué libro del contacto se está solicitando
       let libroContactoId = null
       let libroContactoInfo = null
 
       if (libroContacto) {
-        // Si venimos de la página de un libro específico
         libroContactoId = libroContacto.id
         libroContactoInfo = {
           id: libroContacto.id,
@@ -373,7 +334,6 @@ export default function Mensajes() {
           imagen: libroContacto.imagenes,
         }
       } else if (libroContactoSeleccionado) {
-        // Si se ha seleccionado un libro del contacto en el modal
         libroContactoId = libroContactoSeleccionado.id
         libroContactoInfo = {
           id: libroContactoSeleccionado.id,
@@ -383,7 +343,6 @@ export default function Mensajes() {
         }
       }
 
-      // Registrar el intercambio en la base de datos
       const responseIntercambio = await fetch("/api/intercambios", {
         method: "POST",
         headers: {
@@ -404,7 +363,6 @@ export default function Mensajes() {
 
       const intercambioData = await responseIntercambio.json()
 
-      // Crear el mensaje especial de solicitud de intercambio
       const mensajeIntercambio = {
         tipo: "solicitud_intercambio",
         intercambio_id: intercambioData.intercambio.id,
@@ -419,29 +377,24 @@ export default function Mensajes() {
         yaRespondido: false,
       }
 
-      // Enviar el mensaje como JSON
       await enviarMensaje(session.user.email, contactoSeleccionado.email, JSON.stringify(mensajeIntercambio))
 
-      // Actualizar la interfaz
       setShowIntercambioModal(false)
       setLibrosSeleccionados([])
       setLibroContactoSeleccionado(null)
       await cargarMensajes(contactoSeleccionado.email)
       await cargarConversaciones()
     } catch (error) {
-      console.error("Error al enviar solicitud de intercambio:", error)
       setError("Error al enviar la solicitud de intercambio. Por favor, intenta de nuevo.")
     } finally {
       setEnviando(false)
     }
   }
 
-  // Función para responder a una solicitud de intercambio
   const responderSolicitudIntercambio = async (mensajeId, respuesta, intercambioId) => {
     try {
       setEnviando(true)
 
-      // Verificar si el intercambio ya ha sido respondido
       const { data: intercambio, error: errorConsulta } = await supabase
         .from("intercambios")
         .select("estado")
@@ -452,13 +405,11 @@ export default function Mensajes() {
         throw new Error("Error al verificar el estado del intercambio")
       }
 
-      // Si ya no está en estado pendiente, no permitir responder de nuevo
       if (intercambio.estado !== "pendiente") {
         setError("Este intercambio ya ha sido respondido anteriormente.")
         return
       }
 
-      // Actualizar el estado del intercambio en la base de datos
       const responseIntercambio = await fetch("/api/intercambios", {
         method: "PATCH",
         headers: {
@@ -481,53 +432,43 @@ export default function Mensajes() {
         tipo: "respuesta_intercambio",
         solicitud_id: mensajeId,
         intercambio_id: intercambioId,
-        respuesta: respuesta, // "aceptada" o "rechazada"
+        respuesta: respuesta, 
       }
 
-      // Enviar el mensaje como JSON
       await enviarMensaje(session.user.email, contactoSeleccionado.email, JSON.stringify(mensajeRespuesta))
 
-      // Actualizar la interfaz
       await cargarMensajes(contactoSeleccionado.email)
       await cargarConversaciones()
 
-      // Actualizar el mensaje original para marcar que ya ha sido respondido
       try {
-        // Obtener el mensaje original
         const mensajeOriginal = mensajes.find((m) => m.id === mensajeId)
         if (mensajeOriginal) {
           const contenidoOriginal = JSON.parse(mensajeOriginal.contenido)
           contenidoOriginal.yaRespondido = true
           contenidoOriginal.estado = respuesta === "aceptada" ? "pendiente_entrega" : "rechazado"
 
-          // Actualizar el mensaje en la base de datos
           await supabase
             .from("mensajes")
             .update({ contenido: JSON.stringify(contenidoOriginal) })
             .eq("id", mensajeId)
         }
       } catch (e) {
-        console.error("Error al actualizar el mensaje original:", e)
       }
     } catch (error) {
-      console.error("Error al responder a la solicitud:", error)
       setError("Error al responder a la solicitud. Por favor, intenta de nuevo.")
     } finally {
       setEnviando(false)
     }
   }
 
-  // Función para confirmar la entrega de un intercambio
   const confirmarEntregaIntercambio = async (intercambioId) => {
     try {
-      // Verificar si el botón ya fue pulsado
       if (enviando) {
-        return // Evitar múltiples clics
+        return 
       }
 
       setEnviando(true)
 
-      // Verificar si el intercambio ya ha sido confirmado por este usuario
       const { data: intercambioActual, error: errorConsulta } = await supabase
         .from("intercambios")
         .select("*")
@@ -538,7 +479,6 @@ export default function Mensajes() {
         throw new Error("Error al verificar el estado del intercambio")
       }
 
-      // Verificar si el usuario ya confirmó
       const esUsuarioOfrece = intercambioActual.usuario_id_ofrece === session.user.id
       if (
         (esUsuarioOfrece && intercambioActual.confirmado_ofrece) ||
@@ -549,7 +489,6 @@ export default function Mensajes() {
         return
       }
 
-      // Actualizar el estado del intercambio en la base de datos
       const responseIntercambio = await fetch("/api/intercambios/confirmar", {
         method: "POST",
         headers: {
@@ -568,32 +507,26 @@ export default function Mensajes() {
 
       const data = await responseIntercambio.json()
 
-      // Crear el mensaje de confirmación
       const mensajeConfirmacion = {
         tipo: "confirmacion_entrega",
         intercambio_id: intercambioId,
-        estado: data.estado, // "completado" o "pendiente_confirmacion"
-        timestamp: new Date().toISOString(), // Añadir timestamp para identificar el mensaje
+        estado: data.estado, 
+        timestamp: new Date().toISOString(), 
       }
 
-      // Enviar el mensaje como JSON
       await enviarMensaje(session.user.email, contactoSeleccionado.email, JSON.stringify(mensajeConfirmacion))
 
-      // Actualizar la interfaz
       await cargarMensajes(contactoSeleccionado.email)
       await cargarConversaciones()
 
-      // Mostrar mensaje de éxito
       setError(null)
     } catch (error) {
-      console.error("Error al confirmar la entrega:", error)
       setError("Error al confirmar la entrega. Por favor, intenta de nuevo.")
     } finally {
       setEnviando(false)
     }
   }
 
-  // Función para verificar si un mensaje es una solicitud de intercambio
   const esMensajeIntercambio = (mensaje) => {
     try {
       const contenido = JSON.parse(mensaje.contenido)
@@ -606,8 +539,6 @@ export default function Mensajes() {
       return false
     }
   }
-
-  // Función para renderizar un mensaje de intercambio
   const renderizarMensajeIntercambio = (mensaje) => {
     try {
       const contenido = JSON.parse(mensaje.contenido)

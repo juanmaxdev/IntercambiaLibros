@@ -7,16 +7,10 @@ import { obtenerLibroPorId } from "@/services/librosService"
 
 export default async function BookPage({ params }) {
   try {
-    console.log("🔍 Página de libro: Obteniendo libro con ID:", params.id)
-
-    // Obtener el libro directamente de Supabase en lugar de usar fetch
     const libro = await obtenerLibroPorId(params.id)
-
-    console.log("✅ Libro obtenido correctamente:", !!libro)
 
     return <LibroSeleccionado book={libro} />
   } catch (error) {
-    console.error("❌ Error al obtener el libro:", error)
 
     return (
       <div className="container mt-5 text-center">

@@ -11,12 +11,10 @@ export default function ModernSidebar() {
   const pathname = usePathname()
   const { data: session } = useSession()
 
-  // Función para determinar si un enlace está activo
   const isActive = (path) => {
     return pathname === path || pathname.startsWith(path + "/")
   }
 
-  // Función para alternar el estado del sidebar
   const toggleSidebar = () => {
     setCollapsed(!collapsed)
   }

@@ -3,7 +3,6 @@ import { testSupabaseConnection } from "@/lib/supabase"
 
 export async function GET() {
   try {
-    // Verificar variables de entorno
     const envVars = {
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? "✅" : "❌",
       NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "✅" : "❌",
@@ -11,7 +10,6 @@ export async function GET() {
       NODE_ENV: process.env.NODE_ENV || "No disponible",
     }
 
-    // Probar conexión a Supabase
     const connectionTest = await testSupabaseConnection()
 
     return NextResponse.json({
@@ -23,7 +21,6 @@ export async function GET() {
       serverTime: new Date().toISOString(),
     })
   } catch (error) {
-    console.error("❌ Error en la ruta de prueba:", error)
 
     return NextResponse.json(
       {

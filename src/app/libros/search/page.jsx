@@ -33,7 +33,6 @@ export default function SearchResultsPage() {
 
         const books = await response.json()
 
-        // Filtrar los libros según el término de búsqueda
         const searchLower = searchTerm.toLowerCase()
         const filteredBooks = books.filter((book) => {
           return (
@@ -48,7 +47,6 @@ export default function SearchResultsPage() {
         setResults(filteredBooks)
         setLoading(false)
       } catch (err) {
-        console.error("Error al buscar:", err)
         setError(err.message)
         setLoading(false)
       }
