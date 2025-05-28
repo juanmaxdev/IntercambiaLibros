@@ -29,7 +29,8 @@ export default function BookCard({ book }) {
       className="card shadow-sm position-relative"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      style={{ borderRadius: '8px', overflow: 'hidden', height: '90%' }}
+      onClick={handleMoreInfo}
+      style={{ borderRadius: '8px', overflow: 'hidden', cursor:'pointer', height: '90%' }}
     >
       {/* Etiqueta de donación */}
       {isDonation && (

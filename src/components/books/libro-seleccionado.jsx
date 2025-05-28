@@ -94,7 +94,7 @@ export default function LibroSeleccionado({ book }) {
                     alt={book.titulo || "Portada del libro"}
                     width={225}
                     height={300}
-                    style={{ objectFit: "cover" }}
+                    style={{ objectFit: "fill" }}
                   />
                 ) : (
                   <div

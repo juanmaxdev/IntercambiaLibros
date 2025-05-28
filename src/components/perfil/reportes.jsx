@@ -83,7 +83,7 @@ export default function Reportes() {
       fecha_envio: new Date().toISOString(),
     }
 
-    const response = await fetch("/api/contacto", {
+    const response = await fetch("/api/reportes", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -93,6 +93,7 @@ export default function Reportes() {
 
     if (!response.ok) {
       throw new Error("Error al enviar el formulario")
+      alert("Error al enviar el formulario. Por favor, inténtalo de nuevo más tarde.")
     } else {
       alert("Formulario enviado correctamente")
       setFormValues({
