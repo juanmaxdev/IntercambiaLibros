@@ -41,7 +41,6 @@ El proyecto utiliza las siguientes tecnologías:
 
 ## Estructura del Proyecto
 
-```
 /
 ├── app/                    # Directorio principal de Next.js App Router
 │   ├── api/                # API Routes
@@ -75,7 +74,7 @@ El proyecto utiliza las siguientes tecnologías:
 │   └── auth.js             # Configuración de autenticación
 ├── services/               # Servicios para interactuar con la API
 └── utils/                  # Utilidades generales
-```
+
 
 ## Funcionalidades
 
@@ -181,6 +180,7 @@ La configuración de autenticación se encuentra en `server/auth.js` y los endpo
 - Los usuarios de Google se registran automáticamente en la base de datos
   
 ## Instalación
+
 
 1. Clona el repositorio:
 

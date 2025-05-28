@@ -31,22 +31,6 @@ const nextConfig = {
     env: {
       NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
     },
-    async rewrites() {
-      return [
-        {
-          source: "/api/proxy-books",
-          destination: "https://intercambialibros-omega.vercel.app/api/libros",
-        },
-        {
-          source: "/api/proxy-books/comentarios",
-          destination: "https://intercambialibros-omega.vercel.app/api/valoraciones/libros",
-        },
-        {
-          source: "/api/reportes",
-          destination: "https://intercambialibros-omega.vercel.app/api/contacto"
-        }
-      ];
-    },
   };
   
   export default nextConfig;  

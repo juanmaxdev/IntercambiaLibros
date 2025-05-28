@@ -462,6 +462,7 @@ export default function Mensajes() {
   }
 
   const confirmarEntregaIntercambio = async (intercambioId) => {
+
     try {
       if (enviando) {
         return 
@@ -515,7 +516,6 @@ export default function Mensajes() {
       }
 
       await enviarMensaje(session.user.email, contactoSeleccionado.email, JSON.stringify(mensajeConfirmacion))
-
       await cargarMensajes(contactoSeleccionado.email)
       await cargarConversaciones()
 
@@ -661,6 +661,7 @@ export default function Mensajes() {
                   className="btn btn-primary btn-sm w-100 w-sm-auto"
                   onClick={() => confirmarEntregaIntercambio(contenido.intercambio_id)}
                   disabled={enviando || mensaje.yaConfirmado}
+
                 >
                   {enviando ? (
                     <>
@@ -668,7 +669,7 @@ export default function Mensajes() {
                       <span className="d-none d-sm-inline">Confirmando...</span>
                       <span className="d-sm-none">...</span>
                     </>
-                  ) : mensaje.yaConfirmado ? (
+                  ) : contenido.yaConfirmado ? (
                     <>
                       <i className="bi bi-check-circle me-2"></i>
                       <span className="d-none d-sm-inline">Entrega confirmada</span>

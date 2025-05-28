@@ -86,7 +86,7 @@ export default function LibroSeleccionado({ book }) {
         <div className="col-12 col-lg-5 my-5 d-flex justify-content-center justify-content-lg-start">
           <div className="custom-rectangle bg-secondario mx-auto mx-lg-5 rounded-top">
             <div className="row">
-              <div className="col-12 d-flex flex-column align-items-center h-100 mt-5 mb-4">
+              <div className="col-12 d-flex flex-column align-items-center h-100 mt-5 mb-5">
                 {book.imagenes ? (
                   <Image
                     src={book.imagenes || "/placeholder.svg"}
@@ -107,7 +107,7 @@ export default function LibroSeleccionado({ book }) {
               </div>
             </div>
             <div className="row book-details">
-              <div className="col-6 ps-4 ps-md-5 mt-2">
+              <div className="col-5 ps-4 ps-md-5 mt-2">
                 <p className="ps-2 ps-md-3 fw-semibold">Autor</p>
                 <p className="ps-2 ps-md-3 fw-semibold">Editorial</p>
                 <p className="ps-2 ps-md-3 fw-semibold">Categoria</p>

@@ -40,7 +40,9 @@ export default function FormSubirLibro() {
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Lista de géneros con sus IDs
+
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+
   const generos = [
     { id: 1, nombre: 'Novela' },
     { id: 2, nombre: 'Misterio' },
@@ -77,6 +79,7 @@ export default function FormSubirLibro() {
         ...formData,
         [name]: Number.parseInt(value, 10),
       });
+
     } else {
       setFormData({
         ...formData,
@@ -95,6 +98,7 @@ export default function FormSubirLibro() {
 
       const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
+
     }
   };
 
@@ -109,16 +113,15 @@ export default function FormSubirLibro() {
     if (fileInput) fileInput.value = '';
   };
 
-  // Limpiar la URL de vista previa al desmontar el componente
-  // Esto es importante para evitar fugas de memoria
-  // y liberar recursos del navegador
+
+  // Limpiar la URL de vista previa al desmontar el componente , es importante para liberar recursos del nav
   useEffect(() => {
     return () => {
       if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
+        URL.revokeObjectURL(imagePreview)
       }
-    };
-  }, [imagePreview]);
+    }
+  }, [imagePreview])
 
   const validateForm = () => {
     const tempErrors = {};
@@ -171,6 +174,7 @@ export default function FormSubirLibro() {
       if (formData.archivo.size > maxSize) {
         tempErrors.archivo = 'La imagen no debe superar los 2MB';
         formIsValid = false;
+
       }
     }
 
@@ -185,6 +189,7 @@ export default function FormSubirLibro() {
     if (formData.isbn && !/^\d{10}(\d{3})?$/.test(formData.isbn)) {
       tempErrors.isbn = 'El ISBN debe tener 10 o 13 caracteres numéricos';
       formIsValid = false;
+
     }
 
     setErrors(tempErrors);
@@ -200,8 +205,9 @@ export default function FormSubirLibro() {
     e.preventDefault();
     setIsSubmitted(true);
 
+
     if (validateForm()) {
-      setIsLoading(true);
+      setIsLoading(true)
       try {
         const formDataToSend = new FormData();
 
@@ -265,11 +271,12 @@ export default function FormSubirLibro() {
       } catch (error) {
         alert(`Error al enviar el formulario: ${error.message}`);
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
     } else {
     }
   };
+
 
   useEffect(() => {
     if (isSubmitted) {
@@ -296,7 +303,6 @@ export default function FormSubirLibro() {
       <div className="row">
         <div className="col-2 ps-0"></div>
         <div className="col-10 mb-5">
-          {/* FORMULARIO */}
           <h4 className="mb-4">Subir Libro</h4>
           {showSuccessModal && (
             <div
@@ -423,8 +429,9 @@ export default function FormSubirLibro() {
                 </option>
                 <option value="Nuevo">Nuevo</option>
                 <option value="Seminuevo">Seminuevo</option>
-                <option value="Aceptable">Aceptable</option>
+                <option value="Usado">Usado</option>
                 <option value="Deteriorado">Deteriorado</option>
+                <option value="Muy Deteriorado">Muy Deteriorado</option>
               </select>
               <label htmlFor="estado_libro">Estado del libro</label>
               {errors.estado_libro && <div className="invalid-feedback">{errors.estado_libro}</div>}
@@ -461,7 +468,6 @@ export default function FormSubirLibro() {
                 </option>
                 <option value="Presencial">Presencial</option>
                 <option value="Envío">Envío</option>
-                <option value="Presencial/Envío">Presencial / Envío</option>
               </select>
               <label htmlFor="metodo_intercambio">Método de intercambio</label>
               {errors.metodo_intercambio && <div className="invalid-feedback">{errors.metodo_intercambio}</div>}
@@ -555,6 +561,36 @@ export default function FormSubirLibro() {
           </form>
         </div>
       </div>
+      {/* Modal de éxito */}
+      {showSuccessModal && (
+        <div className="modal-backdrop" style={{ display: "block" }}>
+          <div className="modal fade show" style={{ display: "block" }} tabIndex="-1">
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">¡Operación exitosa!</h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => setShowSuccessModal(false)}
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div className="modal-body text-center py-4">
+                  <i className="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+                  <h4>El libro se ha subido correctamente</h4>
+                  <p className="mb-0">Tu libro ya está disponible para intercambio.</p>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-primary" onClick={() => setShowSuccessModal(false)}>
+                    Aceptar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
