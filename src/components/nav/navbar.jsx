@@ -10,6 +10,7 @@ import { SearchBar } from "./search-bar"
 import { NavLinks } from "./nav-links"
 import { LoginModal } from "./login-modal"
 import { RegistroModal } from "./registro-modal"
+import { SuccessModal } from "./success-modal"
 import { useAuth } from "@/app/hooks/use-auth"
 import NotificationsDropdown from "./notifications-dropdown"
 
@@ -148,6 +149,7 @@ export default function Nav() {
             <RegistroModal />
           </>
         )}
+        <SuccessModal />
         {/* Mostrar notificación de inicio de sesión */}
         {showToast && <ToastNotification message={toastMessage} onClose={() => setShowToast(false)} />}
       </header>

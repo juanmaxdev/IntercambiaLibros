@@ -8,7 +8,6 @@ import bcrypt from 'bcrypt';
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -24,38 +23,48 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         contrasena: { label: 'Contraseña', type: 'password' },
       },
       async authorize(credentials) {
-        const { correo_electronico, contrasena } = credentials;
+        try {
+          const { correo_electronico, contrasena } = credentials;
 
+          if (!correo_electronico || !contrasena) {
+            return null;
+          }
 
-        const { data: user, error } = await supabase
-          .from('usuarios')
-          .select('*')
-          .eq('correo_electronico', correo_electronico)
-          .single();
+          const { data: user, error } = await supabase
+            .from('usuarios')
+            .select('*')
+            .eq('correo_electronico', correo_electronico)
+            .single();
 
-        if (error) {
-          return null; 
+          if (error || !user) {
+            return null;
+          }
+
+          // Si no hay contraseña en la BD (usuario de Google), no permitir login con credenciales
+          if (!user.contrasena) {
+            return null;
+          }
+
+          const passwordCorrecta = await bcrypt.compare(contrasena, user.contrasena);
+          if (!passwordCorrecta) {
+            return null;
+          }
+
+          return {
+            id: user.id,
+            email: user.correo_electronico,
+            name: user.nombre_usuario,
+          };
+        } catch (error) {
+          console.error('Error en authorize:', error);
+          return null;
         }
-
-        if (!user) {
-          return null; 
-        }
-
-        const passwordCorrecta = await bcrypt.compare(contrasena, user.contrasena);
-        if (!passwordCorrecta) {
-          return null; 
-        }
-
-        return {
-          email: user.correo_electronico,
-          name: user.nombre_usuario,
-        };
       },
     }),
   ],
   pages: {
-    signIn: '/login',
-    error: '/error',
+    signIn: '/',
+    error: '/',
   },
   session: {
     strategy: 'jwt',
@@ -63,7 +72,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   callbacks: {
     async signIn({ user, account, profile }) {
-
       const { email, name } = user;
 
       try {
@@ -97,12 +105,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         return true;
       } catch (err) {
+        console.error('Error en signIn callback:', err);
         return false;
       }
     },
 
     async redirect({ url, baseUrl }) {
-      return '/';
+      return baseUrl;
     },
 
     async jwt({ token, user }) {
@@ -114,6 +123,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
 });
-
 
 export const getServerSession = auth;

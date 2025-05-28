@@ -254,15 +254,13 @@ export default function MisLibrosPage() {
                 <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 g-4">
                   {filteredLibros.map((libro) => (
                     <div className="col" key={libro.id}>
-                      <div className="book-card"
-                        style={{width: 280}}>
-                        <div className="book-card-image position-relative overflow-hidden"
-                        style={{height: 300}} >
+                      <div className="book-card" style={{ width: 280 }}>
+                        <div className="book-card-image position-relative overflow-hidden" style={{ height: 300 }}>
                           <Image
                             src={libro.imagenes || '/placeholder.svg?height=300&width=200'}
                             alt={libro.titulo}
                             fill
-                            style={{ objectFit: 'fill'}}
+                            style={{ objectFit: 'fill' }}
                             className="rounded-top"
                           />
                           <div className="book-actions">
