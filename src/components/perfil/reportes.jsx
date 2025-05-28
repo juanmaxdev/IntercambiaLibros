@@ -1,78 +1,78 @@
-"use client"
-import { useState } from "react"
-import SideBar from "@components/perfil/sideBar"
-import Image from "next/image"
-import { useSession } from "next-auth/react"
+'use client';
+import { useState } from 'react';
+import SideBar from '@components/perfil/sideBar';
+import Image from 'next/image';
+import { useSession } from 'next-auth/react';
 
 export default function Reportes() {
-  const { data: session } = useSession()
+  const { data: session } = useSession();
   const [formValues, setFormValues] = useState({
-    nombre: "",
-    apellidos: "",
-    email: "",
-    motivo: "",
-    mensaje: "",
+    nombre: '',
+    apellidos: '',
+    email: '',
+    motivo: '',
+    mensaje: '',
     acepto: false,
-  })
-  const [errors, setErrors] = useState({})
-
+  });
+  const [errors, setErrors] = useState({});
+  const [showModal, setShowModal] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target
+    const { name, value, type, checked } = e.target;
     setFormValues((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }))
-  }
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
 
   const validate = () => {
-    const newErrors = {}
-    const msg = "Este campo es obligatorio."
+    const newErrors = {};
+    const msg = 'Este campo es obligatorio.';
 
     if (!formValues.nombre.trim()) {
-      newErrors.nombre = msg
+      newErrors.nombre = msg;
     } else if (formValues.nombre.trim().length < 3) {
-      newErrors.nombre = "El nombre debe contener al menos 3 caracteres."
+      newErrors.nombre = 'El nombre debe contener al menos 3 caracteres.';
     }
     if (!formValues.apellidos.trim()) {
-      newErrors.apellidos = msg
+      newErrors.apellidos = msg;
     } else if (formValues.apellidos.trim().length < 3) {
-      newErrors.apellidos = "El apellido debe contener al menos 3 caracteres."
+      newErrors.apellidos = 'El apellido debe contener al menos 3 caracteres.';
     }
 
     if (!formValues.email.trim()) {
-      newErrors.email = "Este campo es obligatorio."
-    } else if (!formValues.email.includes("@")) {
-      newErrors.email = "El email debe contener @"
+      newErrors.email = 'Este campo es obligatorio.';
+    } else if (!formValues.email.includes('@')) {
+      newErrors.email = 'El email debe contener @';
     }
 
     if (!formValues.motivo.trim()) {
-      newErrors.motivo = msg
+      newErrors.motivo = msg;
     } else if (formValues.motivo.trim().length < 3) {
-      newErrors.motivo = "El título debe contener al menos 3 caracteres."
+      newErrors.motivo = 'El título debe contener al menos 3 caracteres.';
     }
 
     if (!formValues.mensaje.trim()) {
-      newErrors.mensaje = msg
+      newErrors.mensaje = msg;
     } else if (formValues.mensaje.trim().length < 20) {
       newErrors.mensaje =
-        "El mensaje debe contener al menos 20 caracteres para explicar detalladamente el motivo. Por favor, proporciona una explicación completa."
+        'El mensaje debe contener al menos 20 caracteres para explicar detalladamente el motivo. Por favor, proporciona una explicación completa.';
     }
 
     if (!formValues.acepto) {
-      newErrors.acepto = "Debes aceptar los términos y condiciones."
+      newErrors.acepto = 'Debes aceptar los términos y condiciones.';
     }
-    return newErrors
-  }
+    return newErrors;
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    const validationErrors = validate()
+    e.preventDefault();
+    const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors)
-      return
+      setErrors(validationErrors);
+      return;
     }
-    setErrors({})
+    setErrors({});
 
     const dataForm = {
       nombre: formValues.nombre,
@@ -81,31 +81,43 @@ export default function Reportes() {
       titulo: formValues.motivo,
       mensaje: formValues.mensaje,
       fecha_envio: new Date().toISOString(),
-    }
+    };
 
-    const response = await fetch("/api/reportes", {
-      method: "POST",
+    const response = await fetch('/api/reportes', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(dataForm),
-    })
+    });
 
     if (!response.ok) {
-      throw new Error("Error al enviar el formulario")
-      alert("Error al enviar el formulario. Por favor, inténtalo de nuevo más tarde.")
-    } else {
-      alert("Formulario enviado correctamente")
-      setFormValues({
-        nombre: "",
-        apellidos: "",
-        email: "",
-        motivo: "",
-        mensaje: "",
-        acepto: false,
-      })
+      throw new Error('Error al enviar el formulario');
+      alert('Error al enviar el formulario. Por favor, inténtalo de nuevo más tarde.');
     }
-  }
+    setShowModal(true);
+    setFormValues({
+      nombre: '',
+      apellidos: '',
+      email: '',
+      motivo: '',
+      mensaje: '',
+      acepto: false,
+    });
+
+    setShowModal(true);
+
+    setFormValues({
+      nombre: '',
+      apellidos: '',
+      email: '',
+      motivo: '',
+      mensaje: '',
+      acepto: false,
+    });
+
+    setTimeout(() => setShowModal(false), 2000);
+  };
 
   return (
     <div className="container-fluid">
@@ -248,7 +260,7 @@ export default function Reportes() {
                     id="floatingInputDescripcion"
                     placeholder="Mensaje"
                     name="mensaje"
-                    style={{ height: "100px" }}
+                    style={{ height: '100px' }}
                     value={formValues.mensaje}
                     onChange={handleChange}
                   />
@@ -266,7 +278,7 @@ export default function Reportes() {
                       onChange={handleChange}
                     />
                     <label className="form-check-label" htmlFor="gridCheck">
-                      Acepto los términos y condiciones{" "}
+                      Acepto los términos y condiciones{' '}
                     </label>
                   </div>
                   {errors.acepto && <small className="text-danger">{errors.acepto}</small>}
@@ -281,6 +293,31 @@ export default function Reportes() {
           </div>
         </div>
       </div>
+      {/* Modal de éxito */}
+      <div
+        className={`modal fade ${showModal ? 'show' : ''}`}
+        style={{ display: showModal ? 'block' : 'none' }}
+        tabIndex={-1}
+        aria-labelledby="modalExitoLabel"
+        aria-hidden={!showModal}
+      >
+        <div className="modal-dialog modal-dialog-centered d-flex justify-content-center text-center">
+          <div className="modal-content text-center">
+            <div className="modal-header bg-success text-white d-flex justify-content-center">
+              <h5 className="modal-title" id="modalExitoLabel">
+                ¡Formulario enviado correctamente!
+              </h5>
+            </div>
+            <div className="modal-body">
+              <div className="mb-3">
+                <i className="bi bi-check-circle-fill text-success" style={{ fontSize: '3rem' }} />
+              </div>
+              <p className="mb-0">Has enviado el formulario correctamente.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      {showModal && <div className="modal-backdrop fade show"></div>}
     </div>
-  )
+  );
 }
