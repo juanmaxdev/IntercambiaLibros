@@ -29,12 +29,15 @@ export default function NotificationsDropdown({ userEmail, isOpen, onClose }) {
 
       try {
         setLoading(true)
-        const response = await fetch(`/api/mensajes/notificaciones?email=${encodeURIComponent(userEmail)}&details=true`)
+        const response = await fetch(
+          `/api/mensajes/notificaciones?email=${encodeURIComponent(userEmail)}&details=true`
+        )
         if (response.ok) {
           const data = await response.json()
-          setNotifications(data.notifications || [])
+          setNotifications(Array.isArray(data.notifications) ? data.notifications : [])
         }
       } catch (error) {
+        console.error("Error fetching notifications:", error)
       } finally {
         setLoading(false)
       }
@@ -46,15 +49,14 @@ export default function NotificationsDropdown({ userEmail, isOpen, onClose }) {
   if (!isOpen) return null
 
   return (
-    <div ref={dropdownRef} className="notification-dropdown shadow-lg" onClick={(e) => e.stopPropagation()}>
+    <div
+      ref={dropdownRef}
+      className="notification-dropdown shadow-lg"
+      onClick={(e) => e.stopPropagation()}
+    >
       <div className="notification-header">
         <h6 className="mb-0">Notificaciones</h6>
-        {notifications.length > 0 && (
-          {/* <button className="btn btn-sm text-primary" onClick={onClose}>
-            Marcar todo como leído
-          </button>
-          Implementación futura */}
-        )}
+        {/* Aquí puedes añadir un botón para "Marcar todo como leído" en el futuro */}
       </div>
 
       <div className="notification-body">
@@ -65,27 +67,29 @@ export default function NotificationsDropdown({ userEmail, isOpen, onClose }) {
             </div>
           </div>
         ) : notifications.length === 0 ? (
-          <div className="text-center py-4 text-muted">Marcar
+          <div className="text-center py-4 text-muted">
             <i className="bi bi-bell-slash fs-4 mb-2"></i>
             <p className="mb-0">No tienes notificaciones</p>
           </div>
         ) : (
           notifications.map((notification) => (
             <Link
-              href={`/perfil/mensajes?contacto=${encodeURIComponent(notification.remitente)}`}
               key={notification.id}
-              className="notification-item"
+              href={`/perfil/mensajes?contacto=${encodeURIComponent(notification.remitente)}`}
+              className="notification-item d-flex align-items-start"
               onClick={onClose}
             >
-              <div className="notification-avatar">
-                <div className="avatar-placeholder">{notification.nombreRemitente.charAt(0).toUpperCase()}</div>
+              <div className="notification-avatar me-2">
+                <div className="avatar-placeholder">
+                  {notification.nombreRemitente.charAt(0).toUpperCase()}
+                </div>
               </div>
-              <div className="notification-content">
-                <div className="notification-title">
+              <div className="notification-content flex-grow-1">
+                <div className="notification-title d-flex justify-content-between">
                   <span className="fw-semibold">{notification.nombreRemitente}</span>
                   <span className="notification-time">{formatTime(notification.fecha)}</span>
                 </div>
-                <p className="notification-message">{notification.contenido}</p>
+                <p className="notification-message mb-0">{notification.contenido}</p>
               </div>
             </Link>
           ))

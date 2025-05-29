@@ -72,6 +72,53 @@ export default function MisLibrosPage() {
     return titulo.includes(term) || autor.includes(term);
   });
 
+  const handleEliminarFavorito = async (libroId) => {
+    try {
+      if (!session?.user?.email) return;
+
+      const res = await fetch('/api/libros/favoritos', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          correo_electronico: session.user.email,
+        },
+        body: JSON.stringify({ id_libro: libroId }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Error al eliminar de favoritos');
+      }
+      setLibros((prevLibros) => prevLibros.filter((libro) => libro.id !== libroId));
+
+    } catch (error) {
+      alert('Error al eliminar el libro de favoritos: ' + error.message);
+    }
+  };
+
+  const handleEliminarSubido = async (libroId) => {
+    try {
+      if (!session?.user?.email) return;
+
+      const res = await fetch(`/api/libros/${libroId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          correo_electronico: session.user.email,
+        },
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Error al eliminar el libro');
+      }
+
+      setLibros((prevLibros) => prevLibros.filter((libro) => libro.id !== libroId));
+
+    } catch (error) {
+    }
+  };
+
   if (status === 'loading' || status === 'unauthenticated') {
     return (
       <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
