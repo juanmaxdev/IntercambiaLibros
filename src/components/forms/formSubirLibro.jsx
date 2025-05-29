@@ -167,7 +167,7 @@ export default function FormSubirLibro() {
         formIsValid = false;
       }
 
-      const maxSize = 2 * 1024 * 1024; // 2MB en bytes
+      const maxSize = 10 * 1024 * 1024; // 2MB en bytes
       if (formData.archivo.size > maxSize) {
         tempErrors.archivo = 'La imagen no debe superar los 2MB';
         formIsValid = false;
