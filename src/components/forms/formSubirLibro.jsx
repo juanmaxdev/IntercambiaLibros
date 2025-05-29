@@ -169,7 +169,7 @@ export default function FormSubirLibro() {
 
       const maxSize = 10 * 1024 * 1024; // 2MB en bytes
       if (formData.archivo.size > maxSize) {
-        tempErrors.archivo = 'La imagen no debe superar los 2MB';
+        tempErrors.archivo = 'La imagen no debe superar los 10MB';
         formIsValid = false;
 
       }
@@ -501,7 +501,7 @@ export default function FormSubirLibro() {
                 onChange={handleFileChange}
               />
               {errors.archivo && <div className="invalid-feedback">{errors.archivo}</div>}
-              <small className="form-text text-muted">Formatos permitidos: JPG, PNG. Tamaño máximo: 2MB</small>
+              <small className="form-text text-muted">Formatos permitidos: JPG, PNG. Tamaño máximo: 10MB</small>
 
               {imagePreview && (
                 <div className="mt-3 position-relative">
