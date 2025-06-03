@@ -184,7 +184,7 @@ La configuración de autenticación se encuentra en `server/auth.js` y los endpo
 
 1. Clona el repositorio:
 
-git clone https://github.com/tu-usuario/bookswap.git
+git clone [https://github.com/juanmaxdev/IntercambiaLibros]
 
 2. Instala las dependencias:
 
